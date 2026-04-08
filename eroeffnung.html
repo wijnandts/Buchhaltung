@@ -8,30 +8,23 @@
         :root { --nrw-blue: #005aab; --bg-light: #f4f7f9; --success: #28a745; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-light); display: flex; justify-content: center; padding: 10px; margin: 0; }
         .app-container { background: white; max-width: 900px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); margin-top: 10px; }
-        
         .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; transition: 0.2s; }
-        
         .level-selector { display: flex; gap: 8px; }
         .level-btn { padding: 8px 12px; border: 2px solid var(--nrw-blue); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--nrw-blue); font-size: 0.85rem; }
         .level-btn.active { background: var(--nrw-blue); color: white; }
-
         h1 { color: var(--nrw-blue); text-align: center; font-size: 1.4rem; margin: 15px 0; }
-        .task-box { background: #eef2f7; border-left: 5px solid var(--nrw-blue); padding: 15px; margin: 15px 0; font-size: 0.9rem; line-height: 1.4; }
-        
+        .task-box { background: #eef2f7; border-left: 5px solid var(--nrw-blue); padding: 15px; margin: 15px 0; font-size: 0.9rem; line-height: 1.4; min-height: 80px; }
         .t-konto { width: 100%; border-collapse: collapse; margin-top: 15px; border-top: 4px solid #333; }
         .t-konto th { border-bottom: 2px solid #333; padding: 10px; background: #fafafa; font-size: 0.9rem; }
         .side-info { font-size: 0.75rem; color: #888; font-weight: normal; }
         .t-konto td { width: 50%; border-right: 2px solid #333; padding: 10px; vertical-align: top; min-height: 400px; }
         .t-konto td:last-child { border-right: none; }
-        
         .entry { display: flex; gap: 5px; align-items: center; margin-bottom: 8px; font-size: 0.8rem; }
         select { flex-grow: 1; padding: 4px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.75rem; }
         input.val-in { width: 85px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.85rem; }
-        
         input:disabled, select:disabled { background-color: #f1f3f5; color: #444; border: 1px solid #ddd; font-weight: bold; }
         .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 15px; padding: 8px 0; font-weight: bold; display: flex; justify-content: space-between;}
-        
         .btn-action { width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; }
         .btn-check { background-color: var(--nrw-blue); color: white; }
         .btn-next { background-color: #6c757d; color: white; margin-top: 8px; }
@@ -72,8 +65,12 @@
 
 <script>
     let config = { level: 1 };
+    const K_VERB = "Verbindlichkeiten a. L. L.";
+    const K_EK = "Eigenkapital";
+    const K_DARL = "Darlehen";
+    
     const kontenAktiv = ["BGA", "Fuhrpark", "Waren (Vorrat)", "Forderungen a. L. L.", "Bank", "Kasse"];
-    const kontenPassiv = ["Eigenkapital", "Darlehen", "Verbindlichkeiten a. L. L."];
+    const kontenPassiv = [K_EK, K_DARL, K_VERB];
     const alleKonten = ["-- wählen --", ...kontenAktiv, ...kontenPassiv];
 
     function setLevel(lvl, btn) {
@@ -104,10 +101,21 @@
 
     function generateTask() {
         renderFields();
+        
+        // Zufällige Beträge generieren
+        const r = (min, max) => Math.floor(Math.random() * (max - min + 1) + min) * 100;
+        
         const d = {
-            bga: 45000, fuhrpark: 32000, waren: 12000, ford: 8000, bank: 15000, kasse: 3000,
-            darlehen: 30000, verb: 25000
+            bga: r(300, 600),
+            fuhrpark: r(200, 450),
+            waren: r(80, 200),
+            ford: r(40, 120),
+            bank: r(100, 300),
+            kasse: r(10, 50),
+            darlehen: r(200, 400),
+            verb: r(100, 300)
         };
+        
         const vermoegen = d.bga + d.fuhrpark + d.waren + d.ford + d.bank + d.kasse;
         const schulden = d.darlehen + d.verb;
         const ek = vermoegen - schulden;
@@ -116,17 +124,17 @@
         document.getElementById('label-soll-info').innerText = (config.level === 1) ? "(Passiva)" : "";
         document.getElementById('label-haben-info').innerText = (config.level === 1) ? "(Aktiva)" : "";
 
-        let t = `<b>Aufgabe (Stufe ${config.level}):</b> Bilanzwerte zum 01.01.:<br>`;
+        let t = `<b>Aufgabe (Stufe ${config.level}):</b> Bilanzwerte am 01.01.:<br>`;
         t += `Aktiva: BGA ${d.bga}€, Fuhrpark ${d.fuhrpark}€, Waren ${d.waren}€, Forderungen ${d.ford}€, Bank ${d.bank}€, Kasse ${d.kasse}€.<br>`;
-        t += `Passiva: Darlehen ${d.darlehen}€, Verbindlichkeiten ${d.verb}€. Berechne das Eigenkapital!`;
+        t += `Passiva: Darlehen ${d.darlehen}€, Verbindlichkeiten ${d.verb}€.<br>Berechne das Eigenkapital und erstelle das EBK.`;
         document.getElementById('task').innerHTML = t;
 
         document.getElementById('feedbackBox').style.display = 'none';
 
         if(config.level === 1) {
-            autoFill('s-sel-1', "Eigenkapital");
-            autoFill('s-sel-2', "Darlehen", d.darlehen);
-            autoFill('s-sel-3', "Verbindlichkeiten a.L.L.", d.verb);
+            autoFill('s-sel-1', K_EK);
+            autoFill('s-sel-2', K_DARL, d.darlehen);
+            autoFill('s-sel-3', K_VERB, d.verb);
             autoFill('h-sel-1', "BGA", d.bga); 
             autoFill('h-sel-2', "Fuhrpark", d.fuhrpark);
             autoFill('h-sel-3', "Waren (Vorrat)", d.waren); 
@@ -144,12 +152,8 @@
     function autoFill(selId, selVal, inputVal) {
         const sel = document.getElementById(selId);
         const inp = document.getElementById(selId.replace('sel', 'val'));
-        if(sel) sel.value = selVal; 
-        if(sel) sel.disabled = true;
-        if(inputVal !== undefined && inp) { 
-            inp.value = inputVal; 
-            inp.disabled = true; 
-        }
+        if(sel) { sel.value = selVal; sel.disabled = true; }
+        if(inputVal !== undefined && inp) { inp.value = inputVal; inp.disabled = true; }
     }
 
     function validate() {
@@ -163,18 +167,12 @@
         for(let i=1; i<=3; i++) sollEntries.push({k: getS(`s-sel-${i}`), v: getV(`s-val-${i}`)});
         for(let i=1; i<=6; i++) habenEntries.push({k: getS(`h-sel-${i}`), v: getV(`h-val-${i}`)});
 
-        // Seiten-Logik prüfen
-        sollEntries.forEach(e => {
-            if(kontenAktiv.includes(e.k)) err.push(`❌ ${e.k} gehört ins Haben des EBK.`);
-        });
-        habenEntries.forEach(e => {
-            if(kontenPassiv.includes(e.k)) err.push(`❌ ${e.k} gehört ins Soll des EBK.`);
-        });
+        sollEntries.forEach(e => { if(kontenAktiv.includes(e.k)) err.push(`❌ ${e.k} gehört ins Haben des EBK.`); });
+        habenEntries.forEach(e => { if(kontenPassiv.includes(e.k)) err.push(`❌ ${e.k} gehört ins Soll des EBK.`); });
 
-        // Beträge prüfen
-        checkBetrag(sollEntries, "Eigenkapital", c.ek, err);
-        checkBetrag(sollEntries, "Darlehen", c.darlehen, err);
-        checkBetrag(sollEntries, "Verbindlichkeiten a.L.L.", c.verb, err);
+        checkBetrag(sollEntries, K_EK, c.ek, err);
+        checkBetrag(sollEntries, K_DARL, c.darlehen, err);
+        checkBetrag(sollEntries, K_VERB, c.verb, err);
         checkBetrag(habenEntries, "BGA", c.bga, err);
         checkBetrag(habenEntries, "Fuhrpark", c.fuhrpark, err);
         checkBetrag(habenEntries, "Waren (Vorrat)", c.waren, err);
@@ -183,7 +181,10 @@
         checkBetrag(habenEntries, "Kasse", c.kasse, err);
 
         if(config.level === 3) {
-            if(getS('h-sel-1') !== "BGA" || getS('h-sel-6') !== "Kasse") err.push("❌ Reihenfolge beachten (Anlage- vor Umlaufvermögen).");
+            // Prüfung der strengen Reihenfolge
+            if(getS('h-sel-1') !== "BGA" || getS('h-sel-2') !== "Fuhrpark") err.push("❌ Reihenfolge Haben: Anlagevermögen zuerst.");
+            if(getS('h-sel-6') !== "Kasse") err.push("❌ Reihenfolge Haben: Kasse zuletzt (höchste Liquidität).");
+            if(getS('s-sel-1') !== K_EK) err.push("❌ Reihenfolge Soll: Eigenkapital zuerst.");
         }
 
         const fb = document.getElementById('feedbackBox'); fb.style.display = 'block';
@@ -191,15 +192,15 @@
             fb.innerHTML = "✅ Hervorragend! Das EBK ist perfekt eröffnet.";
             fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
         } else {
-            fb.innerHTML = "<b>Hinweise:</b><br>" + [...new Set(err)].slice(0,4).join("<br>");
+            fb.innerHTML = "<b>Hinweise:</b><br>" + [...new Set(err)].slice(0,3).join("<br>");
             fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
         }
     }
 
     function checkBetrag(list, name, target, errList) {
         const item = list.find(x => x.k === name);
-        if(!item) errList.push(`❌ ${name} fehlt auf der richtigen Seite.`);
-        else if(item.v !== target) errList.push(`❌ Der Betrag für ${name} stimmt nicht.`);
+        if(!item) errList.push(`❌ Konto "${name}" fehlt auf der korrekten Seite.`);
+        else if(item.v !== target) errList.push(`❌ Betrag für "${name}" ist falsch.`);
     }
 
     window.onload = generateTask;
