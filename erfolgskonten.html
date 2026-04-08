@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RW-Trainer BFS2: Erfolgskonten</title>
+    <style>
+        :root { --erfolg-orange: #fd7e14; --guv-green: #20c997; --nrw-blue: #007ab9; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; display: flex; justify-content: center; padding: 10px; }
+        .app-container { background: white; max-width: 600px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        h1 { color: var(--erfolg-orange); text-align: center; }
+        .task-box { background: #fff4e6; border-left: 5px solid var(--erfolg-orange); padding: 15px; margin: 15px 0; }
+        
+        .t-konto { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .t-konto th { border-bottom: 3px solid #333; padding: 10px; background: #eee; }
+        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 15px; vertical-align: top; height: 140px; }
+        .t-konto td:last-child { border-right: none; }
+        
+        .entry { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+        .sum-line { border-top: 2px solid #333; margin-top: 20px; padding-top: 5px; font-weight: bold; }
+        
+        input { width: 80px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; text-align: right; }
+        button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-check { background-color: var(--erfolg-orange); color: white; }
+        .btn-next { background-color: #6c757d; color: white; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h1 id="k-typ">Aufwandskonto</h1>
+    <div id="task" class="task-box">Lade Aufgabe...</div>
+
+    <table class="t-konto">
+        <thead>
+            <tr><th colspan="2" id="k-name">Konto: ---</th></tr>
+            <tr><th>S (Soll)</th><th>H (Haben)</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div class="entry" id="row-s-1"><span>Vorgang:</span> <span id="val-s">0</span> €</div>
+                    <div class="entry" id="row-s-saldo" style="color:var(--guv-green); display:none;"><span>Saldo (an GuV):</span> <input type="number" id="in-s-saldo"></div>
+                    <div class="sum-line">Summe: <input type="number" id="in-s-sum"></div>
+                </td>
+                <td>
+                    <div class="entry" id="row-h-1"><span>Vorgang:</span> <span id="val-h">0</span> €</div>
+                    <div class="entry" id="row-h-saldo" style="color:var(--guv-green); display:none;"><span>Saldo (an GuV):</span> <input type="number" id="in-h-saldo"></div>
+                    <div class="sum-line">Summe: <input type="number" id="in-h-sum"></div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="feedbackBox" class="feedback"></div>
+    <button class="btn-check" onclick="validate()">Abschluss an GuV prüfen</button>
+    <button class="btn-next" onclick="generate()">Nächste Aufgabe</button>
+</div>
+
+<script>
+    let current = {};
+    const konten = {
+        aufwand: ["Mietaufwand", "Lohnaufwand", "Büromaterial"],
+        ertrag: ["Umsatzerlöse", "Zinserträge"]
+    };
+
+    function generate() {
+        const istAufwand = Math.random() > 0.4;
+        current = {
+            art: istAufwand ? 'aufwand' : 'ertrag',
+            name: istAufwand ? konten.aufwand[Math.floor(Math.random()*3)] : konten.ertrag[Math.floor(Math.random()*2)],
+            wert: Math.floor(Math.random() * 50 + 5) * 100
+        };
+
+        document.getElementById('k-typ').innerText = istAufwand ? "Aufwandskonto" : "Ertragskonto";
+        document.getElementById('k-name').innerText = "Konto: " + current.name;
+        
+        // UI Reset
+        document.getElementById('row-s-1').style.opacity = istAufwand ? "1" : "0.2";
+        document.getElementById('row-h-1').style.opacity = istAufwand ? "0.2" : "1";
+        document.getElementById('val-s').innerText = istAufwand ? current.wert : "0";
+        document.getElementById('val-h').innerText = istAufwand ? "0" : current.wert;
+        
+        document.getElementById('row-h-saldo').style.display = istAufwand ? "flex" : "none";
+        document.getElementById('row-s-saldo').style.display = istAufwand ? "none" : "flex";
+
+        document.getElementById('task').innerHTML = `<b>Geschäftsvorfall:</b> Verbuche den Betrag von <b>${current.wert} €</b> auf dem Konto <b>${current.name}</b> und schließe es über das GuV-Konto ab.`;
+        
+        document.querySelectorAll('input').forEach(i => { i.value = ''; i.style.backgroundColor = 'white'; });
+        document.getElementById('feedbackBox').style.display = 'none';
+    }
+
+    function validate() {
+        const sSum = parseInt(document.getElementById('in-s-sum').value) || 0;
+        const hSum = parseInt(document.getElementById('in-h-sum').value) || 0;
+        let correct = (sSum === current.wert && hSum === current.wert);
+        
+        if(current.art === 'aufwand') {
+            if(parseInt(document.getElementById('in-h-saldo').value) !== current.wert) correct = false;
+        } else {
+            if(parseInt(document.getElementById('in-s-saldo').value) !== current.wert) correct = false;
+        }
+
+        const fb = document.getElementById('feedbackBox');
+        fb.style.display = 'block';
+        if(correct) {
+            fb.innerHTML = "🎯 Richtig! Erfolgskonten haben keinen AB und gehen immer ins GuV-Konto.";
+            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+        } else {
+            fb.innerHTML = "💡 Denk dran: Aufwand im Soll, Ertrag im Haben. Der Saldo steht immer auf der Gegenseite!";
+            fb.style.backgroundColor = "#fff3cd"; fb.style.color = "#856404";
+        }
+    }
+    window.onload = generate;
+</script>
+</body>
+</html>

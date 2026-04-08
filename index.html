@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RW-Lernportal | BFS2</title>
+    <style>
+        :root {
+            --primary: #005aab;
+            --secondary: #f4f7f9;
+            --accent: #e67e22;
+            --fibu-purple: #af52de;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--secondary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #546e7a;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-top: 8px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .card h3 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+        }
+        .tag {
+            margin-top: auto;
+            font-size: 0.75rem;
+            background: #eceff1;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #607d8b;
+        }
+        footer {
+            margin-top: 50px;
+            font-size: 0.85rem;
+            color: #90a4ae;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>RW-Lernportal BFS 2</h1>
+    <div class="subtitle">Interaktive Übungen für das Berufskolleg</div>
+</header>
+
+<div class="grid">
+
+    <a href="Buchungssaetze.html" class="card" style="border-top-color: var(--fibu-purple);">
+        <div class="icon">🎮</div>
+        <h3>Fibu-Trainer XXL</h3>
+        <p>Das Level-Spiel: Von einfachen Bestandskonten bis zu komplexen Buchungssätzen mit MwSt.</p>
+        <div class="tag">Training</div>
+    </a>
+
+    <a href="bestandskonten.html" class="card">
+        <div class="icon">📁</div>
+        <h3>Bestandskonten</h3>
+        <p>Eröffnung und Abschluss von Aktiv- und Passivkonten über das SBK.</p>
+        <div class="tag">Bilanz</div>
+    </a>
+
+    <a href="erfolgskonten.html" class="card" style="border-top-color: #fd7e14;">
+        <div class="icon">📈</div>
+        <h3>Erfolgskonten</h3>
+        <p>Aufwendungen und Erträge sicher buchen und über das GuV-Konto abschließen.</p>
+        <div class="tag">G&V</div>
+    </a>
+
+    <a href="umsatzsteuer.html" class="card" style="border-top-color: #28a745;">
+        <div class="icon">⚖️</div>
+        <h3>Umsatzsteuer</h3>
+        <p>Vorsteuer- und Umsatzsteuerverrechnung sowie Zahllast-Ermittlung.</p>
+        <div class="tag">Steuern</div>
+    </a>
+
+</div>
+
+<footer>
+    Viel Erfolg beim Lernen! Bei Fragen wendet euch an euren Lehrer.
+</footer>
+
+</body>
+</html>

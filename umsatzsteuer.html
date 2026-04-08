@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RW-Trainer BFS2: Umsatzsteuer & Zahllast</title>
+    <style>
+        :root { --ust-green: #28a745; --vst-blue: #007ab9; --alert: #dc3545; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 10px; }
+        .app-container { background: white; max-width: 700px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        h1 { color: #333; text-align: center; border-bottom: 2px solid #eee; pb: 10px; }
+        .task-box { background: #fff; border: 2px dashed var(--vst-blue); padding: 15px; margin: 15px 0; border-radius: 8px; font-size: 0.95rem; }
+        
+        .accounts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .t-konto { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .t-konto th { border-bottom: 2px solid #333; padding: 8px; font-size: 0.9rem; }
+        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 10px; vertical-align: top; height: 100px; }
+        .t-konto td:last-child { border-right: none; }
+        
+        .entry { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.8rem; }
+        input { width: 75px; padding: 3px; border: 1px solid #ccc; border-radius: 4px; text-align: right; }
+        
+        .result-box { background: #eee; padding: 15px; border-radius: 8px; margin-top: 10px; text-align: center; }
+        button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-check { background-color: var(--vst-blue); color: white; }
+        .btn-next { background-color: #6c757d; color: white; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h1>Umsatzsteuer-Verrechnung</h1>
+    <div id="task" class="task-box">Lade Szenario...</div>
+
+    <div class="accounts-grid">
+        <table class="t-konto">
+            <thead>
+                <tr><th colspan="2" style="color:var(--vst-blue)">1400 Vorsteuer (VSt)</th></tr>
+                <tr><th>S</th><th>H</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><div class="entry"><span>aus Einkauf:</span> <input type="number" id="vst-soll"></div></td>
+                    <td><div class="entry" style="color:var(--alert)"><span><b>an USt:</b></span> <input type="number" id="vst-haben"></div></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="t-konto">
+            <thead>
+                <tr><th colspan="2" style="color:var(--ust-green)">4800 Umsatzsteuer (USt)</th></tr>
+                <tr><th>S</th><th>H</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><div class="entry" style="color:var(--vst-blue)"><span><b>von VSt:</b></span> <input type="number" id="ust-soll"></div></td>
+                    <td><div class="entry"><span>aus Verkauf:</span> <input type="number" id="ust-haben"></div></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="result-box">
+        <strong>Abschlussbuchung an das Finanzamt:</strong><br>
+        Umsatzsteuer an Bank (Zahllast): <input type="number" id="zahllast" style="width:120px; font-weight:bold;"> €
+    </div>
+
+    <div id="feedbackBox" class="feedback"></div>
+    <button class="btn-check" onclick="validate()">Buchungen & Zahllast prüfen</button>
+    <button class="btn-next" onclick="generate()">Neue Übung</button>
+</div>
+
+<script>
+    let vals = {};
+
+    function generate() {
+        const einkaufNetto = Math.floor(Math.random() * 50 + 10) * 100; // 1000-6000
+        const verkaufNetto = Math.floor(Math.random() * 80 + 70) * 100; // 7000-15000
+        
+        vals = {
+            vst: einkaufNetto * 0.19,
+            ust: verkaufNetto * 0.19
+        };
+
+        document.getElementById('task').innerHTML = `
+            <b>Szenario:</b><br>
+            1. Wir kaufen Waren für <b>${einkaufNetto} € netto</b> ein (19% VSt).<br>
+            2. Wir verkaufen Waren für <b>${verkaufNetto} € netto</b> (19% USt).<br><br>
+            <i>Berechne die Steuerbeträge, verbuche die Umbuchung der VSt und ermittle die Zahllast!</i>
+        `;
+
+        document.querySelectorAll('input').forEach(i => { i.value = ''; i.style.backgroundColor = 'white'; });
+        document.getElementById('feedbackBox').style.display = 'none';
+    }
+
+    function validate() {
+        const vS = parseFloat(document.getElementById('vst-soll').value);
+        const vH = parseFloat(document.getElementById('vst-haben').value);
+        const uS = parseFloat(document.getElementById('ust-soll').value);
+        const uH = parseFloat(document.getElementById('ust-haben').value);
+        const zl = parseFloat(document.getElementById('zahllast').value);
+
+        const correctZahllast = vals.ust - vals.vst;
+        
+        let correct = (vS === vals.vst && vH === vals.vst && uS === vals.vst && uH === vals.ust && zl === correctZahllast);
+
+        const fb = document.getElementById('feedbackBox');
+        fb.style.display = 'block';
+
+        if(correct) {
+            fb.innerHTML = "🚀 Exzellent! VSt korrekt umgebucht und Zahllast von " + correctZahllast.toFixed(2) + " € ermittelt.";
+            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+        } else {
+            fb.innerHTML = "🧐 Fast! Tipps: <br>1. VSt = Netto * 0,19<br>2. Die VSt wird im Haben abgeschlossen und im USt-Konto im Soll gegengebucht.";
+            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+        }
+    }
+
+    window.onload = generate;
+</script>
+</body>
+</html>
