@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RW-Lernportal | BFS2</title>
+    <title>RW-Lernportal | BFS 2 XXL</title>
     <style>
         :root {
             --primary: #005aab;
             --secondary: #f4f7f9;
             --accent: #e67e22;
+            --success: #28a745;
             --fibu-purple: #af52de;
         }
         body {
@@ -26,20 +27,31 @@
         }
         h1 {
             color: var(--primary);
-            font-size: 2rem;
-            margin-bottom: 10px;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
         }
         .subtitle {
             color: #546e7a;
             font-size: 1.1rem;
             font-weight: 300;
         }
+        .section-title {
+            width: 100%;
+            max-width: 1100px;
+            margin: 20px 0 10px 0;
+            color: #37474f;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            max-width: 1200px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            max-width: 1100px;
             width: 100%;
+            margin-bottom: 40px;
         }
         .card {
             background: white;
@@ -49,37 +61,42 @@
             color: #333;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
-            border-top: 8px solid var(--primary);
+            border-left: 8px solid var(--primary);
             display: flex;
-            flex-direction: column;
             align-items: center;
-            text-align: center;
+            gap: 20px;
         }
         .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            transform: translateX(10px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            border-left-color: var(--accent);
         }
         .icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
+            font-size: 2.5rem;
+            min-width: 50px;
+            text-align: center;
+        }
+        .card-content {
+            text-align: left;
         }
         .card h3 {
-            margin: 0 0 10px 0;
+            margin: 0 0 5px 0;
             color: var(--primary);
+            font-size: 1.2rem;
         }
-        .tag {
-            margin-top: auto;
-            font-size: 0.75rem;
-            background: #eceff1;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: bold;
+        .card p {
+            font-size: 0.85rem;
             color: #607d8b;
+            margin: 0;
+            line-height: 1.4;
         }
         footer {
-            margin-top: 50px;
+            margin-top: auto;
+            padding: 40px 0;
             font-size: 0.85rem;
             color: #90a4ae;
+            text-align: center;
+            width: 100%;
         }
     </style>
 </head>
@@ -87,43 +104,87 @@
 
 <header>
     <h1>RW-Lernportal BFS 2</h1>
-    <div class="subtitle">Interaktive Übungen für das Berufskolleg</div>
+    <div class="subtitle">Interaktive Module für das Berufskolleg</div>
 </header>
 
+<div class="section-title">Phase 1: Der Jahresbeginn</div>
 <div class="grid">
-
-    <a href="buchungssaetze.html" class="card" style="border-top-color: var(--fibu-purple);">
-        <div class="icon">🎮</div>
-        <h3>Fibu-Trainer XXL</h3>
-        <p>Das Level-Spiel: Von einfachen Bestandskonten bis zu komplexen Buchungssätzen mit MwSt.</p>
-        <div class="tag">Training</div>
+    <a href="eroeffnung.html" class="card" style="border-left-color: #007ab9;">
+        <div class="icon">🏁</div>
+        <div class="card-content">
+            <h3>1. Eröffnung</h3>
+            <p>Eröffnungsbilanz und EBK: Berechnung des Eigenkapitals und Start der Konten.</p>
+        </div>
     </a>
+</div>
 
+<div class="section-title">Phase 2: Laufende Buchungen</div>
+<div class="grid">
     <a href="bestandskonten.html" class="card">
         <div class="icon">📁</div>
-        <h3>Bestandskonten</h3>
-        <p>Eröffnung und Abschluss von Aktiv- und Passivkonten über das SBK.</p>
-        <div class="tag">Bilanz</div>
+        <div class="card-content">
+            <h3>2. Bestandskonten</h3>
+            <p>Aktiv- und Passivkonten: Buchungen von Zunahmen und Abnahmen.</p>
+        </div>
     </a>
 
-    <a href="erfolgskonten.html" class="card" style="border-top-color: #fd7e14;">
+    <a href="erfolgskonten.html" class="card" style="border-left-color: #fd7e14;">
         <div class="icon">📈</div>
-        <h3>Erfolgskonten</h3>
-        <p>Aufwendungen und Erträge sicher buchen und über das GuV-Konto abschließen.</p>
-        <div class="tag">G&V</div>
+        <div class="card-content">
+            <h3>3. Erfolgskonten</h3>
+            <p>Aufwendungen und Erträge: Erfolgswirksame Buchungen ohne AB.</p>
+        </div>
     </a>
 
-    <a href="umsatzsteuer.html" class="card" style="border-top-color: #28a745;">
+    <a href="umsatzsteuer.html" class="card" style="border-left-color: #28a745;">
         <div class="icon">⚖️</div>
-        <h3>Umsatzsteuer</h3>
-        <p>Vorsteuer- und Umsatzsteuerverrechnung sowie Zahllast-Ermittlung.</p>
-        <div class="tag">Steuern</div>
+        <div class="card-content">
+            <h3>4. Umsatzsteuer</h3>
+            <p>VSt, USt und Zahllast: Die Verrechnung mit dem Finanzamt.</p>
+        </div>
+    </a>
+</div>
+
+<div class="section-title">Phase 3: Der Jahresabschluss</div>
+<div class="grid">
+    <a href="guv.html" class="card" style="border-left-color: #20c997;">
+        <div class="icon">📊</div>
+        <div class="card-content">
+            <h3>5. GuV-Konto</h3>
+            <p>Erfolgsermittlung: Aufwendungen gegen Erträge abschließen.</p>
+        </div>
     </a>
 
+    <a href="sbk.html" class="card" style="border-left-color: #005aab;">
+        <div class="icon">🏛️</div>
+        <div class="card-content">
+            <h3>6. SBK</h3>
+            <p>Schlussbilanzkonto: Die finalen Bestände für die Bilanz sammeln.</p>
+        </div>
+    </a>
+</div>
+
+<div class="section-title">Training & Tools</div>
+<div class="grid">
+    <a href="Buchungssaetze.html" class="card" style="border-left-color: var(--fibu-purple);">
+        <div class="icon">🎮</div>
+        <div class="card-content">
+            <h3>Fibu-Trainer XXL</h3>
+            <p>Das Level-Spiel zur Prüfungsvorbereitung: Alle Buchungssätze im Griff.</p>
+        </div>
+    </a>
+
+    <a href="t-konten vorlagen.pdf" class="card" style="border-left-color: #cfd8dc;">
+        <div class="icon">📄</div>
+        <div class="card-content">
+            <h3>PDF-Vorlagen</h3>
+            <p>T-Konten zum Ausdrucken oder für das digitale Mitschreiben.</p>
+        </div>
+    </a>
 </div>
 
 <footer>
-    Viel Erfolg beim Lernen! Bei Fragen wendet euch an euren Lehrer.
+    Viel Erfolg beim Lernen! Erstellt für die BFS 2 am Berufskolleg.
 </footer>
 
 </body>
