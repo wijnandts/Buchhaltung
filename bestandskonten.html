@@ -3,40 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RW-Trainer BFS2: Konten-Profi</title>
+    <title>RW-Trainer BFS2: Bestandskonten</title>
     <style>
         :root { --nrw-blue: #007ab9; --passiv-purple: #6f42c1; --success: #28a745; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 10px; }
-        .app-container { background: white; max-width: 600px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-        h1 { color: var(--nrw-blue); text-align: center; margin-bottom: 5px; }
-        .type-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; color: white; }
-        .task-box { background: #e7f3f9; border-left: 5px solid var(--nrw-blue); padding: 15px; margin: 10px 0; line-height: 1.4; }
+        .app-container { background: white; max-width: 700px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        h1 { color: var(--nrw-blue); text-align: center; margin-bottom: 5px; font-size: 1.5rem; }
+        .type-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; color: white; }
+        .task-box { background: #e7f3ff; border-left: 5px solid var(--nrw-blue); padding: 15px; margin: 10px 0; line-height: 1.5; font-size: 1rem; color: #333; }
         
-        .t-konto { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .t-konto th { border-bottom: 3px solid #333; padding: 10px; font-size: 1.1rem; }
-        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 15px; vertical-align: top; min-height: 150px; }
+        .t-konto { width: 100%; border-collapse: collapse; margin-top: 15px; border-top: 4px solid #333; }
+        .t-konto th { border-bottom: 2px solid #333; padding: 10px; font-size: 1.1rem; background: #fafafa; }
+        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 10px; vertical-align: top; height: 220px; }
         .t-konto td:last-child { border-right: none; }
         
-        .entry { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.9rem; }
-        .sum-line { border-top: 2px solid #333; margin-top: 20px; padding-top: 10px; font-weight: bold; }
+        .entry { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.9rem; }
+        .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 20px; padding: 8px 0; font-weight: bold; }
         
-        input { width: 85px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.9rem; }
-        input:focus { border-color: var(--nrw-blue); outline: none; box-shadow: 0 0 5px rgba(0,122,185,0.3); }
+        input { width: 100px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.95rem; }
+        input:focus { border-color: var(--nrw-blue); outline: none; background: #fffde7; border-width: 2px; }
         
-        button { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .saldo-label { color: var(--nrw-blue); font-weight: bold; }
+        button { width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; }
         .btn-check { background-color: var(--nrw-blue); color: white; }
+        .btn-check:hover { background-color: #005a8a; }
         .btn-next { background-color: #6c757d; color: white; margin-top: 8px; }
         
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; text-align: center; font-weight: bold; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; text-align: left; font-weight: bold; line-height: 1.4; border: 2px solid transparent; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div id="badge" class="type-badge">Lade...</div>
-    <h1 id="konto-titel">Konto</h1>
+    <h1 id="konto-titel">Bestandskonto abschließen</h1>
     
-    <div id="task" class="task-box">Generiere Aufgabe...</div>
+    <div id="task" class="task-box">Erzeuge Aufgabe...</div>
 
     <table class="t-konto">
         <thead>
@@ -46,16 +48,18 @@
         <tbody>
             <tr>
                 <td>
-                    <div class="entry"><span>AB:</span> <input type="number" id="in-ab-soll" placeholder="0"></div>
-                    <div class="entry" id="label-s-1"><span>Vorgang 1:</span> <span id="val-s-1">0</span> €</div>
-                    <div class="entry" id="label-s-saldo" style="color:var(--nrw-blue); display:none;"><span>Saldo:</span> <input type="number" id="in-saldo-soll"></div>
-                    <div class="sum-line">Summe: <input type="number" id="in-sum-soll"></div>
+                    <div class="entry"><span>Anfangsbestand:</span> <input type="number" id="in-ab-soll" placeholder="€"></div>
+                    <div class="entry"><span><span id="label-v1-s">Vorgang 1</span>:</span> <input type="number" id="in-v1-soll" placeholder="€"></div>
+                    <div class="entry"><span><span id="label-v2-s">Vorgang 2</span>:</span> <input type="number" id="in-v2-soll" placeholder="€"></div>
+                    <div class="entry saldo-label"><span>Saldo (an SBK):</span> <input type="number" id="in-saldo-soll" placeholder="€"></div>
+                    <div class="sum-line">Summe: <input type="number" id="in-sum-soll" placeholder="€"></div>
                 </td>
                 <td>
-                    <div class="entry"><span>AB:</span> <input type="number" id="in-ab-haben" placeholder="0"></div>
-                    <div class="entry" id="label-h-1"><span>Vorgang 2:</span> <span id="val-h-1">0</span> €</div>
-                    <div class="entry" id="label-h-saldo" style="color:var(--nrw-blue); display:none;"><span>Saldo:</span> <input type="number" id="in-saldo-haben"></div>
-                    <div class="sum-line">Summe: <input type="number" id="in-sum-haben"></div>
+                    <div class="entry"><span>Anfangsbestand:</span> <input type="number" id="in-ab-haben" placeholder="€"></div>
+                    <div class="entry"><span><span id="label-v1-h">Vorgang 1</span>:</span> <input type="number" id="in-v1-haben" placeholder="€"></div>
+                    <div class="entry"><span><span id="label-v2-h">Vorgang 2</span>:</span> <input type="number" id="in-v2-haben" placeholder="€"></div>
+                    <div class="entry saldo-label"><span>Saldo (an SBK):</span> <input type="number" id="in-saldo-haben" placeholder="€"></div>
+                    <div class="sum-line">Summe: <input type="number" id="in-sum-haben" placeholder="€"></div>
                 </td>
             </tr>
         </tbody>
@@ -63,16 +67,15 @@
 
     <div id="feedbackBox" class="feedback"></div>
 
-    <button class="btn-check" onclick="validate()">Abschluss prüfen</button>
-    <button class="btn-next" onclick="generateTask()">Nächste Übung</button>
+    <button class="btn-check" onclick="validate()">Eingabe prüfen</button>
+    <button class="btn-next" onclick="generateTask()">Nächste Aufgabe</button>
 </div>
 
 <script>
     let config = {};
-
     const konten = {
-        aktiv: { name: "Bank", badge: "AKTIVKONTO", color: "#007ab9", v1: "Umsatzerlöse", v2: "Miete" },
-        passiv: { name: "Verbindlichkeiten", badge: "PASSIVKONTO", color: "#6f42c1", v1: "Tilgung", v2: "Zieleinkauf" }
+        aktiv: { name: "Bank", badge: "AKTIVKONTO", color: "#007ab9", v1: "Überweisung Kunde", v2: "Barabhebung" },
+        passiv: { name: "Verbindlichkeiten", badge: "PASSIVKONTO", color: "#6f42c1", v1: "Zieleinkauf", v2: "Banküberweisung an Lief." }
     };
 
     function generateTask() {
@@ -82,62 +85,76 @@
         config = {
             type: isAktiv ? 'aktiv' : 'passiv',
             ab: Math.floor(Math.random() * 40 + 20) * 100, // 2000-6000
-            v1: Math.floor(Math.random() * 15 + 5) * 100,  // 500-2000
-            v2: Math.floor(Math.random() * 10 + 2) * 100   // 200-1200
+            v1: Math.floor(Math.random() * 20 + 5) * 100,  // Mehrung
+            v2: Math.floor(Math.random() * 15 + 5) * 100   // Minderung
         };
 
-        // UI Updates
         document.getElementById('badge').innerText = k.badge;
         document.getElementById('badge').style.backgroundColor = k.color;
         document.getElementById('display-name').innerText = "Konto: " + k.name;
-        document.getElementById('label-s-1').children[0].innerText = k.v1 + ":";
-        document.getElementById('label-h-1').children[0].innerText = k.v2 + ":";
-        document.getElementById('val-s-1').innerText = config.v1;
-        document.getElementById('val-h-1').innerText = config.v2;
+        
+        document.getElementById('label-v1-s').innerText = k.v1;
+        document.getElementById('label-v1-h').innerText = k.v1;
+        document.getElementById('label-v2-s').innerText = k.v2;
+        document.getElementById('label-v2-h').innerText = k.v2;
 
-        // Saldo-Feld positionieren
-        document.getElementById('label-h-saldo').style.display = isAktiv ? 'flex' : 'none';
-        document.getElementById('label-s-saldo').style.display = isAktiv ? 'none' : 'flex';
-
-        let aufgabenText = `<b>Situation:</b> Eröffne das Konto <b>${k.name}</b> mit einem AB von <b>${config.ab} €</b>. <br>`;
+        let aufgabenText = `<b>Aufgabe:</b><br>1. Eröffne das Konto <b>${k.name}</b> (AB: <b>${config.ab} €</b>).<br>`;
         if(isAktiv) {
-            aufgabenText += `Buche eine Zunahme (${k.v1}: ${config.v1} €) und eine Abnahme (${k.v2}: ${config.v2} €).`;
+            aufgabenText += `2. Erfasse eine Zunahme (${k.v1}): <b>${config.v1} €</b>.<br>3. Erfasse eine Abnahme (${k.v2}): <b>${config.v2} €</b>.`;
         } else {
-            aufgabenText += `Buche eine Abnahme (${k.v1}: ${config.v1} €) und eine Zunahme (${k.v2}: ${config.v2} €).`;
+            aufgabenText += `2. Erfasse eine Zunahme (${k.v1}): <b>${config.v1} €</b>.<br>3. Erfasse eine Abnahme (${k.v2}): <b>${config.v2} €</b>.`;
         }
+        aufgabenText += `<br>4. Ermittle das Saldo und schließe das Konto ab.`;
         document.getElementById('task').innerHTML = aufgabenText;
 
-        // Reset inputs
         document.querySelectorAll('input').forEach(i => { i.value = ''; i.style.backgroundColor = 'white'; });
         document.getElementById('feedbackBox').style.display = 'none';
     }
 
     function validate() {
-        const val = (id) => parseInt(document.getElementById(id).value) || 0;
-        let correct = true;
+        const val = (id) => {
+            const v = document.getElementById(id).value;
+            return v === "" ? 0 : parseInt(v);
+        };
+        
+        let errors = [];
+        const summe = config.ab + config.v1;
+        const saldoKorrekt = summe - config.v2;
 
+        // Grundlegende Prüfung: AB-Seite
         if(config.type === 'aktiv') {
-            const sum = config.ab + config.v1;
-            const saldo = sum - config.v2;
-            if(val('in-ab-soll') !== config.ab || val('in-ab-haben') !== 0) correct = false;
-            if(val('in-sum-soll') !== sum || val('in-sum-haben') !== sum) correct = false;
-            if(val('in-saldo-haben') !== saldo) correct = false;
+            if(val('in-ab-soll') !== config.ab) errors.push("❌ Der AB eines Aktivkontos gehört ins Soll.");
+            if(val('in-ab-haben') !== 0) errors.push("❌ Der AB darf nicht im Haben stehen.");
+            if(val('in-v1-soll') !== config.v1) errors.push("❌ Zunahmen werden beim Aktivkonto im Soll gebucht.");
+            if(val('in-v2-haben') !== config.v2) errors.push("❌ Abnahmen werden beim Aktivkonto im Haben gebucht.");
+            
+            // Saldo Prüfung
+            if(val('in-saldo-haben') !== saldoKorrekt) errors.push("❌ Das Saldo ist wertmäßig falsch oder steht auf der falschen Seite.");
+            if(val('in-saldo-soll') !== 0) errors.push("❌ Das Saldo muss auf der wertmäßig kleineren Seite (Haben) stehen.");
         } else {
-            const sum = config.ab + config.v2;
-            const saldo = sum - config.v1;
-            if(val('in-ab-haben') !== config.ab || val('in-ab-soll') !== 0) correct = false;
-            if(val('in-sum-soll') !== sum || val('in-sum-haben') !== sum) correct = false;
-            if(val('in-saldo-soll') !== saldo) correct = false;
+            if(val('in-ab-haben') !== config.ab) errors.push("❌ Der AB eines Passivkontos gehört ins Haben.");
+            if(val('in-ab-soll') !== 0) errors.push("❌ Der AB darf nicht im Soll stehen.");
+            if(val('in-v1-haben') !== config.v1) errors.push("❌ Zunahmen werden beim Passivkonto im Haben gebucht.");
+            if(val('in-v2-soll') !== config.v2) errors.push("❌ Abnahmen werden beim Passivkonto im Soll gebucht.");
+            
+            // Saldo Prüfung
+            if(val('in-saldo-soll') !== saldoKorrekt) errors.push("❌ Das Saldo ist wertmäßig falsch oder steht auf der falschen Seite.");
+            if(val('in-saldo-haben') !== 0) errors.push("❌ Das Saldo muss auf der wertmäßig kleineren Seite (Soll) stehen.");
+        }
+
+        // Summenprüfung
+        if(val('in-sum-soll') !== summe || val('in-sum-haben') !== summe) {
+            errors.push("❌ Die Abschlusssummen müssen auf beiden Seiten identisch sein (" + summe + " €).");
         }
 
         const fb = document.getElementById('feedbackBox');
         fb.style.display = 'block';
-        if(correct) {
-            fb.innerHTML = "✅ Absolut richtig! Du hast die Kontenlogik verstanden.";
-            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+        if(errors.length === 0) {
+            fb.innerHTML = "🎉 Korrekt! Du hast das Saldo richtig ermittelt und die Seiten richtig zugeordnet.";
+            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724"; fb.style.borderColor = "#c3e6cb";
         } else {
-            fb.innerHTML = "❌ Da ist noch ein Fehler. Denk dran: Aktivkonten starten im Soll, Passivkonten im Haben!";
-            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+            fb.innerHTML = "<b>Da sind noch Fehler:</b><br>" + errors.join("<br>");
+            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24"; fb.style.borderColor = "#f5c6cb";
         }
     }
 
