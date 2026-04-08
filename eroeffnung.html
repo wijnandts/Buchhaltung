@@ -21,14 +21,15 @@
         
         .t-konto { width: 100%; border-collapse: collapse; margin-top: 15px; border-top: 4px solid #333; }
         .t-konto th { border-bottom: 2px solid #333; padding: 10px; background: #fafafa; font-size: 0.9rem; }
+        .side-info { font-size: 0.75rem; color: #888; font-weight: normal; }
         .t-konto td { width: 50%; border-right: 2px solid #333; padding: 10px; vertical-align: top; min-height: 400px; }
         .t-konto td:last-child { border-right: none; }
         
         .entry { display: flex; gap: 5px; align-items: center; margin-bottom: 8px; font-size: 0.8rem; }
         select { flex-grow: 1; padding: 4px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.75rem; }
-        input.val-in { width: 80px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.8rem; }
+        input.val-in { width: 85px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.85rem; }
         
-        input:disabled, select:disabled { background-color: #f1f3f5; color: #444; border: 1px solid #ddd; }
+        input:disabled, select:disabled { background-color: #f1f3f5; color: #444; border: 1px solid #ddd; font-weight: bold; }
         .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 15px; padding: 8px 0; font-weight: bold; display: flex; justify-content: space-between;}
         
         .btn-action { width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; }
@@ -55,7 +56,10 @@
     <table class="t-konto">
         <thead>
             <tr><th colspan="2">Eröffnungsbilanzkonto (EBK)</th></tr>
-            <tr><th>Soll</th><th>Haben</th></tr>
+            <tr>
+                <th>Soll <span id="label-soll-info" class="side-info"></span></th>
+                <th>Haben <span id="label-haben-info" class="side-info"></span></th>
+            </tr>
         </thead>
         <tbody id="konto-body">
             </tbody>
@@ -109,6 +113,9 @@
         const ek = vermoegen - schulden;
         config.current = { ...d, ek, sum: vermoegen };
 
+        document.getElementById('label-soll-info').innerText = (config.level === 1) ? "(Passiva)" : "";
+        document.getElementById('label-haben-info').innerText = (config.level === 1) ? "(Aktiva)" : "";
+
         let t = `<b>Aufgabe (Stufe ${config.level}):</b> Bilanzwerte zum 01.01.:<br>`;
         t += `Aktiva: BGA ${d.bga}€, Fuhrpark ${d.fuhrpark}€, Waren ${d.waren}€, Forderungen ${d.ford}€, Bank ${d.bank}€, Kasse ${d.kasse}€.<br>`;
         t += `Passiva: Darlehen ${d.darlehen}€, Verbindlichkeiten ${d.verb}€. Berechne das Eigenkapital!`;
@@ -117,24 +124,32 @@
         document.getElementById('feedbackBox').style.display = 'none';
 
         if(config.level === 1) {
-            // Auto-Fill fast alles, nur EK Wert offen
             autoFill('s-sel-1', "Eigenkapital");
             autoFill('s-sel-2', "Darlehen", d.darlehen);
             autoFill('s-sel-3', "Verbindlichkeiten a.L.L.", d.verb);
-            autoFill('h-sel-1', "BGA", d.bga); autoFill('h-sel-2', "Fuhrpark", d.fuhrpark);
-            autoFill('h-sel-3', "Waren (Vorrat)", d.waren); autoFill('h-sel-4', "Forderungen a. L. L.", d.ford);
-            autoFill('h-sel-5', "Bank", d.bank); autoFill('h-sel-6', "Kasse", d.kasse);
-            autoFill('s-sum', vermoegen); autoFill('h-sum', vermoegen);
+            autoFill('h-sel-1', "BGA", d.bga); 
+            autoFill('h-sel-2', "Fuhrpark", d.fuhrpark);
+            autoFill('h-sel-3', "Waren (Vorrat)", d.waren); 
+            autoFill('h-sel-4', "Forderungen a. L. L.", d.ford);
+            autoFill('h-sel-5', "Bank", d.bank); 
+            autoFill('h-sel-6', "Kasse", d.kasse);
+            autoFill('s-sum', vermoegen); 
+            autoFill('h-sum', vermoegen);
         } else if(config.level === 2) {
-            autoFill('s-sum', vermoegen); autoFill('h-sum', vermoegen);
+            autoFill('s-sum', vermoegen); 
+            autoFill('h-sum', vermoegen);
         }
     }
 
     function autoFill(selId, selVal, inputVal) {
         const sel = document.getElementById(selId);
         const inp = document.getElementById(selId.replace('sel', 'val'));
-        sel.value = selVal; sel.disabled = true;
-        if(inputVal !== undefined) { inp.value = inputVal; inp.disabled = true; }
+        if(sel) sel.value = selVal; 
+        if(sel) sel.disabled = true;
+        if(inputVal !== undefined && inp) { 
+            inp.value = inputVal; 
+            inp.disabled = true; 
+        }
     }
 
     function validate() {
@@ -143,46 +158,48 @@
         const getS = (id) => document.getElementById(id).value;
         let err = [];
 
-        // Inhaltsprüfung
-        const sollValues = []; const habenValues = [];
-        for(let i=1; i<=3; i++) sollValues.push({k: getS(`s-sel-${i}`), v: getV(`s-val-${i}`)});
-        for(let i=1; i<=6; i++) habenValues.push({k: getS(`h-sel-${i}`), v: getV(`h-val-${i}`)});
+        const sollEntries = []; 
+        const habenEntries = [];
+        for(let i=1; i<=3; i++) sollEntries.push({k: getS(`s-sel-${i}`), v: getV(`s-val-${i}`)});
+        for(let i=1; i<=6; i++) habenEntries.push({k: getS(`h-sel-${i}`), v: getV(`h-val-${i}`)});
 
-        // Grundprüfung Soll/Haben
-        sollValues.forEach(item => {
-            if(kontenAktiv.includes(item.k)) err.push(`❌ ${item.k} steht im EBK fälschlicherweise im Soll (Aktiva gehören ins Haben!).`);
+        // Seiten-Logik prüfen
+        sollEntries.forEach(e => {
+            if(kontenAktiv.includes(e.k)) err.push(`❌ ${e.k} gehört ins Haben des EBK.`);
         });
-        habenValues.forEach(item => {
-            if(kontenPassiv.includes(item.k)) err.push(`❌ ${item.k} steht im EBK fälschlicherweise im Haben (Passiva gehören ins Soll!).`);
+        habenEntries.forEach(e => {
+            if(kontenPassiv.includes(e.k)) err.push(`❌ ${e.k} gehört ins Soll des EBK.`);
         });
 
-        // Werteprüfung
-        checkVal(sollValues, "Eigenkapital", c.ek, err);
-        checkVal(sollValues, "Darlehen", c.darlehen, err);
-        checkVal(sollValues, "Verbindlichkeiten a.L.L.", c.verb, err);
-        checkVal(habenValues, "BGA", c.bga, err);
-        checkVal(habenValues, "Fuhrpark", c.fuhrpark, err);
-        checkVal(habenValues, "Bank", c.bank, err);
-        // ... usw für den Rest
+        // Beträge prüfen
+        checkBetrag(sollEntries, "Eigenkapital", c.ek, err);
+        checkBetrag(sollEntries, "Darlehen", c.darlehen, err);
+        checkBetrag(sollEntries, "Verbindlichkeiten a.L.L.", c.verb, err);
+        checkBetrag(habenEntries, "BGA", c.bga, err);
+        checkBetrag(habenEntries, "Fuhrpark", c.fuhrpark, err);
+        checkBetrag(habenEntries, "Waren (Vorrat)", c.waren, err);
+        checkBetrag(habenEntries, "Forderungen a. L. L.", c.ford, err);
+        checkBetrag(habenEntries, "Bank", c.bank, err);
+        checkBetrag(habenEntries, "Kasse", c.kasse, err);
 
         if(config.level === 3) {
-            if(getS('h-sel-1') !== "BGA" || getS('h-sel-6') !== "Kasse") err.push("❌ Stufe 3: Achte auf die korrekte Reihenfolge (BGA -> Fuhrpark -> Waren -> Ford. -> Bank -> Kasse).");
+            if(getS('h-sel-1') !== "BGA" || getS('h-sel-6') !== "Kasse") err.push("❌ Reihenfolge beachten (Anlage- vor Umlaufvermögen).");
         }
 
         const fb = document.getElementById('feedbackBox'); fb.style.display = 'block';
         if(err.length === 0 && getV('s-sum') === c.sum) {
-            fb.innerHTML = "✅ Hervorragend! Du hast das komplette EBK im Griff.";
+            fb.innerHTML = "✅ Hervorragend! Das EBK ist perfekt eröffnet.";
             fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
         } else {
-            fb.innerHTML = "<b>Korrekturbedarf:</b><br>" + [...new Set(err)].slice(0,4).join("<br>");
+            fb.innerHTML = "<b>Hinweise:</b><br>" + [...new Set(err)].slice(0,4).join("<br>");
             fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
         }
     }
 
-    function checkVal(arr, name, correct, errList) {
-        const item = arr.find(x => x.k.includes(name.substring(0,5)));
-        if(!item) errList.push(`❌ Das Konto ${name} fehlt im EBK.`);
-        else if(item.v !== correct) errList.push(`❌ Der Wert für ${name} ist falsch.`);
+    function checkBetrag(list, name, target, errList) {
+        const item = list.find(x => x.k === name);
+        if(!item) errList.push(`❌ ${name} fehlt auf der richtigen Seite.`);
+        else if(item.v !== target) errList.push(`❌ Der Betrag für ${name} stimmt nicht.`);
     }
 
     window.onload = generateTask;
