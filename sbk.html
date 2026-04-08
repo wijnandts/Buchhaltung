@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RW-Trainer BFS2: SBK Stufenmodell</title>
+    <style>
+        :root { --nrw-blue: #005aab; --bg-light: #f0f4f8; --success: #28a745; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-light); display: flex; justify-content: center; padding: 10px; margin: 0; }
+        .app-container { background: white; max-width: 750px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); margin-top: 10px; }
+        
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; transition: 0.2s; }
+        
+        .level-selector { display: flex; gap: 8px; }
+        .level-btn { padding: 8px 12px; border: 2px solid var(--nrw-blue); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--nrw-blue); font-size: 0.85rem; }
+        .level-btn.active { background: var(--nrw-blue); color: white; }
+
+        h1 { color: var(--nrw-blue); text-align: center; font-size: 1.4rem; }
+        .task-box { background: #eef2f7; border-left: 5px solid var(--nrw-blue); padding: 15px; margin: 15px 0; font-size: 0.95rem; line-height: 1.4; }
+        
+        .t-konto { width: 100%; border-collapse: collapse; margin-top: 15px; border-top: 4px solid #333; }
+        .t-konto th { border-bottom: 2px solid #333; padding: 10px; background: #fafafa; }
+        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 12px; vertical-align: top; height: 250px; }
+        .t-konto td:last-child { border-right: none; }
+        
+        .entry { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.85rem; }
+        input { width: 90px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: right; }
+        input:disabled { background-color: #f1f3f5; color: #444; border: 1px solid #ddd; font-weight: bold; }
+
+        .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 20px; padding: 8px 0; font-weight: bold; }
+        
+        .btn-action { width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-check { background-color: var(--nrw-blue); color: white; }
+        .btn-next { background-color: #6c757d; color: white; margin-top: 8px; }
+        
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; text-align: left; font-weight: bold; border: 2px solid transparent; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="nav-header">
+        <a href="index.html" class="btn-home">🏠 Übersicht</a>
+        <div class="level-selector">
+            <button class="level-btn active" onclick="setLevel(1, this)">Stufe 1</button>
+            <button class="level-btn" onclick="setLevel(2, this)">Stufe 2</button>
+            <button class="level-btn" onclick="setLevel(3, this)">Stufe 3</button>
+        </div>
+    </div>
+
+    <h1>Schlussbilanzkonto (SBK)</h1>
+    <div id="task" class="task-box">Lade Aufgabe...</div>
+
+    <table class="t-konto">
+        <thead>
+            <tr><th colspan="2">8010 Schlussbilanzkonto (SBK)</th></tr>
+            <tr><th>S (Aktiva)</th><th>H (Passiva)</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div class="entry"><span>Fuhrpark:</span> <input type="number" id="f-s"></div>
+                    <div class="entry"><span>Bank:</span> <input type="number" id="b-s"></div>
+                    <div class="entry"><span>Darlehen:</span> <input type="number" id="d-s"></div>
+                    <div class="entry"><span>Verbindlichkeiten:</span> <input type="number" id="v-s"></div>
+                    <div class="sum-line">Summe: <input type="number" id="sum-s"></div>
+                </td>
+                <td>
+                    <div class="entry"><span>Fuhrpark:</span> <input type="number" id="f-h"></div>
+                    <div class="entry"><span>Bank:</span> <input type="number" id="b-h"></div>
+                    <div class="entry"><span>Darlehen:</span> <input type="number" id="d-h"></div>
+                    <div class="entry"><span>Verbindlichkeiten:</span> <input type="number" id="v-h"></div>
+                    <div class="sum-line">Summe: <input type="number" id="sum-h"></div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="feedbackBox" class="feedback"></div>
+    <button class="btn-action btn-check" onclick="validate()">Eingabe prüfen</button>
+    <button class="btn-action btn-next" onclick="generateTask()">Nächste Aufgabe</button>
+</div>
+
+<script>
+    let config = { level: 1 };
+    
+    function setLevel(lvl, btn) {
+        config.level = lvl;
+        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        generateTask();
+    }
+
+    function generateTask() {
+        const f = Math.floor(Math.random() * 30 + 40) * 1000;
+        const b = Math.floor(Math.random() * 10 + 5) * 1000;
+        const d = Math.floor(Math.random() * 20 + 20) * 1000;
+        const v = (f + b) - d;
+        const sum = f + b;
+
+        config.current = { f, b, d, v, sum };
+
+        document.getElementById('task').innerHTML = `
+            <b>Aufgabe (Stufe ${config.level}):</b><br>
+            Übertrage folgende Salden ins SBK:<br>
+            Fuhrpark: <b>${f} €</b> | Bank: <b>${b} €</b> | Darlehen: <b>${d} €</b> | Verbindlichkeiten: <b>${v} €</b>.
+        `;
+
+        document.querySelectorAll('input').forEach(i => { i.value = ''; i.disabled = false; });
+        document.getElementById('feedbackBox').style.display = 'none';
+
+        if(config.level === 1) {
+            autoFill('f-s', f); autoFill('b-s', b); autoFill('d-h', d); autoFill('v-h', v); autoFill('sum-s', sum); autoFill('sum-h', sum);
+        } else if(config.level === 2) {
+            autoFill('sum-s', sum); autoFill('sum-h', sum);
+        }
+    }
+
+    function autoFill(id, val) { 
+        const el = document.getElementById(id); el.value = val; el.disabled = true; 
+    }
+
+    function validate() {
+        const c = config.current;
+        const val = (id) => parseInt(document.getElementById(id).value) || 0;
+        let err = [];
+
+        if(val('f-s') !== c.f || val('f-h') !== 0) err.push("Fuhrpark (Aktiv) gehört ins Soll.");
+        if(val('b-s') !== c.b || val('b-h') !== 0) err.push("Bank (Aktiv) gehört ins Soll.");
+        if(val('d-h') !== c.

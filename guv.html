@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RW-Trainer BFS2: GuV Stufenmodell</title>
+    <style>
+        :root { --guv-green: #20c997; --nrw-blue: #005aab; --bg-light: #f8fdfc; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; padding: 10px; margin: 0; }
+        .app-container { background: white; max-width: 750px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); margin-top: 10px; }
+        
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; transition: 0.2s; }
+        
+        .level-selector { display: flex; gap: 8px; }
+        .level-btn { padding: 8px 12px; border: 2px solid var(--guv-green); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--guv-green); font-size: 0.85rem; }
+        .level-btn.active { background: var(--guv-green); color: white; }
+
+        h1 { color: var(--guv-green); text-align: center; font-size: 1.4rem; }
+        .task-box { background: #e6fcf5; border-left: 5px solid var(--guv-green); padding: 15px; margin: 15px 0; font-size: 0.95rem; line-height: 1.4; }
+        
+        .t-konto { width: 100%; border-collapse: collapse; margin-top: 15px; border-top: 4px solid #333; }
+        .t-konto th { border-bottom: 2px solid #333; padding: 10px; background: #fafafa; }
+        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 12px; vertical-align: top; height: 220px; }
+        .t-konto td:last-child { border-right: none; }
+        
+        .entry { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.85rem; }
+        input { width: 90px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: right; }
+        input:disabled { background-color: #e9ecef; color: #495057; border: 1px solid #dee2e6; font-weight: bold; }
+        
+        .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 20px; padding: 8px 0; font-weight: bold; }
+        
+        .btn-action { width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-check { background-color: var(--guv-green); color: white; }
+        .btn-next { background-color: #6c757d; color: white; margin-top: 8px; }
+        
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; text-align: left; font-weight: bold; line-height: 1.4; border: 2px solid transparent; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="nav-header">
+        <a href="index.html" class="btn-home">🏠 Übersicht</a>
+        <div class="level-selector">
+            <button class="level-btn active" onclick="setLevel(1, this)">Stufe 1</button>
+            <button class="level-btn" onclick="setLevel(2, this)">Stufe 2</button>
+            <button class="level-btn" onclick="setLevel(3, this)">Stufe 3</button>
+        </div>
+    </div>
+
+    <h1>GuV-Konto (Erfolgsermittlung)</h1>
+    <div id="task" class="task-box">Lade Aufgabe...</div>
+
+    <table class="t-konto">
+        <thead>
+            <tr><th colspan="2">8020 Gewinn- und Verlustkonto (GuV)</th></tr>
+            <tr><th>S (Aufwendungen)</th><th>H (Erträge)</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div class="entry"><span>Mietaufwand:</span> <input type="number" id="auf-s"></div>
+                    <div class="entry" style="color:var(--nrw-blue); font-weight:bold;"><span>Gewinn:</span> <input type="number" id="gew-s"></div>
+                    <div class="sum-line">Summe: <input type="number" id="sum-s"></div>
+                </td>
+                <td>
+                    <div class="entry"><span>Umsatzerlöse:</span> <input type="number" id="ert-h"></div>
+                    <div class="entry" style="color:var(--nrw-blue); font-weight:bold;"><span>Verlust:</span> <input type="number" id="ver-h"></div>
+                    <div class="sum-line">Summe: <input type="number" id="sum-h"></div>
+                </td>
+            </tr>
+        </tbody>
+    </tbody>
+    </table>
+
+    <div id="feedbackBox" class="feedback"></div>
+    <button class="btn-action btn-check" onclick="validate()">Erfolg prüfen</button>
+    <button class="btn-action btn-next" onclick="generateTask()">Nächste Aufgabe</button>
+</div>
+
+<script>
+    let config = { level: 1 };
+
+    function setLevel(lvl, btn) {
+        config.level = lvl;
+        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        generateTask();
+    }
+
+    function generateTask() {
+        const ertrag = Math.floor(Math.random() * 50 + 60) * 100;
+        const aufwand = Math.floor(Math.random() * 40 + 20) * 100;
+        const gewinn = ertrag - aufwand;
+        const sum = ertrag;
+
+        config.current = { ertrag, aufwand, gewinn, sum };
+
+        document.getElementById('task').innerHTML = `
+            <b>Aufgabe (Stufe ${config.level}):</b><br>
+            Mietaufwand: <b>${aufwand} €</b> | Umsatzerlöse: <b>${ertrag} €</b>.<br>
+            Übertrage die Beträge und ermittle den Gewinn/Verlust.
+        `;
+
+        document.querySelectorAll('input').forEach(i => { i.value = ''; i.disabled = false; });
+        document.getElementById('feedbackBox').style.display = 'none';
+
+        if(config.level === 1) {
+            autoFill('auf-s', aufwand); autoFill('ert-h', ertrag); autoFill('gew-s', gewinn); autoFill('sum-s', sum); autoFill('sum-h', sum);
+        } else if(config.level === 2) {
+            autoFill('auf-s', aufwand); autoFill('ert-h', ertrag);
+        }
+    }
+
+    function autoFill(id, val) { 
+        const el = document.getElementById(id); el.value = val; el.disabled = true; 
+    }
+
+    function validate() {
+        const c = config.current;
+        const val = (id) => parseInt(document.getElementById(id).value) || 0;
+        let err = [];
+
+        if(val('auf-s') !== c.aufwand) err.push("Aufwendungen gehören ins Soll.");
+        if(val('ert-h') !== c.ertrag) err.push("Erträge gehören ins Haben.");
+        
+        if(val('gew-s') !== c.gewinn) err.push("Gewinn falsch berechnet oder auf der falschen Seite.");
+        if(val('ver-h') !== 0) err.push("Bei einem Gewinn darf kein Eintrag im Verlust-Feld stehen.");
+
+        if(val('sum-s') !== c.sum || val('sum-h') !== c.sum) err.push("Die Summen müssen gleich hoch sein (" + c.sum + " €).");
+
+        const fb = document.getElementById('feedbackBox');
+        fb.style.display = 'block';
+        if(err.length === 0) {
+            fb.innerHTML = "✅ Super! Der Erfolg wurde korrekt ermittelt.";
+            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724"; fb.style.borderColor = "#c3e6cb";
+        } else {
+            fb.innerHTML = "<b>Fehlerliste:</b><br>" + err.join("<br>");
+            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24"; fb.style.borderColor = "#f5c6cb";
+        }
+    }
+    window.onload = generateTask;
+</script>
+</body>
+</html>
