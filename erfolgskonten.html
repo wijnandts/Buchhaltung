@@ -3,116 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RW-Trainer BFS2: Erfolgskonten</title>
+    <title>RW-Trainer BFS2: Erfolgskonten Stufenmodell</title>
     <style>
-        :root { --erfolg-orange: #fd7e14; --guv-green: #20c997; --nrw-blue: #007ab9; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; display: flex; justify-content: center; padding: 10px; }
-        .app-container { background: white; max-width: 600px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        h1 { color: var(--erfolg-orange); text-align: center; }
-        .task-box { background: #fff4e6; border-left: 5px solid var(--erfolg-orange); padding: 15px; margin: 15px 0; }
+        :root { 
+            --erfolg-orange: #fd7e14; 
+            --guv-green: #20c997; 
+            --nrw-blue: #007ab9;
+            --bg-light: #f8f9fa;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-light); display: flex; justify-content: center; padding: 10px; margin: 0; }
+        .app-container { background: white; max-width: 750px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); margin-top: 10px; }
         
-        .t-konto { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .t-konto th { border-bottom: 3px solid #333; padding: 10px; background: #eee; }
-        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 15px; vertical-align: top; height: 140px; }
+        /* Navigation & Header */
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; transition: 0.2s; }
+        .btn-home:hover { background: #d0d0d0; }
+
+        /* Level-Selector */
+        .level-selector { display: flex; gap: 8px; }
+        .level-btn { padding: 8px 12px; border: 2px solid var(--erfolg-orange); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--erfolg-orange); font-size: 0.85rem; }
+        .level-btn.active { background: var(--erfolg-orange); color: white; }
+
+        h1 { color: var(--erfolg-orange); text-align: center; font-size: 1.4rem; margin: 15px 0 5px 0; }
+        .task-box { background: #fff4e6; border-left: 5px solid var(--erfolg-orange); padding: 15px; margin: 15px 0; line-height: 1.5; font-size: 0.95rem; }
+        
+        /* T-Konto Styling */
+        .t-konto { width: 100%; border-collapse: collapse; margin-top: 15px; border-top: 4px solid #333; }
+        .t-konto th { border-bottom: 2px solid #333; padding: 10px; font-size: 1.1rem; background: #fafafa; }
+        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 12px; vertical-align: top; height: 200px; }
         .t-konto td:last-child { border-right: none; }
         
-        .entry { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
-        .sum-line { border-top: 2px solid #333; margin-top: 20px; padding-top: 5px; font-weight: bold; }
+        .entry { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.85rem; }
+        .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 20px; padding: 8px 0; font-weight: bold; }
         
-        input { width: 80px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; text-align: right; }
-        button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        input { width: 95px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.9rem; }
+        input:focus { border-color: var(--erfolg-orange); outline: none; background: #fffde7; }
+        input:disabled { background-color: #fdf2e9; color: #444; border: 1px solid #edc9af; font-weight: bold; }
+
+        .btn-action { width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; }
         .btn-check { background-color: var(--erfolg-orange); color: white; }
-        .btn-next { background-color: #6c757d; color: white; }
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; text-align: center; font-weight: bold; }
+        .btn-next { background-color: #6c757d; color: white; margin-top: 8px; }
+        
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; text-align: left; font-weight: bold; line-height: 1.4; border: 2px solid transparent; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <h1 id="k-typ">Aufwandskonto</h1>
-    <div id="task" class="task-box">Lade Aufgabe...</div>
+    <div class="nav-header">
+        <a href="index.html" class="btn-home">🏠 Übersicht</a>
+        <div class="level-selector">
+            <button class="level-btn active" onclick="setLevel(1, this)">Stufe 1</button>
+            <button class="level-btn" onclick="setLevel(2, this)">Stufe 2</button>
+            <button class="level-btn" onclick="setLevel(3, this)">Stufe 3</button>
+        </div>
+    </div>
+
+    <h1 id="konto-titel">Erfolgskonto Trainer</h1>
+    <div id="task" class="task-box">Aufgabe lädt...</div>
 
     <table class="t-konto">
         <thead>
-            <tr><th colspan="2" id="k-name">Konto: ---</th></tr>
+            <tr><th colspan="2" id="display-name">Konto: ---</th></tr>
             <tr><th>S (Soll)</th><th>H (Haben)</th></tr>
         </thead>
         <tbody>
             <tr>
                 <td>
-                    <div class="entry" id="row-s-1"><span>Vorgang:</span> <span id="val-s">0</span> €</div>
-                    <div class="entry" id="row-s-saldo" style="color:var(--guv-green); display:none;"><span>Saldo (an GuV):</span> <input type="number" id="in-s-saldo"></div>
-                    <div class="sum-line">Summe: <input type="number" id="in-s-sum"></div>
+                    <div class="entry"><span>Buchung:</span> <input type="number" id="in-v-soll" placeholder="€"></div>
+                    <div class="entry" style="color:var(--guv-green)"><span>Saldo (an GuV):</span> <input type="number" id="in-saldo-soll" placeholder="€"></div>
+                    <div class="sum-line">Summe: <input type="number" id="in-sum-soll" placeholder="€"></div>
                 </td>
                 <td>
-                    <div class="entry" id="row-h-1"><span>Vorgang:</span> <span id="val-h">0</span> €</div>
-                    <div class="entry" id="row-h-saldo" style="color:var(--guv-green); display:none;"><span>Saldo (an GuV):</span> <input type="number" id="in-h-saldo"></div>
-                    <div class="sum-line">Summe: <input type="number" id="in-h-sum"></div>
+                    <div class="entry"><span>Buchung:</span> <input type="number" id="in-v-haben" placeholder="€"></div>
+                    <div class="entry" style="color:var(--guv-green)"><span>Saldo (an GuV):</span> <input type="number" id="in-saldo-haben" placeholder="€"></div>
+                    <div class="sum-line">Summe: <input type="number" id="in-sum-haben" placeholder="€"></div>
                 </td>
             </tr>
         </tbody>
     </table>
 
     <div id="feedbackBox" class="feedback"></div>
-    <button class="btn-check" onclick="validate()">Abschluss an GuV prüfen</button>
-    <button class="btn-next" onclick="generate()">Nächste Aufgabe</button>
+    <button class="btn-action btn-check" onclick="validate()">Abschluss prüfen</button>
+    <button class="btn-action btn-next" onclick="generateTask()">Nächste Aufgabe</button>
 </div>
 
 <script>
-    let current = {};
-    const konten = {
-        aufwand: ["Mietaufwand", "Lohnaufwand", "Büromaterial"],
-        ertrag: ["Umsatzerlöse", "Zinserträge"]
-    };
+    let config = { level: 1 };
+    const konten = [
+        { name: "Mietaufwendungen", type: 'aufwand' },
+        { name: "Lohnaufwendungen", type: 'aufwand' },
+        { name: "Büromaterial", type: 'aufwand' },
+        { name: "Werbeaufwendungen", type: 'aufwand' },
+        { name: "Umsatzerlöse f. Waren", type: 'ertrag' },
+        { name: "Zinserträge", type: 'ertrag' },
+        { name: "Provisionserträge", type: 'ertrag' }
+    ];
 
-    function generate() {
-        const istAufwand = Math.random() > 0.4;
-        current = {
-            art: istAufwand ? 'aufwand' : 'ertrag',
-            name: istAufwand ? konten.aufwand[Math.floor(Math.random()*3)] : konten.ertrag[Math.floor(Math.random()*2)],
-            wert: Math.floor(Math.random() * 50 + 5) * 100
-        };
+    function setLevel(lvl, btn) {
+        config.level = lvl;
+        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        generateTask();
+    }
 
-        document.getElementById('k-typ').innerText = istAufwand ? "Aufwandskonto" : "Ertragskonto";
-        document.getElementById('k-name').innerText = "Konto: " + current.name;
-        
-        // UI Reset
-        document.getElementById('row-s-1').style.opacity = istAufwand ? "1" : "0.2";
-        document.getElementById('row-h-1').style.opacity = istAufwand ? "0.2" : "1";
-        document.getElementById('val-s').innerText = istAufwand ? current.wert : "0";
-        document.getElementById('val-h').innerText = istAufwand ? "0" : current.wert;
-        
-        document.getElementById('row-h-saldo').style.display = istAufwand ? "flex" : "none";
-        document.getElementById('row-s-saldo').style.display = istAufwand ? "none" : "flex";
+    function generateTask() {
+        const k = konten[Math.floor(Math.random() * konten.length)];
+        const wert = Math.floor(Math.random() * 50 + 10) * 100;
 
-        document.getElementById('task').innerHTML = `<b>Geschäftsvorfall:</b> Verbuche den Betrag von <b>${current.wert} €</b> auf dem Konto <b>${current.name}</b> und schließe es über das GuV-Konto ab.`;
-        
-        document.querySelectorAll('input').forEach(i => { i.value = ''; i.style.backgroundColor = 'white'; });
+        config.current = { wert, type: k.type, name: k.name };
+
+        document.getElementById('display-name').innerText = (k.type === 'aufwand' ? "Aufwandskonto: " : "Ertragskonto: ") + k.name;
+
+        let taskTxt = `<b>Aufgabe (Stufe ${config.level}):</b> Verbuche den Geschäftsfall: <b>${k.name} ${wert} €</b> gegen Bank. `;
+        if(config.level >= 2) taskTxt += `Ermittle das Saldo für den Abschluss über das GuV-Konto.`;
+        document.getElementById('task').innerHTML = taskTxt;
+
+        // Reset Inputs
+        document.querySelectorAll('input').forEach(i => { i.value = ''; i.disabled = false; });
         document.getElementById('feedbackBox').style.display = 'none';
+
+        // Auto-Fill Logik
+        if(config.level === 1) {
+            if(k.type === 'aufwand') {
+                autoFill('in-saldo-haben', wert); autoFill('in-sum-soll', wert); autoFill('in-sum-haben', wert);
+            } else {
+                autoFill('in-saldo-soll', wert); autoFill('in-sum-soll', wert); autoFill('in-sum-haben', wert);
+            }
+        } else if(config.level === 2) {
+            if(k.type === 'aufwand') { autoFill('in-v-soll', wert); }
+            else { autoFill('in-v-haben', wert); }
+        }
+    }
+
+    function autoFill(id, val) { 
+        const el = document.getElementById(id); el.value = val; el.disabled = true; 
     }
 
     function validate() {
-        const sSum = parseInt(document.getElementById('in-s-sum').value) || 0;
-        const hSum = parseInt(document.getElementById('in-h-sum').value) || 0;
-        let correct = (sSum === current.wert && hSum === current.wert);
-        
-        if(current.art === 'aufwand') {
-            if(parseInt(document.getElementById('in-h-saldo').value) !== current.wert) correct = false;
+        const c = config.current;
+        const val = (id) => parseInt(document.getElementById(id).value) || 0;
+        let errors = [];
+
+        // 1. Buchung Prüfung
+        if(c.type === 'aufwand') {
+            if(val('in-v-soll') !== c.wert) errors.push("Aufwendungen werden im Soll gebucht.");
+            if(val('in-v-haben') !== 0) errors.push("Aufwandskonten haben keine Buchungen im Haben.");
         } else {
-            if(parseInt(document.getElementById('in-s-saldo').value) !== current.wert) correct = false;
+            if(val('in-v-haben') !== c.wert) errors.push("Erträge werden im Haben gebucht.");
+            if(val('in-v-soll') !== 0) errors.push("Ertragskonten haben keine Buchungen im Soll.");
+        }
+
+        // 2. Saldo & Summe (Stufe 2 & 3)
+        if(config.level >= 2) {
+            if(c.type === 'aufwand') {
+                if(val('in-saldo-haben') !== c.wert) errors.push("Saldo falsch oder auf falscher Seite (Haben erwartet).");
+                if(val('in-saldo-soll') !== 0) errors.push("Das Saldo eines Aufwandskontos steht im Haben.");
+            } else {
+                if(val('in-saldo-soll') !== c.wert) errors.push("Saldo falsch oder auf falscher Seite (Soll erwartet).");
+                if(val('in-saldo-haben') !== 0) errors.push("Das Saldo eines Ertragskontos steht im Soll.");
+            }
+            if(val('in-sum-soll') !== c.wert || val('in-sum-haben') !== c.wert) {
+                errors.push("Die Abschlusssummen müssen identisch sein (" + c.wert + " €).");
+            }
         }
 
         const fb = document.getElementById('feedbackBox');
         fb.style.display = 'block';
-        if(correct) {
-            fb.innerHTML = "🎯 Richtig! Erfolgskonten haben keinen AB und gehen immer ins GuV-Konto.";
-            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+        if(errors.length === 0) {
+            fb.innerHTML = "✅ Korrekt! Erfolgskonten werden immer über das GuV-Konto abgeschlossen.";
+            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724"; fb.style.borderColor = "#c3e6cb";
         } else {
-            fb.innerHTML = "💡 Denk dran: Aufwand im Soll, Ertrag im Haben. Der Saldo steht immer auf der Gegenseite!";
-            fb.style.backgroundColor = "#fff3cd"; fb.style.color = "#856404";
+            fb.innerHTML = "<b>Fehlerliste:</b><br>" + errors.join("<br>");
+            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24"; fb.style.borderColor = "#f5c6cb";
         }
     }
-    window.onload = generate;
+    window.onload = generateTask;
 </script>
 </body>
 </html>
