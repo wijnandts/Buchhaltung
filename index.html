@@ -11,6 +11,7 @@
             --accent: #e67e22;
             --success: #28a745;
             --fibu-purple: #af52de;
+            --info: #17a2b8;
         }
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -38,12 +39,14 @@
         .section-title {
             width: 100%;
             max-width: 1100px;
-            margin: 20px 0 10px 0;
+            margin: 25px 0 10px 0;
             color: #37474f;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+            font-size: 0.85rem;
+            letter-spacing: 1.2px;
+            border-bottom: 2px solid #cfd8dc;
+            padding-bottom: 5px;
         }
         .grid {
             display: grid;
@@ -51,28 +54,28 @@
             gap: 20px;
             max-width: 1100px;
             width: 100%;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         .card {
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 16px;
             text-decoration: none;
             color: #333;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
             transition: all 0.3s ease;
-            border-left: 8px solid var(--primary);
+            border-left: 6px solid var(--primary);
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
         .card:hover {
-            transform: translateX(10px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
             border-left-color: var(--accent);
         }
         .icon {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             min-width: 50px;
             text-align: center;
         }
@@ -80,9 +83,9 @@
             text-align: left;
         }
         .card h3 {
-            margin: 0 0 5px 0;
+            margin: 0 0 4px 0;
             color: var(--primary);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
         .card p {
             font-size: 0.85rem;
@@ -90,10 +93,19 @@
             margin: 0;
             line-height: 1.4;
         }
+        .tag {
+            font-size: 0.65rem;
+            background: #eee;
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            margin-top: 5px;
+            display: inline-block;
+        }
         footer {
-            margin-top: auto;
-            padding: 40px 0;
-            font-size: 0.85rem;
+            margin-top: 20px;
+            padding: 30px 0;
+            font-size: 0.8rem;
             color: #90a4ae;
             text-align: center;
             width: 100%;
@@ -104,87 +116,104 @@
 
 <header>
     <h1>RW-Lernportal BFS 2</h1>
-    <div class="subtitle">Interaktive Module für das Berufskolleg</div>
+    <div class="subtitle">Digitale Übungsmodule für die kaufmännische Grundbildung</div>
 </header>
 
-<div class="section-title">Phase 1: Der Jahresbeginn</div>
+<div class="section-title">Schritt 1: Der Jahresbeginn (Eröffnung)</div>
 <div class="grid">
     <a href="eroeffnung.html" class="card" style="border-left-color: #007ab9;">
         <div class="icon">🏁</div>
         <div class="card-content">
-            <h3>1. Eröffnung</h3>
-            <p>Eröffnungsbilanz und EBK: Berechnung des Eigenkapitals und Start der Konten.</p>
+            <h3>1. Eröffnungsbilanzkonto</h3>
+            <p>EK-Berechnung und EBK-Erstellung mit XXL-Kontenkreis.</p>
+            <span class="tag">Grundlagen</span>
+        </div>
+    </a>
+
+    <a href="eb-zu-ebk.html" class="card" style="border-left-color: var(--info);">
+        <div class="icon">🔄</div>
+        <div class="card-content">
+            <h3>2. Transfer: EB zu EBK</h3>
+            <p>Die Spiegelbild-Logik: Werte von der Bilanz in das Konto übertragen.</p>
+            <span class="tag">Transferleistung</span>
         </div>
     </a>
 </div>
 
-<div class="section-title">Phase 2: Laufende Buchungen</div>
+<div class="section-title">Schritt 2: Laufendes Buchen</div>
 <div class="grid">
     <a href="bestandskonten.html" class="card">
         <div class="icon">📁</div>
         <div class="card-content">
-            <h3>2. Bestandskonten</h3>
-            <p>Aktiv- und Passivkonten: Buchungen von Zunahmen und Abnahmen.</p>
+            <h3>3. Bestandskonten</h3>
+            <p>Aktiv- und Passivkonten: Systematik von Zunahmen und Abnahmen.</p>
+            <span class="tag">Bestand</span>
         </div>
     </a>
 
     <a href="erfolgskonten.html" class="card" style="border-left-color: #fd7e14;">
         <div class="icon">📈</div>
         <div class="card-content">
-            <h3>3. Erfolgskonten</h3>
-            <p>Aufwendungen und Erträge: Erfolgswirksame Buchungen ohne AB.</p>
+            <h3>4. Erfolgskonten</h3>
+            <p>Aufwendungen und Erträge: Erfolgswirksam buchen ohne AB.</p>
+            <span class="tag">Erfolg</span>
         </div>
     </a>
 
     <a href="umsatzsteuer.html" class="card" style="border-left-color: #28a745;">
         <div class="icon">⚖️</div>
         <div class="card-content">
-            <h3>4. Umsatzsteuer</h3>
-            <p>VSt, USt und Zahllast: Die Verrechnung mit dem Finanzamt.</p>
+            <h3>5. Umsatzsteuer</h3>
+            <p>Vorsteuer, Umsatzsteuer und Zahllast: Verrechnung mit dem FA.</p>
+            <span class="tag">Steuern</span>
         </div>
     </a>
 </div>
 
-<div class="section-title">Phase 3: Der Jahresabschluss</div>
+<div class="section-title">Schritt 3: Der Jahresabschluss</div>
 <div class="grid">
     <a href="guv.html" class="card" style="border-left-color: #20c997;">
         <div class="icon">📊</div>
         <div class="card-content">
-            <h3>5. GuV-Konto</h3>
-            <p>Erfolgsermittlung: Aufwendungen gegen Erträge abschließen.</p>
+            <h3>6. GuV-Abschluss</h3>
+            <p>Erfolgsermittlung: Aufwendungen und Erträge gegenüberstellen.</p>
+            <span class="tag">Abschluss</span>
         </div>
     </a>
 
     <a href="sbk.html" class="card" style="border-left-color: #005aab;">
         <div class="icon">🏛️</div>
         <div class="card-content">
-            <h3>6. SBK</h3>
-            <p>Schlussbilanzkonto: Die finalen Bestände für die Bilanz sammeln.</p>
+            <h3>7. SBK-Abschluss</h3>
+            <p>Schlussbilanzkonto: Die Bestände für das neue Jahr sichern.</p>
+            <span class="tag">Bilanz</span>
         </div>
     </a>
 </div>
 
-<div class="section-title">Training & Tools</div>
+<div class="section-title">Training & Extras</div>
 <div class="grid">
-    <a href="buchungssaetze.html" class="card" style="border-left-color: var(--fibu-purple);">
+    <a href="Buchungssaetze.html" class="card" style="border-left-color: var(--fibu-purple);">
         <div class="icon">🎮</div>
         <div class="card-content">
             <h3>Fibu-Trainer XXL</h3>
-            <p>Das Level-Spiel zur Prüfungsvorbereitung: Alle Buchungssätze im Griff.</p>
+            <p>Level-basiertes Buchungstraining mit Gamification-Faktor.</p>
+            <span class="tag">Training</span>
         </div>
     </a>
 
-    <a href="t-konten vorlagen.pdf" class="card" style="border-left-color: #cfd8dc;">
+    <a href="t-konten vorlagen.pdf" class="card" style="border-left-color: #90a4ae;">
         <div class="icon">📄</div>
         <div class="card-content">
-            <h3>PDF-Vorlagen</h3>
-            <p>T-Konten zum Ausdrucken oder für das digitale Mitschreiben.</p>
+            <h3>PDF-Download</h3>
+            <p>Leere T-Konten Vorlagen für analoge oder digitale Notizen.</p>
+            <span class="tag">Material</span>
         </div>
     </a>
 </div>
 
 <footer>
-    Viel Erfolg beim Lernen! Erstellt für die BFS 2 am Berufskolleg.
+    RW-Lernportal BFS 2 | Berufskolleg NRW | 2026
 </footer>
 
 </body>
