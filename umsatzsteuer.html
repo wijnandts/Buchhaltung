@@ -3,35 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RW-Trainer BFS2: Umsatzsteuer & Zahllast</title>
+    <title>RW-Trainer BFS2: Umsatzsteuer Stufenmodell</title>
     <style>
-        :root { --ust-green: #28a745; --vst-blue: #007ab9; --alert: #dc3545; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 10px; }
-        .app-container { background: white; max-width: 700px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        h1 { color: #333; text-align: center; border-bottom: 2px solid #eee; pb: 10px; }
-        .task-box { background: #fff; border: 2px dashed var(--vst-blue); padding: 15px; margin: 15px 0; border-radius: 8px; font-size: 0.95rem; }
+        :root { 
+            --ust-green: #28a745; 
+            --vst-blue: #007ab9; 
+            --bg-light: #f4f7f6;
+            --alert: #dc3545;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-light); display: flex; justify-content: center; padding: 10px; margin: 0; }
+        .app-container { background: white; max-width: 800px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); margin-top: 10px; }
         
-        .accounts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .t-konto { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .t-konto th { border-bottom: 2px solid #333; padding: 8px; font-size: 0.9rem; }
-        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 10px; vertical-align: top; height: 100px; }
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; transition: 0.2s; }
+        .btn-home:hover { background: #d0d0d0; }
+
+        .level-selector { display: flex; gap: 8px; }
+        .level-btn { padding: 8px 12px; border: 2px solid var(--vst-blue); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--vst-blue); font-size: 0.85rem; }
+        .level-btn.active { background: var(--vst-blue); color: white; }
+
+        h1 { color: #333; text-align: center; font-size: 1.4rem; margin: 15px 0 5px 0; }
+        .task-box { background: #fff; border: 2px dashed var(--vst-blue); padding: 15px; margin: 15px 0; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; }
+        
+        .accounts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .t-konto { width: 100%; border-collapse: collapse; border-top: 3px solid #333; }
+        .t-konto th { border-bottom: 2px solid #333; padding: 8px; font-size: 0.9rem; background: #fafafa; }
+        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 10px; vertical-align: top; height: 120px; }
         .t-konto td:last-child { border-right: none; }
         
-        .entry { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.8rem; }
-        input { width: 75px; padding: 3px; border: 1px solid #ccc; border-radius: 4px; text-align: right; }
-        
-        .result-box { background: #eee; padding: 15px; border-radius: 8px; margin-top: 10px; text-align: center; }
-        button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .entry { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.8rem; }
+        input { width: 80px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; text-align: right; }
+        input:disabled { background-color: #f1f3f5; color: #444; border: 1px solid #dee2e6; }
+
+        .result-box { background: #e9ecef; padding: 15px; border-radius: 8px; margin-top: 20px; text-align: center; border: 1px solid #ced4da; }
+        .btn-action { width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; }
         .btn-check { background-color: var(--vst-blue); color: white; }
-        .btn-next { background-color: #6c757d; color: white; }
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; text-align: center; font-weight: bold; }
+        .btn-next { background-color: #6c757d; color: white; margin-top: 8px; }
+        
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; text-align: left; font-weight: bold; line-height: 1.4; border: 2px solid transparent; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
+    <div class="nav-header">
+        <a href="index.html" class="btn-home">🏠 Übersicht</a>
+        <div class="level-selector">
+            <button class="level-btn active" onclick="setLevel(1, this)">Stufe 1</button>
+            <button class="level-btn" onclick="setLevel(2, this)">Stufe 2</button>
+            <button class="level-btn" onclick="setLevel(3, this)">Stufe 3</button>
+        </div>
+    </div>
+
     <h1>Umsatzsteuer-Verrechnung</h1>
-    <div id="task" class="task-box">Lade Szenario...</div>
+    <div id="task" class="task-box">Aufgabe lädt...</div>
 
     <div class="accounts-grid">
         <table class="t-konto">
@@ -41,8 +66,8 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><div class="entry"><span>aus Einkauf:</span> <input type="number" id="vst-soll"></div></td>
-                    <td><div class="entry" style="color:var(--alert)"><span><b>an USt:</b></span> <input type="number" id="vst-haben"></div></td>
+                    <td><div class="entry"><span>Einkauf:</span> <input type="number" id="vst-s"></div></td>
+                    <td><div class="entry" style="color:var(--alert)"><span><b>an USt:</b></span> <input type="number" id="vst-h"></div></td>
                 </tr>
             </tbody>
         </table>
@@ -54,70 +79,90 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><div class="entry" style="color:var(--vst-blue)"><span><b>von VSt:</b></span> <input type="number" id="ust-soll"></div></td>
-                    <td><div class="entry"><span>aus Verkauf:</span> <input type="number" id="ust-haben"></div></td>
+                    <td><div class="entry" style="color:var(--vst-blue)"><span><b>v. VSt:</b></span> <input type="number" id="ust-s"></div></td>
+                    <td><div class="entry"><span>Verkauf:</span> <input type="number" id="ust-h"></div></td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <div class="result-box">
-        <strong>Abschlussbuchung an das Finanzamt:</strong><br>
-        Umsatzsteuer an Bank (Zahllast): <input type="number" id="zahllast" style="width:120px; font-weight:bold;"> €
+        <strong>Abschlussbuchung (Zahllast):</strong><br>
+        Umsatzsteuer an Bank: <input type="number" id="zahllast" style="width:110px; font-weight:bold; margin-top:5px;"> €
     </div>
 
     <div id="feedbackBox" class="feedback"></div>
-    <button class="btn-check" onclick="validate()">Buchungen & Zahllast prüfen</button>
-    <button class="btn-next" onclick="generate()">Neue Übung</button>
+    <button class="btn-action btn-check" onclick="validate()">Eingabe prüfen</button>
+    <button class="btn-action btn-next" onclick="generateTask()">Nächste Aufgabe</button>
 </div>
 
 <script>
-    let vals = {};
+    let config = { level: 1 };
 
-    function generate() {
-        const einkaufNetto = Math.floor(Math.random() * 50 + 10) * 100; // 1000-6000
-        const verkaufNetto = Math.floor(Math.random() * 80 + 70) * 100; // 7000-15000
-        
-        vals = {
-            vst: einkaufNetto * 0.19,
-            ust: verkaufNetto * 0.19
-        };
-
-        document.getElementById('task').innerHTML = `
-            <b>Szenario:</b><br>
-            1. Wir kaufen Waren für <b>${einkaufNetto} € netto</b> ein (19% VSt).<br>
-            2. Wir verkaufen Waren für <b>${verkaufNetto} € netto</b> (19% USt).<br><br>
-            <i>Berechne die Steuerbeträge, verbuche die Umbuchung der VSt und ermittle die Zahllast!</i>
-        `;
-
-        document.querySelectorAll('input').forEach(i => { i.value = ''; i.style.backgroundColor = 'white'; });
-        document.getElementById('feedbackBox').style.display = 'none';
+    function setLevel(lvl, btn) {
+        config.level = lvl;
+        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        generateTask();
     }
 
-    function validate() {
-        const vS = parseFloat(document.getElementById('vst-soll').value);
-        const vH = parseFloat(document.getElementById('vst-haben').value);
-        const uS = parseFloat(document.getElementById('ust-soll').value);
-        const uH = parseFloat(document.getElementById('ust-haben').value);
-        const zl = parseFloat(document.getElementById('zahllast').value);
+    function generateTask() {
+        const eNetto = Math.floor(Math.random() * 30 + 10) * 100;
+        const vNetto = Math.floor(Math.random() * 50 + 60) * 100;
+        const vst = eNetto * 0.19;
+        const ust = vNetto * 0.19;
+        const zl = ust - vst;
 
-        const correctZahllast = vals.ust - vals.vst;
-        
-        let correct = (vS === vals.vst && vH === vals.vst && uS === vals.vst && uH === vals.ust && zl === correctZahllast);
+        config.current = { eNetto, vNetto, vst, ust, zl };
 
-        const fb = document.getElementById('feedbackBox');
-        fb.style.display = 'block';
+        document.getElementById('task').innerHTML = `
+            <b>Szenario (Stufe ${config.level}):</b><br>
+            1. Waren-Einkauf: <b>${eNetto} € netto</b> (19% VSt).<br>
+            2. Waren-Verkauf: <b>${vNetto} € netto</b> (19% USt).<br>
+            Berechne die Steuern und ermittle die Zahllast an das Finanzamt.
+        `;
 
-        if(correct) {
-            fb.innerHTML = "🚀 Exzellent! VSt korrekt umgebucht und Zahllast von " + correctZahllast.toFixed(2) + " € ermittelt.";
-            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
-        } else {
-            fb.innerHTML = "🧐 Fast! Tipps: <br>1. VSt = Netto * 0,19<br>2. Die VSt wird im Haben abgeschlossen und im USt-Konto im Soll gegengebucht.";
-            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+        document.querySelectorAll('input').forEach(i => { i.value = ''; i.disabled = false; });
+        document.getElementById('feedbackBox').style.display = 'none';
+
+        if(config.level === 1) {
+            autoFill('vst-s', vst); autoFill('vst-h', vst); autoFill('ust-s', vst); autoFill('ust-h', ust);
+        } else if(config.level === 2) {
+            autoFill('vst-s', vst); autoFill('ust-h', ust);
         }
     }
 
-    window.onload = generate;
+    function autoFill(id, val) { 
+        const el = document.getElementById(id); el.value = val; el.disabled = true; 
+    }
+
+    function validate() {
+        const c = config.current;
+        const val = (id) => parseFloat(document.getElementById(id).value) || 0;
+        let err = [];
+
+        if(val('vst-s') !== c.vst) err.push("Vorsteuerbetrag beim Einkauf falsch (19% von " + c.eNetto + ").");
+        if(val('ust-h') !== c.ust) err.push("Umsatzsteuerbetrag beim Verkauf falsch (19% von " + c.vNetto + ").");
+        
+        if(val('vst-h') !== c.vst || val('ust-s') !== c.vst) {
+            err.push("Die Umbuchung der Vorsteuer muss im Haben (VSt) und Soll (USt) mit dem gleichen Betrag erfolgen.");
+        }
+
+        if(val('zahllast') !== c.zl) {
+            err.push("Zahllast falsch berechnet. Formel: Umsatzsteuer (" + c.ust + ") - Vorsteuer (" + c.vst + ").");
+        }
+
+        const fb = document.getElementById('feedbackBox');
+        fb.style.display = 'block';
+        if(err.length === 0) {
+            fb.innerHTML = "✅ Hervorragend! Du hast die Umsatzsteuer-Systematik voll verstanden.";
+            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724"; fb.style.borderColor = "#c3e6cb";
+        } else {
+            fb.innerHTML = "<b>Fehler gefunden:</b><br>" + err.join("<br>");
+            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24"; fb.style.borderColor = "#f5c6cb";
+        }
+    }
+    window.onload = generateTask;
 </script>
 </body>
 </html>
