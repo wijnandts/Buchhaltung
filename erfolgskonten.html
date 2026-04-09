@@ -20,7 +20,7 @@
         .level-btn { padding: 8px 12px; border: 2px solid var(--primary); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--primary); font-size: 0.8rem; }
         .level-btn.active { background: var(--primary); color: white; }
 
-        /* Taschenrechner (Verschiebbar & Touch) */
+        /* Taschenrechner */
         #calc-container { display: none; position: fixed; top: 100px; left: 20px; width: 230px; background: #333; border-radius: 12px; padding: 12px; z-index: 2000; box-shadow: 0 10px 40px rgba(0,0,0,0.5); cursor: move; touch-action: none; }
         #calc-display { width: 100%; height: 50px; background: #eee; border-radius: 5px; margin-bottom: 10px; text-align: right; padding: 10px; font-family: monospace; font-size: 1.4rem; border: none; box-sizing: border-box; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
@@ -40,9 +40,9 @@
         .t-konto td:last-child { border-right: none; }
         
         .entry { display: flex; gap: 5px; align-items: center; margin-bottom: 10px; }
-        .gk-field { font-size: 0.75rem; color: #444; width: 110px; overflow: hidden; white-space: nowrap; }
+        .gk-field { font-size: 0.75rem; color: #444; width: 130px; overflow: hidden; white-space: nowrap; font-weight: bold; }
         .gk-select { flex-grow: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.85rem; background: #fff; }
-        .val-input { width: 95px; padding: 8px; border: 1px solid #ccc; border-radius: 6px; text-align: right; font-size: 0.9rem; }
+        .val-input { width: 105px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.9rem; font-weight: bold; }
         
         .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 10px; padding: 10px 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
 
@@ -51,15 +51,11 @@
         .btn-next { background-color: #6c757d; color: white; margin-top: 10px; opacity: 0.5; cursor: not-allowed; }
         .btn-next.enabled { background-color: var(--success); opacity: 1; cursor: pointer; }
 
-        .feedback { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; font-weight: bold; text-align: center; border: 2px solid transparent; }
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; font-weight: bold; text-align: center; }
         
-        /* Hilfe Modal */
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 650px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 650px; position: relative; }
         .close { position: absolute; top: 15px; right: 25px; font-size: 32px; cursor: pointer; color: #888; }
-        .help-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .help-table td, .help-table th { border: 1px solid #ddd; padding: 10px; font-size: 0.85rem; }
-        .help-table th { background: #f8f9fa; text-align: left; }
     </style>
 </head>
 <body>
@@ -129,37 +125,37 @@
 <div id="helpModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="toggleHelp(false)">&times;</span>
-        <h2 style="color:var(--primary)">Anleitung & Stufenübersicht</h2>
-        <p><b>Wichtig:</b> Erfolgskonten haben keinen AB. Buchungen sind immer <b>Netto</b>!</p>
-        <table class="help-table">
-            <tr><th>Stufe</th><th>Regeln</th></tr>
-            <tr><td><b>Stufe 1</b></td><td>1 Fall + GuV-Abschluss. Gegenkonten sind vorgegeben.</td></tr>
-            <tr><td><b>Stufe 2</b></td><td>2 Fälle + GuV-Abschluss. <b>Reihenfolge egal.</b></td></tr>
-            <tr><td><b>Stufe 3</b></td><td>3-4 Fälle. <b>Brutto-Netto-Rechnung</b> (Brutto / 1,19). Freie Kontenwahl.</td></tr>
-        </table>
-        <button class="btn-action btn-check" style="margin-top: 20px;" onclick="toggleHelp(false)">Alles klar!</button>
+        <h2 style="color:var(--primary)">Anleitung: Erfolgskonten</h2>
+        <div style="font-size: 0.9rem; line-height: 1.6;">
+            <p>1. <b>Kein Anfangsbestand:</b> Erfolgskonten starten bei 0,00 €.</p>
+            <p>2. <b>Netto-Prinzip:</b> In Erfolgskonten werden nur Netto-Werte gebucht.</p>
+            <p>3. <b>Abschluss:</b> Der Saldo wird am Ende über das Konto <b>GuV</b> abgeschlossen.</p>
+            <p>4. <b>Brutto-Fälle:</b> In Stufe 3 musst du Brutto-Beträge durch 1,19 teilen, um den Netto-Wert zu erhalten.</p>
+        </div>
+        <button class="btn-action btn-check" style="margin-top: 20px;" onclick="toggleHelp(false)">Verstanden!</button>
     </div>
 </div>
 
 <script>
     let config = { level: 1 };
-    let currentTask = { konto: {}, faelle: [], solS: [], solH: [], targetSum: 0 };
-    let lastKonto = "";
+    let currentTask = {};
 
-    const kontenListe = ["Bank", "Kasse", "Forderungen a. L. L.", "Verbindlichkeiten a. L. L.", "GuV", "Vorsteuer", "Umsatzsteuer", "Warenvorrat"];
+    const kontenListe = ["Bank", "Kasse", "Forderungen", "Verbindlichkeiten", "GuV", "Vorsteuer", "Umsatzsteuer", "Warenvorrat"];
 
-    const szenarien = [
+    const pool = [
         { n: "Mietaufwendungen", t: "aufwand", f: [
-            {t:"Überweisung der Büromiete", v:1200, gk:"Bank", tax:false},
-            {t:"Mietrechnung Lager", v:900, gk:"Verbindlichkeiten a. L. L.", tax:true},
-            {t:"Lastschrift Mietnebenkosten", v:230, gk:"Bank", tax:false}
+            {t:"Überweisung der monatlichen Miete", v:1500, gk:"Bank"},
+            {t:"Mietnebenkosten per Banklastschrift", v:240, gk:"Bank"},
+            {t:"Mietrechnung für externe Lagerhalle", v:800, gk:"Verbindlichkeiten"}
         ]},
         { n: "Umsatzerlöse für Waren", t: "ertrag", f: [
-            {t:"Warenverkauf auf Ziel", v:5000, gk:"Forderungen a. L. L.", tax:true},
-            {t:"Barverkauf von Waren", v:450, gk:"Kasse", tax:true},
-            {t:"Warenverkauf gegen Banküberweisung", v:3200, gk:"Bank", tax:true}
+            {t:"Warenverkauf auf Ziel an Kunden", v:4000, gk:"Forderungen"},
+            {t:"Barverkauf von Handelswaren", v:350, gk:"Kasse"},
+            {t:"Warenverkauf gegen Sofortüberweisung", v:2200, gk:"Bank"}
         ]}
     ];
+
+    const fmt = (n) => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     function toggleHelp(s) { document.getElementById('helpModal').style.display = s ? 'block' : 'none'; }
     function toggleCalc() { const c = document.getElementById("calc-container"); c.style.display = (c.style.display === "block") ? "none" : "block"; }
@@ -171,9 +167,8 @@
     function calcNum(n) { calcVal === "0" && n !== "." ? calcVal = n : calcVal += n; updateCalc(); }
     function calcOp(op) { calcVal += " " + op + " "; updateCalc(); }
     function calcClear() { calcVal = "0"; updateCalc(); }
-    function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); } catch { calcVal = "Error"; } updateCalc(); }
+    function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); } catch { calcVal = "Fehler"; } updateCalc(); }
 
-    // Drag-Logik
     const calc = document.getElementById("calc-container");
     let isDragging = false, offset = [0,0];
     const startDrag = (e) => { if(e.target.tagName === 'BUTTON') return; isDragging = true; const cX = e.clientX || e.touches[0].clientX; const cY = e.clientY || e.touches[0].clientY; offset = [calc.offsetLeft - cX, calc.offsetTop - cY]; };
@@ -185,25 +180,27 @@
     function generateTask() {
         const nextBtn = document.getElementById('nextTaskBtn');
         nextBtn.disabled = true; nextBtn.classList.remove('enabled');
-
-        let pool = szenarien;
+        
         let sz = pool[Math.floor(Math.random() * pool.length)];
+        let count = config.level === 1 ? 1 : (config.level === 2 ? 2 : 3);
+        let selFaelle = [...sz.f].sort(() => 0.5 - Math.random()).slice(0, count);
 
-        let anzahl = (config.level === 1) ? 1 : (config.level === 2 ? 2 : 3);
-        let selected = sz.f.slice(0, anzahl).map(item => {
-            let copy = {...item};
-            copy.displayV = copy.v;
-            copy.isBrutto = false;
-            if(config.level === 3 && Math.random() > 0.5) {
-                copy.displayV = Math.round(copy.v * 1.19 * 100) / 100;
-                copy.isBrutto = true;
+        // Stufe 3: Brutto-Werte im Text
+        selFaelle = selFaelle.map(f => {
+            let item = {...f};
+            item.displayV = item.v;
+            item.isBrutto = false;
+            if(config.level === 3 && Math.random() > 0.4) {
+                item.displayV = item.v * 1.19;
+                item.isBrutto = true;
             }
-            return copy;
+            return item;
         });
 
-        currentTask = { konto: sz, faelle: selected, solS: [], solH: [] };
+        currentTask = { konto: sz, faelle: selFaelle };
+        currentTask.solS = []; currentTask.solH = [];
         let total = 0;
-        selected.forEach(f => {
+        selFaelle.forEach(f => {
             if(sz.t === "aufwand") currentTask.solS.push({gk: f.gk, v: f.v});
             else currentTask.solH.push({gk: f.gk, v: f.v});
             total += f.v;
@@ -211,25 +208,27 @@
 
         if(sz.t === "aufwand") currentTask.solH.push({gk: "GuV", v: total});
         else currentTask.solS.push({gk: "GuV", v: total});
-        currentTask.targetSum = total;
+        currentTask.total = total;
+
         render();
     }
 
     function render() {
         document.getElementById('konto-name').innerText = currentTask.konto.n;
-        let t = `<b>Aufgabe:</b> Buchen und schließen Sie über <b>GuV</b> ab.<br>`;
-        t += currentTask.faelle.map(f => `• ${f.t}: ${f.displayV.toLocaleString('de-DE')} €${f.isBrutto ? " (Brutto)" : " (Netto)"}`).join("<br>");
+        let t = `<b>Aufgabe:</b> Buchen Sie die Fälle und schließen Sie über <b>GuV</b> ab.<br>`;
+        t += currentTask.faelle.map(f => `• ${f.t}: ${fmt(f.displayV)} € ${f.isBrutto ? "(Brutto)" : "(Netto)"}`).join("<br>");
         document.getElementById('task').innerHTML = t;
 
         const buildSide = (side, solList) => {
             let h = "";
-            for(let i=0; i<5; i++) {
+            let rows = config.level === 1 ? 2 : (config.level === 2 ? 3 : 5);
+            for(let i=0; i<rows; i++) {
                 h += `<div class="entry">`;
-                if(config.level < 3) h += `<span class="gk-field" id="${side}-label-${i}">${solList[i] ? solList[i].gk : ""}</span>`;
+                if(config.level < 3) h += `<span class="gk-field">${solList[i] ? solList[i].gk : ""}</span>`;
                 else h += `<select class="gk-select" id="${side}-gk-${i}"><option value="">Gegenkonto</option>${kontenListe.map(k=>`<option value="${k}">${k}</option>`).join('')}</select>`;
-                h += `<input type="number" inputmode="decimal" class="val-input" id="${side}-val-${i}"></div>`;
+                h += `<input type="number" step="0.01" class="val-input" id="${side}-val-${i}"></div>`;
             }
-            h += `<div class="sum-line"><span>Summe:</span> <input type="number" inputmode="decimal" class="val-input" id="${side}-sum"></div>`;
+            h += `<div class="sum-line"><span>Summe:</span> <input type="number" step="0.01" class="val-input" id="${side}-sum"></div>`;
             return h;
         };
         document.getElementById('soll-side').innerHTML = buildSide('s', currentTask.solS);
@@ -240,15 +239,16 @@
     function validate() {
         const fb = document.getElementById('feedbackBox');
         fb.style.display = 'block';
-        // Einfache Summenprüfung für Demo
         const sSum = parseFloat(document.getElementById('s-sum').value) || 0;
         const hSum = parseFloat(document.getElementById('h-sum').value) || 0;
-        
-        if(Math.abs(sSum - currentTask.targetSum) < 1 && Math.abs(hSum - currentTask.targetSum) < 1) {
-            fb.innerHTML = "✅ Korrekt!"; fb.style.backgroundColor = "#d4edda";
+
+        if(Math.abs(sSum - currentTask.total) < 0.01 && Math.abs(hSum - currentTask.total) < 0.01) {
+            fb.innerHTML = "✅ Korrekt! Das Konto wurde richtig geführt und abgeschlossen.";
+            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
             document.getElementById('nextTaskBtn').disabled = false; document.getElementById('nextTaskBtn').classList.add('enabled');
         } else {
-            fb.innerHTML = "❌ Summen oder Netto-Werte falsch."; fb.style.backgroundColor = "#f8d7da";
+            fb.innerHTML = "❌ Die Summen oder Netto-Werte stimmen nicht. Prüfen Sie Ihre Buchungen!";
+            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
         }
     }
     window.onload = generateTask;
