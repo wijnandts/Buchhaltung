@@ -3,56 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RW-Trainer: Bestandskonten XXL (Mobile-Fit)</title>
+    <title>RW-Trainer: Bestandskonten Master</title>
     <style>
-        :root { --primary: #005aab; --primary-dark: #004a8d; --bg: #f4f7f9; --success: #28a745; --error: #dc3545; }
+        :root { --primary: #005aab; --primary-dark: #004a8d; --bg: #f4f7f9; --success: #28a745; --error: #dc3545; --border: #ced4da; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; touch-action: manipulation; }
-        .app-container { background: white; max-width: 950px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); position: relative; box-sizing: border-box; }
+        .app-container { background: white; max-width: 1000px; width: 100%; padding: 25px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); position: relative; box-sizing: border-box; }
         
         /* Header & Navigation */
         .header-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 100; }
-        .btn-round { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 1.2rem; }
+        .btn-round { background: var(--primary); color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 1.2rem; }
         
         .nav-header { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; padding-right: 140px; }
         .btn-home { text-decoration: none; color: #555; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; }
         
         .level-selector { display: flex; gap: 5px; margin-top: 10px; }
-        .level-btn { padding: 6px 10px; border: 2px solid var(--primary); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--primary); font-size: 0.75rem; }
+        .level-btn { padding: 6px 12px; border: 2px solid var(--primary); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--primary); font-size: 0.8rem; }
         .level-btn.active { background: var(--primary); color: white; }
 
-        /* Taschenrechner (Verschiebbar & Touch) */
-        #calc-container { display: none; position: fixed; top: 100px; left: 20px; width: 220px; background: #333; border-radius: 12px; padding: 12px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: move; touch-action: none; }
+        h1 { color: var(--primary); text-align: center; font-size: 1.4rem; margin: 10px 0; text-transform: uppercase; }
+        .task-box { background: #eef2f7; border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 15px; border-radius: 4px; font-size: 0.95rem; line-height: 1.5; }
+        
+        /* T-Konto Styling */
+        .ledger-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; margin-top: 20px; overflow-x: auto; }
+        .t-konto { border: 1px solid var(--border); border-top: 4px solid #333; background: white; border-radius: 8px; overflow: hidden; min-width: 450px; }
+        .t-header { background: #f8f9fa; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid #333; }
+        .t-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .t-table th { border-bottom: 1px solid #333; padding: 8px; background: #fafafa; }
+        .soll-side { border-right: 2px solid #333; width: 50%; }
+        
+        .entry { display: flex; gap: 4px; align-items: center; padding: 6px; border-bottom: 1px solid #eee; }
+        .gk-select { flex-grow: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.75rem; background: #fff; }
+        .val-input { width: 105px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.85rem; font-weight: bold; }
+        
+        .sum-row { background: #f1f1f1; border-top: 2px solid #333; border-bottom: 4px double #333; font-weight: bold; display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; }
+
+        /* Buttons & Feedback */
+        .btn-action { width: 100%; padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1rem; margin-top: 15px; }
+        .btn-check { background: var(--primary); color: white; }
+        .btn-next { background: var(--success); color: white; display: none; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; font-weight: bold; text-align: center; }
+
+        /* Taschenrechner */
+        #calc-container { display: none; position: fixed; top: 120px; left: 20px; width: 230px; background: #333; border-radius: 12px; padding: 12px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: move; touch-action: none; }
         #calc-display { width: 100%; height: 45px; background: #eee; border-radius: 5px; margin-bottom: 10px; text-align: right; padding: 10px; font-family: monospace; font-size: 1.3rem; border: none; box-sizing: border-box; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .calc-btn { padding: 12px; border: none; border-radius: 6px; background: #555; color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .calc-btn { padding: 12px; border: none; border-radius: 8px; background: #555; color: white; font-weight: bold; cursor: pointer; }
         .calc-btn.op { background: var(--primary); }
         .calc-btn.eq { background: var(--success); grid-column: span 2; }
         .calc-btn.clr { background: var(--error); grid-column: span 2; }
 
-        h1 { color: var(--primary); text-align: center; font-size: 1.3rem; margin: 10px 0; }
-        .task-box { background: #eef2f7; border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 15px; border-radius: 4px; font-size: 0.9rem; line-height: 1.4; }
-        
-        /* T-Konto Styling */
-        .konto-grid { overflow-x: auto; margin-top: 15px; }
-        .t-konto { width: 100%; min-width: 600px; border-collapse: collapse; border-top: 4px solid #333; table-layout: fixed; }
-        .t-konto th { border-bottom: 2px solid #333; padding: 10px; background: #fafafa; font-size: 0.9rem; }
-        .t-konto td { border-right: 2px solid #333; padding: 10px; vertical-align: top; width: 50%; }
-        .t-konto td:last-child { border-right: none; }
-        
-        .entry { display: flex; gap: 4px; align-items: center; margin-bottom: 8px; }
-        .gk-field { font-size: 0.75rem; color: #444; width: 110px; overflow: hidden; white-space: nowrap; }
-        .gk-select { flex-grow: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.75rem; min-width: 0; }
-        .val-input { width: 85px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.85rem; }
-        
-        .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 10px; padding: 8px 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-
-        .btn-action { width: 100%; padding: 16px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 10px; }
-        .btn-check { background: var(--primary); color: white; }
-        .btn-next { background: #6c757d; color: white; opacity: 0.5; cursor: not-allowed; }
-        .btn-next.enabled { background: var(--success); opacity: 1; cursor: pointer; }
-
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; font-weight: bold; text-align: center; }
-        
+        /* Modal */
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); }
         .modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 15px; width: 85%; max-width: 600px; position: relative; }
         .close { position: absolute; top: 10px; right: 20px; font-size: 28px; cursor: pointer; color: #aaa; }
@@ -77,7 +77,7 @@
         <button class="calc-btn" onclick="calcNum('1')">1</button>
         <button class="calc-btn" onclick="calcNum('2')">2</button>
         <button class="calc-btn" onclick="calcNum('3')">3</button>
-        <button class="calc-btn op" onclick="calcNum('.')">.</button>
+        <button class="calc-btn" onclick="calcNum('.')">.</button>
         <button class="calc-btn" onclick="calcNum('0')">0</button>
         <button class="calc-btn eq" onclick="calcSolve()">=</button>
     </div>
@@ -99,57 +99,82 @@
         </div>
     </div>
 
-    <h1 id="konto-name-title">Bestandskonten führen</h1>
-    <div id="task" class="task-box">Generiere Fall...</div>
+    <h1>Bestandskonten: Buchung & Abschluss</h1>
+    <div id="task" class="task-box">Generiere Aufgabe...</div>
 
-    <div class="konto-grid">
-        <table class="t-konto">
-            <thead>
-                <tr><th colspan="2" id="konto-name">Konto</th></tr>
-                <tr><th>Soll</th><th>Haben</th></tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td id="soll-side"></td>
-                    <td id="haben-side"></td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="ledger-grid" id="ledger-area">
+        <div class="t-konto">
+            <div class="t-header" id="konto-title">Konto</div>
+            <table class="t-table">
+                <thead>
+                    <tr><th class="soll-side">Soll</th><th>Haben</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="soll-side" id="soll-rows"></td>
+                        <td id="haben-rows"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="sum-row">
+                <span>Summe: <input type="number" step="0.01" class="val-input" id="sum-soll"></span>
+                <span>Summe: <input type="number" step="0.01" class="val-input" id="sum-haben"></span>
+            </div>
+        </div>
     </div>
 
-    <div id="feedbackBox" class="feedback"></div>
-    <button class="btn-action btn-check" onclick="validate()">Eingabe prüfen</button>
-    <button id="nextTaskBtn" class="btn-action btn-next" onclick="generateTask()" disabled>Nächste Aufgabe</button>
+    <div id="feedback" class="feedback"></div>
+    <button id="checkBtn" class="btn-action btn-check" onclick="validate()">Eingabe prüfen & abschließen</button>
+    <button id="nextBtn" class="btn-action btn-next" onclick="generateTask()">Nächste Aufgabe</button>
 </div>
 
 <div id="helpModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="toggleHelp(false)">&times;</span>
         <h2 style="color:var(--primary)">Anleitung</h2>
-        <p>1. <b>AB:</b> Trage den Betrag bei EBK ein (Aktiv: Soll | Passiv: Haben).<br>
-           2. <b>Buchen:</b> Geschäftsfälle auf die richtige Seite eintragen.<br>
-           3. <b>Saldo (SBK):</b> Differenz auf der schwächeren Seite eintragen.<br>
-           4. <b>Summe:</b> Beide Seiten addieren - sie müssen gleich sein!</p>
+        <div style="font-size: 0.95rem; line-height: 1.6;">
+            <p>1. <b>Eröffnung:</b> Trage den AB beim Gegenkonto <b>EBK</b> ein (Aktiv: Soll | Passiv: Haben).</p>
+            <p>2. <b>Buchungen:</b> Trage die Geschäftsfälle auf die richtige Seite ein.</p>
+            <p>3. <b>Abschluss:</b> Ermittle die Differenz (Saldo) und trage sie auf der wertmäßig kleineren Seite mit dem Gegenkonto <b>SBK</b> ein.</p>
+            <p>4. <b>Summen:</b> Addiere beide Seiten. Die Summen müssen identisch sein!</p>
+        </div>
         <button class="btn-action btn-check" onclick="toggleHelp(false)">Verstanden!</button>
     </div>
 </div>
 
 <script>
     let config = { level: 1 };
-    let currentTask = {};
-    const kontenListe = ["Bank", "Kasse", "BGA", "Fuhrpark", "Forderungen a. L. L.", "Verbindlichkeiten a. L. L.", "Darlehen", "Eigenkapital", "Warenvorrat", "EBK", "SBK"];
+    let task = {};
+    const kontoliste = ["BGA", "Fuhrpark", "Warenvorrat", "Forderungen", "Bank", "Kasse", "Eigenkapital", "Darlehen", "Verbindlichkeiten", "EBK", "SBK"];
 
-    const szenarien = [
-        { n: "Bank", t: "aktiv", f: [{t:"Kunde zahlt per Bank", v:2400, gk:"Forderungen a. L. L.", z:true}, {t:"Zahlung Lieferant", v:3100, gk:"Verbindlichkeiten a. L. L.", z:false}]},
-        { n: "Kasse", t: "aktiv", f: [{t:"Barabhebung vom Bankkonto", v:500, gk:"Bank", z:true}, {t:"Bargeldkauf BGA", v:120, gk:"BGA", z:false}]},
-        { n: "Verbindlichkeiten a. L. L.", t: "passiv", f: [{t:"Warenkauf Ziel", v:4500, gk:"Warenvorrat", z:true}, {t:"Zahlung Bank", v:2000, gk:"Bank", z:false}]}
-    ];
+    const pool = {
+        Bank: [
+            {t:"Kunde begleicht Rechnung per Überweisung", v:2500, gk:"Forderungen", z:true},
+            {t:"Zahlung einer Lieferantenrechnung", v:3200, gk:"Verbindlichkeiten", z:false},
+            {t:"Aufnahme eines Darlehens (Gutschrift)", v:10000, gk:"Darlehen", z:true},
+            {t:"Kauf neuer Büromöbel per Bank", v:1200, gk:"BGA", z:false},
+            {t:"Bareinzahlung auf das Geschäftskonto", v:800, gk:"Kasse", z:true},
+            {t:"Banküberweisung der monatlichen Darlehensrate", v:1500, gk:"Darlehen", z:false}
+        ],
+        Kasse: [
+            {t:"Barabhebung vom Bankkonto für die Kasse", v:500, gk:"Bank", z:true},
+            {t:"Kunde zahlt eine offene Forderung bar", v:150, gk:"Forderungen", z:true},
+            {t:"Barzahlung für Büromaterial", v:60, gk:"BGA", z:false},
+            {t:"Bareinzahlung auf das Bankkonto", v:1200, gk:"Bank", z:false}
+        ],
+        Verbindlichkeiten: [
+            {t:"Warenkauf beim Großhändler auf Ziel", v:4500, gk:"Warenvorrat", z:true},
+            {t:"Überweisung an Lieferer per Bank", v:2000, gk:"Bank", z:false},
+            {t:"Barzahlung an einen Lieferer", v:350, gk:"Kasse", z:false},
+            {t:"Kauf eines Firmenwagens auf Ziel", v:22000, gk:"Fuhrpark", z:true}
+        ]
+    };
 
+    function fmt(n) { return n.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+    function setLevel(l, b) { config.level = l; document.querySelectorAll('.level-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); generateTask(); }
     function toggleHelp(s) { document.getElementById('helpModal').style.display = s ? 'block' : 'none'; }
-    function toggleCalc() { const c = document.getElementById("calc-container"); c.style.display = (c.style.display === "block") ? "none" : "block"; }
-    function setLevel(l, b) { config.level = parseInt(l); document.querySelectorAll('.level-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); generateTask(); }
 
-    // Rechner-Logik
+    // Rechner Logik
     let calcVal = "0";
     function updateCalc() { document.getElementById("calc-display").value = calcVal; }
     function calcNum(n) { calcVal === "0" && n !== "." ? calcVal = n : calcVal += n; updateCalc(); }
@@ -157,7 +182,7 @@
     function calcClear() { calcVal = "0"; updateCalc(); }
     function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); } catch { calcVal = "Fehler"; } updateCalc(); }
 
-    // Rechner Drag-Logik (Touch & Mouse)
+    // Rechner Drag
     const calc = document.getElementById("calc-container");
     let isDragging = false, offset = [0,0];
     const startDrag = (e) => { if(e.target.tagName === 'BUTTON') return; isDragging = true; const cX = e.clientX || e.touches[0].clientX; const cY = e.clientY || e.touches[0].clientY; offset = [calc.offsetLeft - cX, calc.offsetTop - cY]; };
@@ -165,61 +190,102 @@
     calc.addEventListener('mousedown', startDrag); calc.addEventListener('touchstart', startDrag);
     document.addEventListener('mousemove', doDrag); document.addEventListener('touchmove', doDrag, {passive:false});
     document.addEventListener('mouseup', () => isDragging = false); document.addEventListener('touchend', () => isDragging = false);
+    function toggleCalc() { const c = document.getElementById("calc-container"); c.style.display = (c.style.display === "block") ? "none" : "block"; }
 
     function generateTask() {
-        const nextBtn = document.getElementById('nextTaskBtn');
-        nextBtn.disabled = true; nextBtn.classList.remove('enabled');
-        let sz = szenarien[Math.floor(Math.random() * szenarien.length)];
-        let selFaelle = sz.f.slice(0, config.level - 1);
-        currentTask = { konto: sz, ab: Math.floor(Math.random() * 20 + 5) * 1000, faelle: selFaelle };
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('checkBtn').style.display = 'block';
+        document.getElementById('feedback').style.display = 'none';
+
+        const keys = Object.keys(pool);
+        const name = keys[Math.floor(Math.random() * keys.length)];
+        const isAktiv = name !== "Verbindlichkeiten";
         
-        // Soll/Haben-Logik vorbereiten
-        currentTask.solS = []; currentTask.solH = [];
-        if(sz.t === "aktiv") {
-            currentTask.solS.push({gk:"EBK", v:currentTask.ab});
-            selFaelle.forEach(f => f.z ? currentTask.solS.push({gk:f.gk, v:f.v}) : currentTask.solH.push({gk:f.gk, v:f.v}));
+        let count = config.level === 1 ? 1 : (config.level === 2 ? 3 : 5);
+        let selFaelle = [...pool[name]].sort(() => 0.5 - Math.random()).slice(0, count);
+        
+        if(config.level === 3) selFaelle = selFaelle.map(f => ({...f, v: f.v + (Math.random() * 0.95)}));
+
+        task = { name, typ: isAktiv ? "aktiv" : "passiv", ab: Math.floor(Math.random() * 20 + 10) * 1000 + (config.level === 3 ? Math.random() * 50 : 0), faelle: selFaelle };
+
+        task.solS = []; task.solH = [];
+        if(isAktiv) {
+            task.solS.push({gk:"EBK", v:task.ab});
+            selFaelle.forEach(f => f.z ? task.solS.push({gk:f.gk, v:f.v}) : task.solH.push({gk:f.gk, v:f.v}));
         } else {
-            currentTask.solH.push({gk:"EBK", v:currentTask.ab});
-            selFaelle.forEach(f => f.z ? currentTask.solH.push({gk:f.gk, v:f.v}) : currentTask.solS.push({gk:f.gk, v:f.v}));
+            task.solH.push({gk:"EBK", v:task.ab});
+            selFaelle.forEach(f => f.z ? task.solH.push({gk:f.gk, v:f.v}) : task.solS.push({gk:f.gk, v:f.v}));
         }
-        let sSum = currentTask.solS.reduce((a,b)=>a+b.v, 0);
-        let hSum = currentTask.solH.reduce((a,b)=>a+b.v, 0);
-        let saldo = Math.abs(sSum - hSum);
-        if(sSum > hSum) currentTask.solH.push({gk:"SBK", v:saldo}); else currentTask.solS.push({gk:"SBK", v:saldo});
-        currentTask.targetSum = Math.max(sSum, hSum);
+        
+        let sSum = task.solS.reduce((a,b) => a + b.v, 0);
+        let hSum = task.solH.reduce((a,b) => a + b.v, 0);
+        task.saldo = Math.abs(sSum - hSum);
+        task.total = Math.max(sSum, hSum);
+        if(sSum > hSum) task.solH.push({gk:"SBK", v:task.saldo}); else task.solS.push({gk:"SBK", v:task.saldo});
 
         render();
     }
 
     function render() {
-        document.getElementById('konto-name').innerText = currentTask.konto.n;
-        let t = `<b>Aufgabe:</b> Eröffne das Bestandskonto (AB: ${currentTask.ab} €).`;
-        if(config.level > 1) t += `<br>Fälle:<br>` + currentTask.faelle.map(f => `• ${f.t}: ${f.v} €`).join("<br>");
-        document.getElementById('task').innerHTML = t;
+        document.getElementById('konto-title').innerText = task.name;
+        document.getElementById('task').innerHTML = `<b>1. Eröffnung:</b> AB ${fmt(task.ab)} €.<br><b>2. Buchungen:</b><br>` + 
+            task.faelle.map(f => `• ${f.t}: ${fmt(f.v)} €`).join("<br>") + `<br><b>3. Abschluss:</b> Errechne den Saldo (SBK) und die Summen.`;
 
-        const buildSide = (side, solList) => {
+        const buildRows = (side) => {
             let h = "";
-            for(let i=0; i<5; i++) {
-                h += `<div class="entry">`;
-                if(config.level < 3) h += `<span class="gk-field" id="${side}-label-${i}">${solList[i] ? solList[i].gk : ""}</span>`;
-                else h += `<select class="gk-select" id="${side}-gk-${i}"><option value="">Gegenkonto</option>${kontenListe.map(k=>`<option value="${k}">${k}</option>`).join('')}</select>`;
-                h += `<input type="number" inputmode="decimal" class="val-input" id="${side}-val-${i}"></div>`;
+            let rowCount = config.level === 1 ? 3 : (config.level === 2 ? 6 : 9);
+            for(let i=0; i<rowCount; i++) {
+                h += `<div class="entry">
+                    <select class="gk-select" id="${side}-gk-${i}">
+                        <option value="">Gegenkonto</option>
+                        ${kontoliste.map(k => `<option value="${k}">${k}</option>`).join('')}
+                    </select>
+                    <input type="number" step="0.01" class="val-input" id="${side}-val-${i}">
+                </div>`;
             }
-            h += `<div class="sum-line"><span>Summe:</span> <input type="number" inputmode="decimal" class="val-input" id="${side}-sum"></div>`;
             return h;
         };
-        document.getElementById('soll-side').innerHTML = buildSide('s', currentTask.solS);
-        document.getElementById('haben-side').innerHTML = buildSide('h', currentTask.solH);
-        document.getElementById('feedbackBox').style.display = 'none';
+        document.getElementById('soll-rows').innerHTML = buildRows('s');
+        document.getElementById('haben-rows').innerHTML = buildRows('h');
+        document.getElementById('sum-soll').value = "";
+        document.getElementById('sum-haben').value = "";
     }
 
     function validate() {
-        const fb = document.getElementById('feedbackBox');
+        const fb = document.getElementById('feedback');
         fb.style.display = 'block';
-        // Vereinfachte Validierung für Demo
-        fb.innerHTML = "✅ Validierung erfolgt..."; fb.style.background = "#d4edda";
-        document.getElementById('nextTaskBtn').disabled = false;
-        document.getElementById('nextTaskBtn').classList.add('enabled');
+        let rowCount = config.level === 1 ? 3 : (config.level === 2 ? 6 : 9);
+        
+        const getUserEntries = (side) => {
+            let entries = [];
+            for(let i=0; i<rowCount; i++) {
+                let v = parseFloat(document.getElementById(`${side}-val-${i}`).value) || 0;
+                let g = document.getElementById(`${side}-gk-${i}`).value;
+                if(v > 0) entries.push({gk: g, v: v});
+            }
+            return entries;
+        };
+
+        const uS = getUserEntries('s'); const uH = getUserEntries('h');
+        const sumS = parseFloat(document.getElementById('sum-soll').value) || 0;
+        const sumH = parseFloat(document.getElementById('sum-haben').value) || 0;
+
+        const checkArr = (u, s) => {
+            if(u.length !== s.length) return false;
+            let s1 = [...u].sort((a,b) => a.v - b.v);
+            let s2 = [...s].sort((a,b) => a.v - b.v);
+            return s1.every((e, idx) => e.gk === s2[idx].gk && Math.abs(e.v - s2[idx].v) < 0.01);
+        };
+
+        if(checkArr(uS, task.solS) && checkArr(uH, task.solH) && Math.abs(sumS - task.total) < 0.01 && Math.abs(sumH - task.total) < 0.01) {
+            fb.innerHTML = "✅ Hervorragend! Das Konto ist korrekt geführt und abgeschlossen.";
+            fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'block';
+        } else {
+            fb.innerHTML = "❌ Fehler im Konto. Prüfe AB, Saldo (SBK) und die Summen!";
+            fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+        }
     }
 
     window.onload = generateTask;
