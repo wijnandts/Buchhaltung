@@ -3,37 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RW-Trainer BFS2: Eröffnung XXL</title>
+    <title>RW-Trainer BFS2: Eröffnung XXL (Mobile-Fit)</title>
     <style>
-        :root { --nrw-blue: #005aab; --bg-light: #f4f7f9; --success: #28a745; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-light); display: flex; justify-content: center; padding: 10px; margin: 0; }
-        .app-container { background: white; max-width: 900px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); margin-top: 10px; }
-        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; transition: 0.2s; }
-        .level-selector { display: flex; gap: 8px; }
-        .level-btn { padding: 8px 12px; border: 2px solid var(--nrw-blue); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--nrw-blue); font-size: 0.85rem; }
+        :root { --nrw-blue: #005aab; --bg-light: #f4f7f9; --success: #28a745; --error: #dc3545; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-light); display: flex; justify-content: center; padding: 10px; margin: 0; touch-action: manipulation; }
+        .app-container { background: white; max-width: 900px; width: 100%; padding: 20px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); margin-top: 10px; position: relative; box-sizing: border-box; }
+        
+        .header-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 100; }
+        .btn-round { background: var(--nrw-blue); color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 1.3rem; }
+        
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; padding-right: 150px; }
+        .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; }
+        
+        .level-selector { display: flex; gap: 5px; margin-top: 10px; }
+        .level-btn { padding: 8px 12px; border: 2px solid var(--nrw-blue); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--nrw-blue); font-size: 0.8rem; }
         .level-btn.active { background: var(--nrw-blue); color: white; }
+
+        #calc-container { display: none; position: fixed; top: 100px; left: 20px; width: 230px; background: #333; border-radius: 12px; padding: 12px; z-index: 2000; box-shadow: 0 10px 40px rgba(0,0,0,0.5); cursor: move; touch-action: none; }
+        #calc-display { width: 100%; height: 50px; background: #eee; border-radius: 5px; margin-bottom: 10px; text-align: right; padding: 10px; font-family: monospace; font-size: 1.4rem; border: none; box-sizing: border-box; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .calc-btn { padding: 15px; border: none; border-radius: 8px; background: #555; color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        .calc-btn.op { background: var(--nrw-blue); }
+        .calc-btn.eq { background: var(--success); grid-column: span 2; }
+        .calc-btn.clr { background: var(--error); grid-column: span 2; }
+
         h1 { color: var(--nrw-blue); text-align: center; font-size: 1.4rem; margin: 15px 0; }
-        .task-box { background: #eef2f7; border-left: 5px solid var(--nrw-blue); padding: 15px; margin: 15px 0; font-size: 0.9rem; line-height: 1.4; min-height: 80px; }
-        .t-konto { width: 100%; border-collapse: collapse; margin-top: 15px; border-top: 4px solid #333; }
-        .t-konto th { border-bottom: 2px solid #333; padding: 10px; background: #fafafa; font-size: 0.9rem; }
-        .side-info { font-size: 0.75rem; color: #888; font-weight: normal; }
-        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 10px; vertical-align: top; min-height: 400px; }
+        .task-box { background: #eef2f7; border-left: 5px solid var(--nrw-blue); padding: 15px; margin-bottom: 15px; border-radius: 4px; font-size: 0.95rem; line-height: 1.5; }
+        
+        .konto-grid { overflow-x: auto; }
+        .t-konto { width: 100%; min-width: 650px; border-collapse: collapse; margin-top: 15px; border-top: 4px solid #333; table-layout: fixed; }
+        .t-konto th { border-bottom: 2px solid #333; padding: 10px; background: #fafafa; font-size: 0.95rem; }
+        .t-konto td { border-right: 2px solid #333; padding: 10px; vertical-align: top; width: 50%; }
         .t-konto td:last-child { border-right: none; }
-        .entry { display: flex; gap: 5px; align-items: center; margin-bottom: 8px; font-size: 0.8rem; }
-        select { flex-grow: 1; padding: 4px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.75rem; }
-        input.val-in { width: 85px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.85rem; }
-        input:disabled, select:disabled { background-color: #f1f3f5; color: #444; border: 1px solid #ddd; font-weight: bold; }
-        .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 15px; padding: 8px 0; font-weight: bold; display: flex; justify-content: space-between;}
-        .btn-action { width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        
+        .entry { display: flex; gap: 5px; align-items: center; margin-bottom: 10px; }
+        select { flex-grow: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.85rem; background: #fff; }
+        input.val-in { width: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 6px; text-align: right; font-size: 0.9rem; }
+        input:disabled, select:disabled { background-color: #f1f3f5; color: #444; font-weight: bold; border-color: #ddd; }
+        
+        .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 15px; padding: 10px 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+
+        .btn-action { width: 100%; padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1rem; margin-top: 15px; }
         .btn-check { background-color: var(--nrw-blue); color: white; }
-        .btn-next { background-color: #6c757d; color: white; margin-top: 8px; }
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; text-align: left; font-weight: bold; line-height: 1.4; border: 2px solid transparent; }
+        .btn-next { background-color: #6c757d; color: white; margin-top: 10px; opacity: 0.5; cursor: not-allowed; }
+        .btn-next.enabled { background-color: var(--success); opacity: 1; cursor: pointer; }
+
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; font-weight: bold; text-align: center; border: 2px solid transparent; }
+        
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 650px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .close { position: absolute; top: 15px; right: 25px; font-size: 32px; cursor: pointer; color: #888; }
+        .help-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .help-table td, .help-table th { border: 1px solid #ddd; padding: 10px; font-size: 0.85rem; }
+        .help-table th { background: #f8f9fa; text-align: left; }
     </style>
 </head>
 <body>
 
+<div id="calc-container">
+    <input type="text" id="calc-display" readonly value="0">
+    <div class="calc-grid">
+        <button class="calc-btn clr" onclick="calcClear()">C</button>
+        <button class="calc-btn op" onclick="calcOp('/')">÷</button>
+        <button class="calc-btn op" onclick="calcOp('*')">×</button>
+        <button class="calc-btn" onclick="calcNum('7')">7</button>
+        <button class="calc-btn" onclick="calcNum('8')">8</button>
+        <button class="calc-btn" onclick="calcNum('9')">9</button>
+        <button class="calc-btn op" onclick="calcOp('-')">-</button>
+        <button class="calc-btn" onclick="calcNum('4')">4</button>
+        <button class="calc-btn" onclick="calcNum('5')">5</button>
+        <button class="calc-btn" onclick="calcNum('6')">6</button>
+        <button class="calc-btn op" onclick="calcOp('+')">+</button>
+        <button class="calc-btn" onclick="calcNum('1')">1</button>
+        <button class="calc-btn" onclick="calcNum('2')">2</button>
+        <button class="calc-btn" onclick="calcNum('3')">3</button>
+        <button class="calc-btn op" onclick="calcNum('.')">.</button>
+        <button class="calc-btn" onclick="calcNum('0')">0</button>
+        <button class="calc-btn eq" onclick="calcSolve()">=</button>
+    </div>
+</div>
+
 <div class="app-container">
+    <div class="header-actions">
+        <a href="mailto:wijnandts@bk-erkelenz.de" class="btn-round">✉</a>
+        <button class="btn-round" onclick="toggleCalc()">🖩</button>
+        <button class="btn-round" onclick="toggleHelp(true)">?</button>
+    </div>
+    
     <div class="nav-header">
         <a href="index.html" class="btn-home">🏠 Übersicht</a>
         <div class="level-selector">
@@ -43,166 +99,127 @@
         </div>
     </div>
 
-    <h1>Eröffnungsbilanzkonto (EBK) XXL</h1>
-    <div id="task" class="task-box">Aufgabe lädt...</div>
+    <h1>EBK XXL: Eröffnung trainieren</h1>
+    <div id="task" class="task-box">Generiere Aufgabe...</div>
 
-    <table class="t-konto">
-        <thead>
-            <tr><th colspan="2">Eröffnungsbilanzkonto (EBK)</th></tr>
-            <tr>
-                <th>Soll <span id="label-soll-info" class="side-info"></span></th>
-                <th>Haben <span id="label-haben-info" class="side-info"></span></th>
-            </tr>
-        </thead>
-        <tbody id="konto-body">
-            </tbody>
-    </table>
+    <div class="konto-grid">
+        <table class="t-konto">
+            <thead>
+                <tr><th colspan="2">Eröffnungsbilanzkonto (EBK)</th></tr>
+                <tr><th>Soll (Passiva)</th><th>Haben (Aktiva)</th></tr>
+            </thead>
+            <tbody id="konto-body"></tbody>
+        </table>
+    </div>
 
     <div id="feedbackBox" class="feedback"></div>
     <button class="btn-action btn-check" onclick="validate()">Eingabe prüfen</button>
-    <button class="btn-action btn-next" onclick="generateTask()">Nächste Aufgabe</button>
+    <button id="nextTaskBtn" class="btn-action btn-next" onclick="generateTask()">Nächste Aufgabe</button>
+</div>
+
+<div id="helpModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="toggleHelp(false)">&times;</span>
+        <h2 style="color:var(--nrw-blue)">Anleitung & Stufenübersicht</h2>
+        <p><b>Grundprinzip:</b> Das EBK ist das Spiegelbild der Bilanz. Aktiva stehen im Haben, Passiva im Soll.</p>
+        <table class="help-table">
+            <tr><th>Stufe</th><th>Regeln</th></tr>
+            <tr><td><b>Stufe 1</b></td><td>Berechne nur das Eigenkapital (Aktiva - Schulden).</td></tr>
+            <tr><td><b>Stufe 2</b></td><td>Wähle Konten frei. Die <b>Reihenfolge ist egal</b>.</td></tr>
+            <tr><td><b>Stufe 3</b></td><td><b>Profi-Reihenfolge:</b><br>Haben: Anlagevermögen zuerst, Kasse/Bank zuletzt.<br>Soll: Eigenkapital zuerst, kurzfristige Verbindlichkeiten zuletzt.</td></tr>
+        </table>
+        <button class="btn-action btn-check" style="margin-top: 20px;" onclick="toggleHelp(false)">Alles klar!</button>
+    </div>
 </div>
 
 <script>
-    let config = { level: 1 };
+    let config = { level: 1, currentTask: {} };
     const K_VERB = "Verbindlichkeiten a. L. L.";
     const K_EK = "Eigenkapital";
     const K_DARL = "Darlehen";
-    
     const kontenAktiv = ["BGA", "Fuhrpark", "Waren (Vorrat)", "Forderungen a. L. L.", "Bank", "Kasse"];
     const kontenPassiv = [K_EK, K_DARL, K_VERB];
     const alleKonten = ["-- wählen --", ...kontenAktiv, ...kontenPassiv];
 
-    function setLevel(lvl, btn) {
-        config.level = lvl;
-        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        generateTask();
-    }
+    function toggleHelp(s) { document.getElementById('helpModal').style.display = s ? 'block' : 'none'; }
+    function toggleCalc() { const c = document.getElementById("calc-container"); c.style.display = (c.style.display === "block") ? "none" : "block"; }
+    function setLevel(lvl, btn) { config.level = lvl; document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); generateTask(); }
+
+    let calcVal = "0";
+    function updateCalc() { document.getElementById("calc-display").value = calcVal; }
+    function calcNum(n) { calcVal === "0" && n !== "." ? calcVal = n : calcVal += n; updateCalc(); }
+    function calcOp(op) { calcVal += " " + op + " "; updateCalc(); }
+    function calcClear() { calcVal = "0"; updateCalc(); }
+    function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); } catch { calcVal = "Error"; } updateCalc(); }
+
+    const calc = document.getElementById("calc-container");
+    let isDragging = false, offset = [0,0];
+    const startDrag = (e) => { if(e.target.tagName === 'BUTTON') return; isDragging = true; const cX = e.clientX || e.touches[0].clientX; const cY = e.clientY || e.touches[0].clientY; offset = [calc.offsetLeft - cX, calc.offsetTop - cY]; };
+    const doDrag = (e) => { if (!isDragging) return; const cX = e.clientX || (e.touches ? e.touches[0].clientX : null); const cY = e.clientY || (e.touches ? e.touches[0].clientY : null); if(cX !== null) { calc.style.left = (cX + offset[0]) + "px"; calc.style.top = (cY + offset[1]) + "px"; }};
+    calc.addEventListener('mousedown', startDrag); calc.addEventListener('touchstart', startDrag);
+    document.addEventListener('mousemove', doDrag); document.addEventListener('touchmove', doDrag, {passive:false});
+    document.addEventListener('mouseup', () => isDragging = false); document.addEventListener('touchend', () => isDragging = false);
 
     function renderFields() {
         const body = document.getElementById('konto-body');
-        body.innerHTML = `
-            <tr>
-                <td id="soll-col">
-                    ${[1,2,3].map(i => `<div class="entry"><select id="s-sel-${i}"></select><input type="number" class="val-in" id="s-val-${i}"></div>`).join('')}
-                    <div class="sum-line"><span>Summe:</span> <input type="number" class="val-in" id="s-sum"></div>
-                </td>
-                <td id="haben-col">
-                    ${[1,2,3,4,5,6].map(i => `<div class="entry"><select id="h-sel-${i}"></select><input type="number" class="val-in" id="h-val-${i}"></div>`).join('')}
-                    <div class="sum-line"><span>Summe:</span> <input type="number" class="val-in" id="h-sum"></div>
-                </td>
-            </tr>
-        `;
-        document.querySelectorAll('select').forEach(sel => {
-            alleKonten.forEach(k => sel.add(new Option(k, k)));
-        });
+        body.innerHTML = `<tr>
+            <td id="soll-col">${[1,2,3].map(i => `<div class="entry"><select id="s-sel-${i}"></select><input type="number" inputmode="decimal" class="val-in" id="s-val-${i}"></div>`).join('')}<div class="sum-line"><span>Summe:</span> <input type="number" inputmode="decimal" class="val-in" id="s-sum"></div></td>
+            <td id="haben-col">${[1,2,3,4,5,6].map(i => `<div class="entry"><select id="h-sel-${i}"></select><input type="number" inputmode="decimal" class="val-in" id="h-val-${i}"></div>`).join('')}<div class="sum-line"><span>Summe:</span> <input type="number" inputmode="decimal" class="val-in" id="h-sum"></div></td>
+        </tr>`;
+        document.querySelectorAll('select').forEach(sel => { alleKonten.forEach(k => sel.add(new Option(k, k))); });
     }
 
     function generateTask() {
         renderFields();
-        
-        // Zufällige Beträge generieren
         const r = (min, max) => Math.floor(Math.random() * (max - min + 1) + min) * 100;
-        
-        const d = {
-            bga: r(300, 600),
-            fuhrpark: r(200, 450),
-            waren: r(80, 200),
-            ford: r(40, 120),
-            bank: r(100, 300),
-            kasse: r(10, 50),
-            darlehen: r(200, 400),
-            verb: r(100, 300)
-        };
-        
+        const d = { bga: r(300, 600), fuhrpark: r(200, 450), waren: r(80, 200), ford: r(40, 120), bank: r(100, 300), kasse: r(10, 50), darlehen: r(200, 400), verb: r(100, 300) };
         const vermoegen = d.bga + d.fuhrpark + d.waren + d.ford + d.bank + d.kasse;
-        const schulden = d.darlehen + d.verb;
-        const ek = vermoegen - schulden;
-        config.current = { ...d, ek, sum: vermoegen };
-
-        document.getElementById('label-soll-info').innerText = (config.level === 1) ? "(Passiva)" : "";
-        document.getElementById('label-haben-info').innerText = (config.level === 1) ? "(Aktiva)" : "";
-
-        let t = `<b>Aufgabe (Stufe ${config.level}):</b> Bilanzwerte am 01.01.:<br>`;
-        t += `Aktiva: BGA ${d.bga}€, Fuhrpark ${d.fuhrpark}€, Waren ${d.waren}€, Forderungen ${d.ford}€, Bank ${d.bank}€, Kasse ${d.kasse}€.<br>`;
-        t += `Passiva: Darlehen ${d.darlehen}€, Verbindlichkeiten ${d.verb}€.<br>Berechne das Eigenkapital und erstelle das EBK.`;
-        document.getElementById('task').innerHTML = t;
-
+        const ek = vermoegen - (d.darlehen + d.verb);
+        config.currentTask = { ...d, ek, sum: vermoegen };
+        document.getElementById('task').innerHTML = `<b>Aufgabe:</b> Bilanzwerte:<br>Aktiva: BGA ${d.bga}€, Fuhrpark ${d.fuhrpark}€, Waren ${d.waren}€, Forderungen ${d.ford}€, Bank ${d.bank}€, Kasse ${d.kasse}€.<br>Passiva: Darlehen ${d.darlehen}€, Verb. a.L.L. ${d.verb}€.<br>Berechne das EK und erstelle das EBK.`;
         document.getElementById('feedbackBox').style.display = 'none';
+        document.getElementById('nextTaskBtn').disabled = true; document.getElementById('nextTaskBtn').classList.remove('enabled');
 
         if(config.level === 1) {
-            autoFill('s-sel-1', K_EK);
-            autoFill('s-sel-2', K_DARL, d.darlehen);
-            autoFill('s-sel-3', K_VERB, d.verb);
-            autoFill('h-sel-1', "BGA", d.bga); 
-            autoFill('h-sel-2', "Fuhrpark", d.fuhrpark);
-            autoFill('h-sel-3', "Waren (Vorrat)", d.waren); 
-            autoFill('h-sel-4', "Forderungen a. L. L.", d.ford);
-            autoFill('h-sel-5', "Bank", d.bank); 
-            autoFill('h-sel-6', "Kasse", d.kasse);
-            autoFill('s-sum', vermoegen); 
-            autoFill('h-sum', vermoegen);
-        } else if(config.level === 2) {
-            autoFill('s-sum', vermoegen); 
-            autoFill('h-sum', vermoegen);
+            document.getElementById('s-sel-1').value = K_EK; document.getElementById('s-sel-2').value = K_DARL; document.getElementById('s-val-2').value = d.darlehen;
+            document.getElementById('s-sel-3').value = K_VERB; document.getElementById('s-val-3').value = d.verb;
+            const hKeys = ["bga", "fuhrpark", "waren", "ford", "bank", "kasse"];
+            [1,2,3,4,5,6].forEach((n, i) => { 
+                document.getElementById(`h-sel-${n}`).value = kontenAktiv[i]; 
+                document.getElementById(`h-val-${n}`).value = d[hKeys[i]]; 
+            });
+            document.querySelectorAll('input, select').forEach(el => { if(el.id !== 's-val-1' && el.id !== 's-sum' && el.id !== 'h-sum') el.disabled = true; });
         }
-    }
-
-    function autoFill(selId, selVal, inputVal) {
-        const sel = document.getElementById(selId);
-        const inp = document.getElementById(selId.replace('sel', 'val'));
-        if(sel) { sel.value = selVal; sel.disabled = true; }
-        if(inputVal !== undefined && inp) { inp.value = inputVal; inp.disabled = true; }
     }
 
     function validate() {
-        const c = config.current;
-        const getV = (id) => parseInt(document.getElementById(id).value) || 0;
-        const getS = (id) => document.getElementById(id).value;
+        const c = config.currentTask; const getV = (id) => parseInt(document.getElementById(id).value) || 0; const getS = (id) => document.getElementById(id).value;
         let err = [];
+        const sEntries = [1,2,3].map(i => ({k: getS(`s-sel-${i}`), v: getV(`s-val-${i}`)}));
+        const hEntries = [1,2,3,4,5,6].map(i => ({k: getS(`h-sel-${i}`), v: getV(`h-val-${i}`)}));
 
-        const sollEntries = []; 
-        const habenEntries = [];
-        for(let i=1; i<=3; i++) sollEntries.push({k: getS(`s-sel-${i}`), v: getV(`s-val-${i}`)});
-        for(let i=1; i<=6; i++) habenEntries.push({k: getS(`h-sel-${i}`), v: getV(`h-val-${i}`)});
-
-        sollEntries.forEach(e => { if(kontenAktiv.includes(e.k)) err.push(`❌ ${e.k} gehört ins Haben des EBK.`); });
-        habenEntries.forEach(e => { if(kontenPassiv.includes(e.k)) err.push(`❌ ${e.k} gehört ins Soll des EBK.`); });
-
-        checkBetrag(sollEntries, K_EK, c.ek, err);
-        checkBetrag(sollEntries, K_DARL, c.darlehen, err);
-        checkBetrag(sollEntries, K_VERB, c.verb, err);
-        checkBetrag(habenEntries, "BGA", c.bga, err);
-        checkBetrag(habenEntries, "Fuhrpark", c.fuhrpark, err);
-        checkBetrag(habenEntries, "Waren (Vorrat)", c.waren, err);
-        checkBetrag(habenEntries, "Forderungen a. L. L.", c.ford, err);
-        checkBetrag(habenEntries, "Bank", c.bank, err);
-        checkBetrag(habenEntries, "Kasse", c.kasse, err);
+        const checkValue = (list, name, target) => { const item = list.find(x => x.k === name); if(!item || item.v !== target) err.push(`Fehler bei ${name}`); };
+        checkValue(sEntries, K_EK, c.ek); checkValue(sEntries, K_DARL, c.darlehen); checkValue(sEntries, K_VERB, c.verb);
+        checkValue(hEntries, "BGA", c.bga); checkValue(hEntries, "Fuhrpark", c.fuhrpark); checkValue(hEntries, "Waren (Vorrat)", c.waren);
+        checkValue(hEntries, "Forderungen a. L. L.", c.ford); checkValue(hEntries, "Bank", c.bank); checkValue(hEntries, "Kasse", c.kasse);
 
         if(config.level === 3) {
-            // Prüfung der strengen Reihenfolge
-            if(getS('h-sel-1') !== "BGA" || getS('h-sel-2') !== "Fuhrpark") err.push("❌ Reihenfolge Haben: Anlagevermögen zuerst.");
-            if(getS('h-sel-6') !== "Kasse") err.push("❌ Reihenfolge Haben: Kasse zuletzt (höchste Liquidität).");
-            if(getS('s-sel-1') !== K_EK) err.push("❌ Reihenfolge Soll: Eigenkapital zuerst.");
+            if(sEntries[0].k !== K_EK) err.push("Stufe 3: Eigenkapital muss oben stehen.");
+            if(hEntries[0].k !== "BGA" && hEntries[0].k !== "Fuhrpark") err.push("Stufe 3: Anlagevermögen muss oben stehen.");
+            const last2 = [hEntries[4].k, hEntries[5].k];
+            if(!last2.includes("Bank") || !last2.includes("Kasse")) err.push("Stufe 3: Bank/Kasse ans Ende.");
+            if(sEntries[2].k !== K_VERB) err.push("Stufe 3: Verbindlichkeiten ans Ende der Soll-Seite.");
         }
+        if(getV('s-sum') !== c.sum || getV('h-sum') !== c.sum) err.push("Die Summen sind nicht korrekt.");
 
         const fb = document.getElementById('feedbackBox'); fb.style.display = 'block';
-        if(err.length === 0 && getV('s-sum') === c.sum) {
-            fb.innerHTML = "✅ Hervorragend! Das EBK ist perfekt eröffnet.";
-            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+        if(err.length === 0) {
+            fb.innerHTML = "✅ Hervorragend!"; fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+            document.getElementById('nextTaskBtn').disabled = false; document.getElementById('nextTaskBtn').classList.add('enabled');
         } else {
-            fb.innerHTML = "<b>Hinweise:</b><br>" + [...new Set(err)].slice(0,3).join("<br>");
-            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+            fb.innerHTML = "❌ " + err[0]; fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
         }
     }
-
-    function checkBetrag(list, name, target, errList) {
-        const item = list.find(x => x.k === name);
-        if(!item) errList.push(`❌ Konto "${name}" fehlt auf der korrekten Seite.`);
-        else if(item.v !== target) errList.push(`❌ Betrag für "${name}" ist falsch.`);
-    }
-
     window.onload = generateTask;
 </script>
 </body>
