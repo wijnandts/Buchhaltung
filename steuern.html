@@ -9,7 +9,6 @@
             --ust-color: #27ae60; 
             --vst-color: #00ced1; 
             --primary: var(--ust-color); 
-            --primary-dark: #1e8449; 
             --bg: #f7fcf9; 
             --success: #2ecc71; 
             --error: #e74c3c; 
@@ -35,7 +34,7 @@
         .calc-btn.eq { background: var(--success); grid-column: span 2; }
         .calc-btn.clr { background: var(--error); grid-column: span 2; }
 
-        h1 { color: var(--primary); text-align: center; font-size: 1.4rem; margin: 15px 0; }
+        h1 { color: var(--primary); text-align: center; font-size: 1.4rem; margin: 15px 0; text-transform: uppercase; }
         .task-box { background: #f0fdfa; border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 15px; border-radius: 4px; font-size: 0.95rem; line-height: 1.5; color: #1e462f; }
         
         .konto-grid { overflow-x: auto; }
@@ -45,9 +44,9 @@
         .t-konto td:last-child { border-right: none; }
         
         .entry { display: flex; gap: 5px; align-items: center; margin-bottom: 10px; }
-        .gk-field { font-size: 0.75rem; color: #444; width: 110px; overflow: hidden; white-space: nowrap; }
-        .gk-select { flex-grow: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.85rem; background: #fff; }
-        .val-input { width: 95px; padding: 8px; border: 1px solid #ccc; border-radius: 6px; text-align: right; font-size: 0.9rem; }
+        .gk-field { font-size: 0.75rem; color: #444; width: 130px; overflow: hidden; white-space: nowrap; font-weight: bold; }
+        .gk-select { flex-grow: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.85rem; background: #fff; font-weight: bold; }
+        .val-input { width: 105px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.9rem; font-weight: bold; }
         
         .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 10px; padding: 10px 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
 
@@ -57,13 +56,6 @@
         .btn-next.enabled { background-color: var(--success); opacity: 1; cursor: pointer; }
 
         .feedback { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; font-weight: bold; text-align: center; border: 2px solid transparent; }
-        
-        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 650px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-        .close { position: absolute; top: 15px; right: 25px; font-size: 32px; cursor: pointer; color: #888; }
-        .help-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .help-table td, .help-table th { border: 1px solid #ddd; padding: 10px; font-size: 0.85rem; }
-        .help-table th { background: #f8f9fa; text-align: left; }
     </style>
 </head>
 <body>
@@ -93,7 +85,7 @@
 
 <div class="app-container">
     <div class="header-actions">
-        <a href="mailto:wijnandts@bk-erkelenz.de" class="btn-round" title="Kontakt">✉</a>
+        <a href="mailto:wijnandts@bk-erkelenz.de" class="btn-round">✉</a>
         <button class="btn-round" onclick="toggleCalc()" title="Rechner">🖩</button>
         <button class="btn-round" onclick="toggleHelp(true)" title="Hilfe">?</button>
     </div>
@@ -130,21 +122,6 @@
     <button id="nextTaskBtn" class="btn-action btn-next" onclick="generateTask()" disabled>Nächste Aufgabe</button>
 </div>
 
-<div id="helpModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="toggleHelp(false)">&times;</span>
-        <h2 id="modal-title" style="color: var(--primary)">Anleitung & Stufenübersicht</h2>
-        <p><b>Merke:</b> Umsatzsteuer (Passiv) nimmt im Haben zu. Vorsteuer (Aktiv) nimmt im Soll zu.</p>
-        <table class="help-table">
-            <tr><th>Stufe</th><th>Regeln</th></tr>
-            <tr><td><b>Stufe 1</b></td><td>AB eintragen (über EBK) + 1 Buchung. Gegenkonten fest.</td></tr>
-            <tr><td><b>Stufe 2</b></td><td>Mehrere Buchungen. Gegenkonten aus Liste wählen.</td></tr>
-            <tr><td><b>Stufe 3</b></td><td>Brutto-Werte umrechnen (Brutto / 1,19 * 0,19). <b>Abschluss über SBK</b> + Summen.</td></tr>
-        </table>
-        <button class="btn-action btn-check" style="margin-top: 20px;" onclick="toggleHelp(false)">Alles klar!</button>
-    </div>
-</div>
-
 <script>
     let config = { level: 1 };
     let currentTask = { type: 'UST', solS: [], solH: [], targetSum: 0 };
@@ -152,36 +129,21 @@
 
     const poolUST = [
         {t:"Warenverkauf auf Ziel", v:5000, gk:"Forderungen a. L. L."},
-        {t:"Barverkauf von Waren", v:450, gk:"Kasse"},
-        {t:"Bankgutschrift aus Verkauf", v:3200, gk:"Bank"}
+        {t:"Barverkauf von Handelswaren", v:450, gk:"Kasse"},
+        {t:"Banküberweisung aus Warenverkauf", v:3200, gk:"Bank"}
     ];
 
     const poolVST = [
         {t:"Wareneinkauf auf Ziel", v:2000, gk:"Verbindlichkeiten a. L. L."},
-        {t:"Barzahlung Büromaterial", v:100, gk:"Kasse"},
-        {t:"Rechnung für Reparatur per Bank", v:600, gk:"Bank"}
+        {t:"Barzahlung für Büromaterial", v:120, gk:"Kasse"},
+        {t:"Reparaturrechnung per Banküberweisung", v:600, gk:"Bank"}
     ];
 
-    function toggleHelp(s) { document.getElementById('helpModal').style.display = s ? 'block' : 'none'; }
+    const fmt = (n) => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    function toggleHelp(s) { /* Logic handled in separate help view if needed */ }
     function toggleCalc() { const c = document.getElementById("calc-container"); c.style.display = (c.style.display === "block") ? "none" : "block"; }
     function setLevel(l, b) { config.level = parseInt(l); document.querySelectorAll('.level-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); generateTask(); }
-
-    // Rechner Logik
-    let calcVal = "0";
-    function updateCalc() { document.getElementById("calc-display").value = calcVal; }
-    function calcNum(n) { calcVal === "0" && n !== "." ? calcVal = n : calcVal += n; updateCalc(); }
-    function calcOp(op) { calcVal += " " + op + " "; updateCalc(); }
-    function calcClear() { calcVal = "0"; updateCalc(); }
-    function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); } catch { calcVal = "Error"; } updateCalc(); }
-
-    // Drag-Logik
-    const calc = document.getElementById("calc-container");
-    let isDragging = false, offset = [0,0];
-    const startDrag = (e) => { if(e.target.tagName === 'BUTTON') return; isDragging = true; const cX = e.clientX || e.touches[0].clientX; const cY = e.clientY || e.touches[0].clientY; offset = [calc.offsetLeft - cX, calc.offsetTop - cY]; };
-    const doDrag = (e) => { if (!isDragging) return; const cX = e.clientX || (e.touches ? e.touches[0].clientX : null); const cY = e.clientY || (e.touches ? e.touches[0].clientY : null); if(cX !== null) { calc.style.left = (cX + offset[0]) + "px"; calc.style.top = (cY + offset[1]) + "px"; }};
-    calc.addEventListener('mousedown', startDrag); calc.addEventListener('touchstart', startDrag);
-    document.addEventListener('mousemove', doDrag); document.addEventListener('touchmove', doDrag, {passive:false});
-    document.addEventListener('mouseup', () => isDragging = false); document.addEventListener('touchend', () => isDragging = false);
 
     function generateTask() {
         const nextBtn = document.getElementById('nextTaskBtn');
@@ -192,7 +154,7 @@
         document.documentElement.style.setProperty('--primary', isUst ? '#27ae60' : '#00ced1');
         
         document.getElementById('page-title').innerText = isUst ? 'Umsatzsteuer führen' : 'Vorsteuer führen';
-        document.getElementById('konto-name-header').innerText = isUst ? 'Umsatzsteuer (Passiv)' : 'Vorsteuer (Aktiv)';
+        document.getElementById('konto-name-header').innerText = isUst ? 'Umsatzsteuer' : 'Vorsteuer';
 
         let anzahl = config.level === 1 ? 1 : (config.level === 2 ? 2 : 3);
         let ab = Math.floor(Math.random() * 2000) + 500;
@@ -200,28 +162,33 @@
         let selected = [...pool].sort(() => 0.5 - Math.random()).slice(0, anzahl);
 
         currentTask.solS = []; currentTask.solH = [];
-        let totalVal = ab;
+        let totalTax = ab;
 
         if(isUst) currentTask.solH.push({gk: "EBK", v: ab});
         else currentTask.solS.push({gk: "EBK", v: ab});
 
         selected.forEach(f => {
-            let st = Math.round(f.v * 0.19 * 100) / 100;
-            if(isUst) currentTask.solH.push({gk: f.gk, v: st});
-            else currentTask.solS.push({gk: f.gk, v: st});
-            totalVal += st;
+            let taxValue = Math.round(f.v * 0.19 * 100) / 100;
+            if(isUst) currentTask.solH.push({gk: f.gk, v: taxValue});
+            else currentTask.solS.push({gk: f.gk, v: taxValue});
+            totalTax += taxValue;
+            f.taxVal = taxValue;
         });
 
         if(config.level === 3) {
-            if(isUst) currentTask.solS.push({gk: "SBK", v: Math.round(totalVal*100)/100});
-            else currentTask.solH.push({gk: "SBK", v: Math.round(totalVal*100)/100});
-            currentTask.targetSum = totalVal;
+            let saldo = Math.round(totalTax * 100) / 100;
+            if(isUst) currentTask.solS.push({gk: "SBK", v: saldo});
+            else currentTask.solH.push({gk: "SBK", v: saldo});
+            currentTask.targetSum = totalTax;
         }
 
-        let taskText = `<b>Anfangsbestand:</b> ${ab.toFixed(2)} €<br><br><b>Buchungen:</b><br>`;
+        let taskText = `<b>Anfangsbestand:</b> ${fmt(ab)} €<br><br><b>Buchungen:</b><br>`;
         selected.forEach(f => {
-            if(config.level === 3 && Math.random() > 0.5) taskText += `• ${f.t}: Bruttobetrag ${(f.v * 1.19).toFixed(2)} € (inkl. 19% Steuer)<br>`;
-            else taskText += `• ${f.t}: Steuerbetrag ${(f.v * 0.19).toFixed(2)} €<br>`;
+            if(config.level === 3 && Math.random() > 0.5) {
+                taskText += `• ${f.t}: Bruttobetrag ${fmt(f.v * 1.19)} € (inkl. 19% Steuer)<br>`;
+            } else {
+                taskText += `• ${f.t}: Steuerbetrag ${fmt(f.taxVal)} €<br>`;
+            }
         });
         document.getElementById('task').innerHTML = taskText;
         render();
@@ -235,9 +202,9 @@
                 h += `<div class="entry">`;
                 if(config.level < 2) h += `<span class="gk-field" id="${side}-label-${i}">${solList[i] ? solList[i].gk : ""}</span>`;
                 else h += `<select class="gk-select" id="${side}-gk-${i}"><option value="">Gegenkonto</option>${kontenListe.map(k=>`<option value="${k}">${k}</option>`).join('')}</select>`;
-                h += `<input type="number" inputmode="decimal" class="val-input" id="${side}-val-${i}"></div>`;
+                h += `<input type="number" step="0.01" class="val-input" id="${side}-val-${i}"></div>`;
             }
-            if(config.level === 3) h += `<div class="sum-line"><span>Summe:</span> <input type="number" inputmode="decimal" class="val-input" id="${side}-sum"></div>`;
+            if(config.level === 3) h += `<div class="sum-line"><span>Summe:</span> <input type="number" step="0.01" class="val-input" id="${side}-sum"></div>`;
             return h;
         };
         document.getElementById('soll-side').innerHTML = buildSide('s', currentTask.solS);
@@ -260,7 +227,7 @@
             if(user.length !== sol.length) return false;
             let solCopy = JSON.parse(JSON.stringify(sol));
             for(let u of user) {
-                let idx = solCopy.findIndex(s => Math.abs(s.v - u.v) < 0.1 && (config.level < 2 || s.gk === u.gk));
+                let idx = solCopy.findIndex(s => Math.abs(s.v - u.v) < 0.01 && (config.level < 2 || s.gk === u.gk));
                 if(idx === -1) return false;
                 solCopy.splice(idx, 1);
             }
@@ -271,16 +238,27 @@
         if(config.level === 3) {
             let sSum = Math.round((parseFloat(document.getElementById('s-sum').value)||0)*100)/100;
             let hSum = Math.round((parseFloat(document.getElementById('h-sum').value)||0)*100)/100;
-            if(sSum !== Math.round(currentTask.targetSum*100)/100 || hSum !== sSum) ok = false;
+            if(Math.abs(sSum - currentTask.targetSum) > 0.01 || Math.abs(hSum - sSum) > 0.01) ok = false;
         }
 
         if(ok) {
-            fb.innerHTML = "✅ Korrekt! Das Konto wurde über das SBK abgeschlossen."; fb.style.backgroundColor = "#d4edda";
+            fb.innerHTML = "✅ Hervorragend! Das Steuerkonto wurde korrekt geführt und abgeschlossen."; 
+            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
             document.getElementById('nextTaskBtn').disabled = false; document.getElementById('nextTaskBtn').classList.add('enabled');
         } else {
-            fb.innerHTML = "❌ Fehler in Buchungen, Gegenkonten oder Summen."; fb.style.backgroundColor = "#f8d7da";
+            fb.innerHTML = "❌ Fehler in den Buchungen, Gegenkonten oder Summen. Bitte prüfen!"; 
+            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
         }
     }
+
+    // Calculator Logic (Standard)
+    let calcVal = "0";
+    function updateCalc() { document.getElementById("calc-display").value = calcVal; }
+    function calcNum(n) { calcVal === "0" && n !== "." ? calcVal = n : calcVal += n; updateCalc(); }
+    function calcOp(op) { calcVal += " " + op + " "; updateCalc(); }
+    function calcClear() { calcVal = "0"; updateCalc(); }
+    function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); } catch { calcVal = "Error"; } updateCalc(); }
+
     window.onload = generateTask;
 </script>
 </body>
