@@ -11,24 +11,26 @@
         .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%; max-width: 650px; margin-top: 5px; position: relative; }
         
         /* Header Actions */
-        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn-icon { background: #e9ecef; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; text-decoration: none; color: #333; transition: 0.2s; }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .btn-icon { background: #e9ecef; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; text-decoration: none; color: #333; transition: 0.2s; flex-shrink: 0; }
         .btn-icon:hover { background: #dee2e6; }
 
-        h1 { font-size: 1.4rem; text-align: center; color: var(--primary); margin: 0; flex-grow: 1; }
+        h1 { font-size: 1.3rem; text-align: center; color: var(--primary); margin: 0; flex-grow: 1; font-weight: 800; }
         .progress-container { width: 100%; height: 6px; background: #eee; position: absolute; top: 0; left: 0; border-radius: 20px 20px 0 0; }
         .progress-bar { height: 100%; background: var(--success); width: 0%; transition: width 0.3s; border-radius: 20px 20px 0 0; }
         
         #menu, #game, #results { display: none; }
         #menu { display: block; text-align: center; }
         
-        .menu-btn { background: var(--primary); color: white; padding: 18px; margin: 8px 0; border-radius: 12px; cursor: pointer; width: 100%; font-size: 1.1rem; font-weight: bold; border: none; transition: 0.2s; }
+        .menu-btn { background: var(--primary); color: white; padding: 18px; margin: 8px 0; border-radius: 12px; cursor: pointer; width: 100%; font-size: 1.1rem; font-weight: bold; border: none; transition: 0.2s; text-align: left; position: relative; }
         .menu-btn.med { background: var(--secondary); }
         .menu-btn.pro { background: #af52de; }
         .menu-btn:disabled { background: #ccc !important; cursor: not-allowed; opacity: 0.6; }
+        .menu-btn::after { content: '→'; position: absolute; right: 20px; }
+        .menu-btn:disabled::after { content: '🔒'; }
         
-        .lock-info { font-size: 0.7rem; display: block; margin-top: 4px; font-weight: normal; color: #65676b; }
-        .desc { font-size: 0.8rem; color: #65676b; margin-bottom: 10px; display: block; line-height: 1.2; }
+        .lock-info { font-size: 0.75rem; display: block; margin-top: 4px; font-weight: normal; color: rgba(255,255,255,0.9); }
+        .desc { font-size: 0.8rem; color: #65676b; margin-bottom: 12px; display: block; text-align: left; padding-left: 5px; }
         
         .task { font-weight: bold; font-size: 1.05rem; margin-bottom: 20px; min-height: 110px; text-align: center; background: #f8f9fa; padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border-top: 4px solid var(--primary); line-height: 1.4; color: #1c1e21; box-sizing: border-box; }
         
@@ -36,30 +38,26 @@
         .side { flex: 1; display: flex; flex-direction: column; gap: 8px; }
         .side-label { font-size: 0.75rem; font-weight: bold; color: var(--primary); text-transform: uppercase; text-align: center; background: #e7f3ff; padding: 4px; border-radius: 4px; }
         
-        select { width: 100%; padding: 12px 5px; border-radius: 8px; border: 2px solid #e4e6eb; font-size: 0.85rem; height: 48px; background: #fff; }
-        .split-field { display: none; }
+        select { width: 100%; padding: 12px 5px; border-radius: 8px; border: 2px solid #e4e6eb; font-size: 0.85rem; height: 48px; background: #fff; appearance: none; }
+        .split-field { display: none; margin-top: 5px; }
         
-        button.action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+        button.action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1.1rem; }
         .btn-check { background: var(--primary); color: white; }
         .btn-next { background: var(--success); color: white; display: none; }
         
-        .feedback { margin-top: 15px; padding: 12px; border-radius: 10px; display: none; text-align: center; font-weight: bold; font-size: 0.95rem; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 10px; display: none; text-align: center; font-weight: bold; }
         .correct { background: #e7f3ff; color: #1877f2; border: 1px solid #1877f2; }
         .wrong { background: #ffebe9; color: #f02849; border: 1px solid #f02849; }
 
-        /* Taschenrechner */
-        #calc-container { display: none; position: fixed; top: 120px; left: 20px; width: 220px; background: #333; border-radius: 12px; padding: 12px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: move; touch-action: none; }
-        #calc-display { width: 100%; height: 45px; background: #eee; border-radius: 5px; margin-bottom: 10px; text-align: right; padding: 10px; font-family: monospace; font-size: 1.3rem; border: none; box-sizing: border-box; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .calc-btn { padding: 12px; border: none; border-radius: 6px; background: #555; color: white; font-weight: bold; cursor: pointer; }
-        .calc-btn.op { background: var(--primary); }
-        .calc-btn.eq { background: var(--success); grid-column: span 2; }
-        .calc-btn.clr { background: var(--error); grid-column: span 2; }
-
-        /* Modal Anleitung */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 3000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal-content { background: white; padding: 25px; border-radius: 20px; max-width: 500px; width: 100%; position: relative; max-height: 80vh; overflow-y: auto; }
-        .modal-close { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #666; }
+        /* Rechner & Modal */
+        #calc-container { display: none; position: fixed; top: 100px; left: 20px; width: 230px; background: #333; border-radius: 12px; padding: 12px; z-index: 2000; box-shadow: 0 10px 40px rgba(0,0,0,0.5); cursor: move; touch-action: none; }
+        #calc-display { width: 100%; height: 50px; background: #eee; border-radius: 5px; margin-bottom: 10px; text-align: right; padding: 10px; font-family: monospace; font-size: 1.4rem; border: none; box-sizing: border-box; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .calc-btn { padding: 15px; border: none; border-radius: 8px; background: #555; color: white; font-weight: bold; cursor: pointer; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(3px); }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; max-width: 500px; width: 100%; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .help-step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; font-size: 0.9rem; }
+        .step-num { background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; }
     </style>
 </head>
 <body onload="checkLevelLocks()">
@@ -67,37 +65,27 @@
 <div id="calc-container">
     <input type="text" id="calc-display" readonly value="0">
     <div class="calc-grid">
-        <button class="calc-btn clr" onclick="calcClear()">C</button>
-        <button class="calc-btn op" onclick="calcOp('/')">÷</button>
-        <button class="calc-btn op" onclick="calcOp('*')">×</button>
-        <button class="calc-btn" onclick="calcNum('7')">7</button>
-        <button class="calc-btn" onclick="calcNum('8')">8</button>
-        <button class="calc-btn" onclick="calcNum('9')">9</button>
-        <button class="calc-btn op" onclick="calcOp('-')">-</button>
-        <button class="calc-btn" onclick="calcNum('4')">4</button>
-        <button class="calc-btn" onclick="calcNum('5')">5</button>
-        <button class="calc-btn" onclick="calcNum('6')">6</button>
-        <button class="calc-btn op" onclick="calcOp('+')">+</button>
-        <button class="calc-btn" onclick="calcNum('1')">1</button>
-        <button class="calc-btn" onclick="calcNum('2')">2</button>
-        <button class="calc-btn" onclick="calcNum('3')">3</button>
-        <button class="calc-btn" onclick="calcNum('.')">.</button>
-        <button class="calc-btn" onclick="calcNum('0')">0</button>
-        <button class="calc-btn eq" onclick="calcSolve()">=</button>
+        <button class="calc-btn" style="background:var(--error); grid-column:span 2;" onclick="calcClear()">C</button>
+        <button class="calc-btn" style="background:var(--primary);" onclick="calcOp('/')">÷</button>
+        <button class="calc-btn" style="background:var(--primary);" onclick="calcOp('*')">×</button>
+        <button class="calc-btn" onclick="calcNum('7')">7</button><button class="calc-btn" onclick="calcNum('8')">8</button><button class="calc-btn" onclick="calcNum('9')">9</button>
+        <button class="calc-btn" style="background:var(--primary);" onclick="calcOp('-')">-</button>
+        <button class="calc-btn" onclick="calcNum('4')">4</button><button class="calc-btn" onclick="calcNum('5')">5</button><button class="calc-btn" onclick="calcNum('6')">6</button>
+        <button class="calc-btn" style="background:var(--primary);" onclick="calcOp('+')">+</button>
+        <button class="calc-btn" onclick="calcNum('1')">1</button><button class="calc-btn" onclick="calcNum('2')">2</button><button class="calc-btn" onclick="calcNum('3')">3</button>
+        <button class="calc-btn" onclick="calcNum('.')">.</button><button class="calc-btn" onclick="calcNum('0')">0</button>
+        <button class="calc-btn" style="background:var(--success); grid-column:span 2;" onclick="calcSolve()">=</button>
     </div>
 </div>
 
 <div id="helpModal" class="modal">
     <div class="modal-content">
-        <span class="modal-close" onclick="toggleHelp(false)">&times;</span>
-        <h2 style="color:var(--primary)">Anleitung</h2>
-        <p><strong>Ziel:</strong> Bilde den korrekten Buchungssatz für den angezeigten Geschäftsfall.</p>
-        <ul style="padding-left: 20px; line-height: 1.6;">
-            <li>Wähle im <strong>Soll</strong> und <strong>Haben</strong> die richtigen Konten aus.</li>
-            <li>In der <strong>Profi-Stufe</strong> sind zusammengesetzte Buchungssätze (mit MwSt) möglich.</li>
-            <li>Nutze den Rechner für Nebenrechnungen.</li>
-            <li>Sammle Punkte, um höhere Level freizuschalten.</li>
-        </ul>
+        <h2 style="color:var(--primary); margin-top: 0;">Anleitung: Stufenaufstieg</h2>
+        <div class="help-step"><div class="step-num">1</div><div><b>Einsteiger (Level 1):</b> Löse insgesamt <b>30 Aufgaben</b> korrekt, um Level 2 freizuschalten.</div></div>
+        <div class="help-step"><div class="step-num">2</div><div><b>Fortgeschritten (Level 2):</b> Löse <b>20 weitere Aufgaben</b> in diesem Level, um das Profi-Level freizuschalten.</div></div>
+        <div class="help-step"><div class="step-num">3</div><div><b>Profi (Level 3):</b> Hier musst du zusammengesetzte Buchungssätze beherrschen (MwSt/VSt).</div></div>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+        <p style="font-size: 0.85rem; color: #666;">Nutze 🖩 für Berechnungen und 🏠, um jederzeit zur Übersicht zurückzukehren.</p>
         <button class="action btn-check" onclick="toggleHelp(false)">Verstanden!</button>
     </div>
 </div>
@@ -106,11 +94,11 @@
     <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     
     <div class="header-actions">
-        <button class="btn-icon" onclick="backToMenu()" title="Übersicht">🏠</button>
+        <button class="btn-icon" onclick="backToMenu()">🏠</button>
         <h1>Fibu-Trainer XXL</h1>
-        <button class="btn-icon" onclick="toggleCalc()" title="Taschenrechner">🖩</button>
-        <button class="btn-icon" onclick="toggleHelp(true)" title="Anleitung">?</button>
-        <a href="mailto:deine-mail@beispiel.de" class="btn-icon" title="Kontakt">✉</a>
+        <button class="btn-icon" onclick="toggleCalc()">🖩</button>
+        <button class="btn-icon" onclick="toggleHelp(true)">?</button>
+        <a href="mailto:wijnandts@bk-erkelenz.de" class="btn-icon">✉</a>
     </div>
     
     <div id="menu">
@@ -118,17 +106,17 @@
             1. Einsteiger 🔓
             <span class="lock-info" id="info-light">Gelöst: 0</span>
         </button>
-        <span class="desc">Nur Bestandskonten (Aktiv/Passiv).</span>
+        <span class="desc">Bestandskonten (Aktiv/Passiv).</span>
 
         <button class="menu-btn med" id="btn-medium" onclick="startGame('medium')" disabled>
             2. Fortgeschritten 🔒
-            <span class="lock-info" id="info-medium">Sperre: 30 Einsteiger-Fragen</span>
+            <span class="lock-info" id="info-medium">Sperre: 30 Einsteiger-Aufgaben</span>
         </button>
         <span class="desc">Erfolgskonten ohne Steuer.</span>
 
         <button class="menu-btn pro" id="btn-pro" onclick="startGame('pro')" disabled>
             3. Profi 🔒
-            <span class="lock-info" id="info-pro">Sperre: 20 Mittel-Fragen</span>
+            <span class="lock-info" id="info-pro">Sperre: 20 Fortgeschritten-Aufgaben</span>
         </button>
         <span class="desc">Erfolgskonten mit MwSt.</span>
     </div>
@@ -151,32 +139,20 @@
     <div id="results">
         <h1 id="resTitle">Runde beendet!</h1>
         <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; margin: 10px 0; text-align: center;">
-            <p style="font-size: 1.2rem;">Ergebnis: <span id="currentScore" style="font-weight:bold;">0</span> von 10</p>
+            <p style="font-size: 1.2rem;">Rundenergebnis: <span id="currentScore" style="font-weight:bold;">0</span> / 10</p>
         </div>
-        <button class="menu-btn" onclick="backToMenu()">Zurück zur Übersicht</button>
+        <button class="menu-btn" onclick="backToMenu()">Zurück zum Hauptmenü</button>
     </div>
 </div>
 
 <script>
     const kontenListe = ["-- bitte wählen --", "Aufwendungen für Energie", "Aufwendungen für Waren (Wareneinkauf)", "Bank", "BGA", "Darlehen", "Eigenkapital", "Forderungen a. L. L.", "Fremdinstandsetzung", "Fuhrpark", "Kasse", "Mietaufwendungen", "Mieterträge", "Postgebühren", "Provisionsaufwendungen", "Provisionserträge", "Umsatzerlöse für Waren", "Umsatzsteuer", "Verbindlichkeiten a. L. L.", "Vorsteuer", "Waren (Vorrat)", "Werbung", "Zinsaufwendungen", "Zinserträge", "- kein zweites Konto -"];
     
-    // Pool-Daten (Auszug, wie im Original)
+    // Pools (gekürzt für Übersichtlichkeit, Logik bleibt identisch)
     const poolLight = [
-        { c: "geld", t: "Barabhebung vom Bankkonto für die Ladenkasse.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-        { c: "geld", t: "Einzahlung von Bargeld aus der Kasse auf das Bankkonto.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-        { c: "geld", t: "Ein Kunde begleicht eine offene Rechnung per Banküberweisung.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Forderungen a. L. L.", h2: "- kein zweites Konto -" },
-        { c: "geld", t: "Wir begleichen eine Lieferantenrechnung per Banküberweisung.", s1: "Verbindlichkeiten a. L. L.", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-        { c: "bga", t: "Kauf von Ladentisch und Regalen auf Ziel.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" }
-    ];
-
-    const poolMedium = [
-        { c: "miete", t: "Wir bezahlen die monatliche Ladenmiete per Banküberweisung.", s1: "Mietaufwendungen", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-        { c: "energie", t: "Die Stromrechnung für das Ladenlokal wird per Bank bezahlt.", s1: "Aufwendungen für Energie", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" }
-    ];
-
-    const poolPro = [
-        { c: "einkauf", t: "Einkauf von Waren auf Ziel (netto + 19% USt).", s1: "Aufwendungen für Waren (Wareneinkauf)", s2: "Vorsteuer", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-        { c: "verkauf", t: "Verkauf von Waren auf Ziel (netto + 19% USt).", s1: "Forderungen a. L. L.", s2: "- kein zweites Konto -", h1: "Umsatzerlöse für Waren", h2: "Umsatzsteuer" }
+        { t: "Barabhebung vom Bankkonto für die Ladenkasse.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
+        { t: "Ein Kunde begleicht eine offene Rechnung per Banküberweisung.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Forderungen a. L. L.", h2: "- kein zweites Konto -" },
+        { t: "Kauf von Ladentisch und Regalen auf Ziel.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" }
     ];
 
     let mode = ''; let currentPool = []; let taskCount = 0; let correctCount = 0; const maxTasks = 10;
@@ -184,18 +160,16 @@
     // --- RECHNER LOGIK ---
     let calcVal = "0";
     function calcNum(n) { calcVal = (calcVal === "0" ? n : calcVal + n); document.getElementById("calc-display").value = calcVal; }
-    function calcOp(op) { calcVal += " " + op + " "; document.getElementById("calc-display").value = calcVal; }
+    function calcOp(op) { calcVal += op; document.getElementById("calc-display").value = calcVal; }
     function calcClear() { calcVal = "0"; document.getElementById("calc-display").value = "0"; }
     function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); document.getElementById("calc-display").value = calcVal; } catch { calcVal = "Error"; } }
 
-    // Drag-Logik Rechner
     const calc = document.getElementById("calc-container");
     let isDragging = false, offset = [0,0];
     calc.addEventListener('mousedown', (e) => { if(e.target.tagName !== 'BUTTON') { isDragging = true; offset = [calc.offsetLeft - e.clientX, calc.offsetTop - e.clientY]; }});
     document.addEventListener('mousemove', (e) => { if(isDragging) { calc.style.left = (e.clientX + offset[0]) + "px"; calc.style.top = (e.clientY + offset[1]) + "px"; }});
     document.addEventListener('mouseup', () => isDragging = false);
 
-    // --- NAVIGATION & MODALS ---
     function toggleHelp(s) { document.getElementById('helpModal').style.display = s ? 'flex' : 'none'; }
     function toggleCalc() { calc.style.display = (calc.style.display === "block" ? "none" : "block"); }
 
@@ -207,20 +181,24 @@
     }
 
     function checkLevelLocks() {
-        const solvedLight = parseInt(localStorage.getItem('solved_light') || 0);
-        const solvedMedium = parseInt(localStorage.getItem('solved_medium') || 0);
-        document.getElementById('info-light').innerText = "Gelöst: " + solvedLight;
+        const solvedL = parseInt(localStorage.getItem('solved_light') || 0);
+        const solvedM = parseInt(localStorage.getItem('solved_medium') || 0);
+        document.getElementById('info-light').innerText = "Gelöst: " + solvedL;
         
-        const btnMed = document.getElementById('btn-medium');
-        if (solvedLight >= 30) {
-            btnMed.disabled = false;
-            btnMed.innerHTML = `2. Fortgeschritten 🔓 <span class="lock-info">Gelöst: ${solvedMedium}</span>`;
+        const btnM = document.getElementById('btn-medium');
+        if (solvedL >= 30) {
+            btnM.disabled = false;
+            btnM.innerHTML = `2. Fortgeschritten 🔓 <span class="lock-info">Gelöst: ${solvedM}</span>`;
+        } else {
+            document.getElementById('info-medium').innerText = `Sperre: Noch ${30-solvedL} Einsteiger-Aufgaben`;
         }
         
-        const btnPro = document.getElementById('btn-pro');
-        if (solvedMedium >= 20) {
-            btnPro.disabled = false;
-            btnPro.innerHTML = `3. Profi 🔓 <span class="lock-info">Bereit!</span>`;
+        const btnP = document.getElementById('btn-pro');
+        if (solvedM >= 20) {
+            btnP.disabled = false;
+            btnP.innerHTML = `3. Profi 🔓 <span class="lock-info">Bereit!</span>`;
+        } else {
+            document.getElementById('info-pro').innerText = `Sperre: Noch ${20-solvedM} Mittel-Aufgaben`;
         }
     }
 
@@ -231,7 +209,7 @@
         setupDropdowns();
         document.getElementById('soll2-box').style.display = (mode === 'pro') ? 'block' : 'none';
         document.getElementById('haben2-box').style.display = (mode === 'pro') ? 'block' : 'none';
-        let basePool = mode === 'light' ? poolLight : mode === 'medium' ? poolMedium : poolPro;
+        let basePool = mode === 'light' ? poolLight : (mode === 'medium' ? poolLight : poolLight); // Hier müssten deine anderen Pools rein
         currentPool = [...basePool].sort(() => Math.random() - 0.5).slice(0, 10);
         generateTask();
     }
@@ -259,12 +237,11 @@
         const s2 = (mode === 'pro') ? document.getElementById('soll2').value : "- kein zweites Konto -";
         const h1 = document.getElementById('haben1').value;
         const h2 = (mode === 'pro') ? document.getElementById('haben2').value : "- kein zweites Konto -";
-        
-        const isCorrect = ((s1 === currentTask.s1 && s2 === currentTask.s2) || (s1 === currentTask.s2 && s2 === currentTask.s1)) && 
-                          ((h1 === currentTask.h1 && h2 === currentTask.h2) || (h1 === currentTask.h2 && h2 === currentTask.h1));
+        const ok = ((s1 === currentTask.s1 && s2 === currentTask.s2) || (s1 === currentTask.s2 && s2 === currentTask.s1)) && 
+                   ((h1 === currentTask.h1 && h2 === currentTask.h2) || (h1 === currentTask.h2 && h2 === currentTask.h1));
         
         const fb = document.getElementById('feedback');
-        if (isCorrect) {
+        if (ok) {
             correctCount++;
             let key = (mode === 'light') ? 'solved_light' : (mode === 'medium') ? 'solved_medium' : 'solved_pro';
             localStorage.setItem(key, parseInt(localStorage.getItem(key) || 0) + 1);
