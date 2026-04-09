@@ -6,154 +6,135 @@
     <title>RW-Trainer: Lernmodule Übersicht</title>
     <style>
         :root {
-            --primary: #8e44ad; /* Lila Akzent aus den Steuer-Modulen */
-            --primary-dark: #7d3c98;
-            --bg: #f9f5fb;
-            --text: #2c3e50;
-            --white: #ffffff;
+            --primary: #2c3e50;
+            --accent-blue: #3498db;
+            --accent-green: #27ae60;
+            --accent-orange: #e67e22;
+            --accent-purple: #8e44ad;
+            --bg: #f4f7f6;
         }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg); 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 800px; width: 100%; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { color: var(--primary); text-align: center; margin-bottom: 30px; border-bottom: 3px solid var(--accent-blue); padding-bottom: 10px; }
+        
+        .module-list { list-style: none; padding: 0; }
+        .module-item { 
+            margin-bottom: 15px; 
+            transition: transform 0.2s; 
+            display: flex;
+            align-items: center;
         }
-        .container { 
-            background: var(--white); 
-            max-width: 800px; 
-            width: 100%; 
-            padding: 30px; 
-            border-radius: 15px; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1); 
-            margin-top: 20px; 
-        }
-        h1 { 
-            color: var(--primary); 
-            text-align: center; 
-            border-bottom: 3px solid var(--primary); 
-            padding-bottom: 15px; 
-            margin-top: 0;
-        }
-        .module-grid { 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 12px; 
-            margin-top: 25px; 
-        }
+        .module-item:hover { transform: translateX(10px); }
+        
         .module-link {
             text-decoration: none;
-            color: var(--text);
-            background: #fff;
-            padding: 15px 20px;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            transition: all 0.2s ease-in-out;
-            font-weight: 600;
-        }
-        .module-link:hover {
-            border-color: var(--primary);
-            background-color: #f4ecf7;
-            transform: translateX(5px);
-        }
-        .module-link .number {
-            background: var(--primary);
             color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            font-size: 0.9rem;
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .module-link .file-info {
-            margin-left: auto;
-            font-size: 0.75rem;
-            color: #95a5a6;
-            font-family: monospace;
-        }
-        .pdf-link {
-            border-color: #e74c3c;
-            margin-top: 10px;
-        }
-        .pdf-link:hover {
-            background-color: #fdedec;
-            border-color: #c0392b;
-        }
-        footer {
-            margin-top: 30px;
-            font-size: 0.8rem;
-            color: #7f8c8d;
-            text-align: center;
-        }
+
+        .blue   { background-color: var(--accent-blue); }
+        .green  { background-color: var(--accent-green); }
+        .orange { background-color: var(--accent-orange); }
+        .purple { background-color: var(--accent-purple); }
+
+        .icon { margin-right: 15px; font-size: 1.4rem; }
+        .badge { margin-left: auto; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 5px; font-size: 0.8rem; }
+        .filename { display: block; font-size: 0.7rem; font-weight: normal; opacity: 0.8; margin-top: 2px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Accounting Trainer 2026</h1>
+    <h1>RW Trainer 2026</h1>
     
-    <div class="module-grid">
-        <a href="bestandskonten.html" class="module-link">
-            <span class="number">1</span> Aktiv- & Passivkonten führen
-            <span class="file-info">bestandskonten.html</span>
-        </a>
-        
-        <a href="buchungssatze.html" class="module-link">
-            <span class="number">2</span> Buchungssätze bilden
-            <span class="file-info">buchungssatze.html</span>
-        </a>
+    <ul class="module-list">
+        <li class="module-item">
+            <a href="bestandskonten.html" class="module-link blue">
+                <span class="icon">📊</span>
+                <div>1. Bestandskonten führen<span class="filename">bestandskonten.html</span></div>
+                <span class="badge">Aktiv / Passiv</span>
+            </a>
+        </li>
 
-        <a href="eroeffnung.html" class="module-link">
-            <span class="number">3</span> Eröffnungsbilanzkonto (EBK)
-            <span class="file-info">eroeffnung.html</span>
-        </a>
+        <li class="module-item">
+            <a href="buchungssaatze.html" class="module-link blue">
+                <span class="icon">📝</span>
+                <div>2. Buchungssätze bilden<span class="filename">buchungssaatze.html</span></div>
+                <span class="badge">Soll an Haben</span>
+            </a>
+        </li>
 
-        <a href="ebzuebk.html" class="module-link">
-            <span class="number">4</span> EBK zu Eröffnungsbilanz
-            <span class="file-info">ebzuebk.html</span>
-        </a>
+        <li class="module-item">
+            <a href="eroeffnung.html" class="module-link blue">
+                <span class="icon">🔓</span>
+                <div>3. Eröffnungsbuchungen<span class="filename">eroeffnung.html</span></div>
+                <span class="badge">EBK</span>
+            </a>
+        </li>
 
-        <a href="erfolgskonten.html" class="module-link">
-            <span class="number">5</span> Erfolgskonten buchen
-            <span class="file-info">erfolgskonten.html</span>
-        </a>
+        <li class="module-item">
+            <a href="ebzuebk.html" class="module-link blue">
+                <span class="icon">🔄</span>
+                <div>4. EBK zu Eröffnungsbilanz<span class="filename">ebzuebk.html</span></div>
+                <span class="badge">Transfer</span>
+            </a>
+        </li>
 
-        <a href="guv.html" class="module-link">
-            <span class="number">6</span> Gewinn- und Verlustrechnung (GuV)
-            <span class="file-info">guv.html</span>
-        </a>
+        <li class="module-item">
+            <a href="erfolgskonten.html" class="module-link orange">
+                <span class="icon">📈</span>
+                <div>5. Erfolgskonten buchen<span class="filename">erfolgskonten.html</span></div>
+                <span class="badge">Aufwand / Ertrag</span>
+            </a>
+        </li>
 
-        <a href="steuern.html" class="module-link">
-            <span class="number">7</span> Laufende Steuerbuchungen
-            <span class="file-info">steuern.html</span>
-        </a>
+        <li class="module-item">
+            <a href="guv.html" class="module-link orange">
+                <span class="icon">⚖️</span>
+                <div>6. GuV-Rechnung<span class="filename">guv.html</span></div>
+                <span class="badge">Ergebnisrechnung</span>
+            </a>
+        </li>
 
-        <a href="steuerabschluss.html" class="module-link">
-            <span class="number">8</span> Vorsteuer & Umsatzsteuer abschließen
-            <span class="file-info">steuerabschluss.html</span>
-        </a>
+        <li class="module-item">
+            <a href="steuern.html" class="module-link green">
+                <span class="icon">💸</span>
+                <div>7. Steuerkonten (lfd.)<span class="filename">steuern.html</span></div>
+                <span class="badge">VSt / USt</span>
+            </a>
+        </li>
 
-        <a href="sbk.html" class="module-link">
-            <span class="number">9</span> Schlussbilanzkonto (SBK)
-            <span class="file-info">sbk.html</span>
-        </a>
+        <li class="module-item">
+            <a href="steuerabschluss.html" class="module-link purple">
+                <span class="icon">🏁</span>
+                <div>8. Steuerabschluss<span class="filename">steuerabschluss.html</span></div>
+                <span class="badge">Zahllast / Überhang</span>
+            </a>
+        </li>
 
-        <a href="t-konten vorlagen.pdf" class="module-link pdf-link" target="_blank">
-            <span class="number">📄</span> PDF-Vorlagen: T-Konten
-            <span class="file-info">t-konten vorlagen.pdf</span>
-        </a>
-    </div>
+        <li class="module-item">
+            <a href="sbk.html" class="module-link blue">
+                <span class="icon">🔒</span>
+                <div>9. Schlussbilanzkonto (SBK)<span class="filename">sbk.html</span></div>
+                <span class="badge">Bilanzabschluss</span>
+            </a>
+        </li>
 
-    <footer>
-        E-Mail Kontakt für Feedback im Modul (✉ Icon oben rechts)
-    </footer>
+        <li class="module-item">
+            <a href="t-konten vorlagen.pdf" class="module-link green" style="background-color: #27ae60;" target="_blank">
+                <span class="icon">📄</span>
+                <div>T-Konten Vorlagen<span class="filename">t-konten vorlagen.pdf</span></div>
+                <span class="badge">PDF</span>
+            </a>
+        </li>
+    </ul>
 </div>
 
 </body>
