@@ -27,14 +27,13 @@
         h1 { color: var(--guv-green); text-align: center; font-size: 1.5rem; margin: 15px 0; text-transform: uppercase; }
         .task-box { background: #e6fcf5; border-left: 5px solid var(--guv-green); padding: 15px; margin-bottom: 15px; border-radius: 4px; font-size: 0.95rem; line-height: 1.5; }
         
-        .konto-grid { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .konto-grid { overflow-x: auto; }
         .t-konto { width: 100%; min-width: 800px; border-collapse: collapse; margin-top: 15px; border-top: 4px solid #333; table-layout: fixed; }
         .t-konto th { border-bottom: 2px solid #333; padding: 10px; background: #fafafa; font-size: 0.95rem; }
         .t-konto td { border-right: 2px solid #333; padding: 12px; vertical-align: top; width: 50%; }
-        .t-konto td:last-child { border-right: none; }
         
         .entry { display: flex; gap: 5px; align-items: center; margin-bottom: 10px; }
-        .gk-field { font-size: 0.85rem; flex: 1; color: #444; }
+        .gk-field { font-size: 0.85rem; flex: 1; color: #444; font-weight: bold; }
         .gk-select { flex-grow: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.85rem; background: #fff; }
         .val-in { width: 115px; padding: 8px; border: 1px solid var(--border); border-radius: 6px; text-align: right; font-size: 0.9rem; font-weight: bold; }
         
@@ -47,12 +46,6 @@
         .btn-next.enabled { background-color: var(--success); opacity: 1; cursor: pointer; }
 
         .feedback { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; font-weight: bold; text-align: center; border: 2px solid transparent; }
-        
-        .modal { display: none; position: fixed; z-index: 4000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 650px; position: relative; max-height: 80vh; overflow-y: auto; }
-        .close { position: absolute; top: 15px; right: 25px; font-size: 32px; cursor: pointer; color: #888; }
-        .help-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .help-table td, .help-table th { border: 1px solid #ddd; padding: 10px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -95,7 +88,7 @@
     <div class="konto-grid">
         <table class="t-konto">
             <thead>
-                <tr><th colspan="2">Gewinn- und Verlustkonto</th></tr>
+                <tr><th colspan="2">Gewinn- und Verlustkonto (GuV)</th></tr>
                 <tr><th>Soll (Aufwendungen)</th><th>Haben (Erträge)</th></tr>
             </thead>
             <tbody id="konto-body"></tbody>
@@ -107,42 +100,15 @@
     <button id="nextTaskBtn" class="btn-action btn-next" onclick="generateTask()">Nächste Aufgabe</button>
 </div>
 
-<div id="helpModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="toggleHelp(false)">&times;</span>
-        <h2 style="color:var(--guv-green)">Anleitung: Erfolgsermittlung</h2>
-        <div style="font-size: 0.9rem; line-height: 1.5;">
-            <p>Das GuV-Konto ist ein Unterkonto des Eigenkapitals. Hier werden alle Aufwendungen und Erträge eines Jahres gesammelt.</p>
-            
-            <p><b>1. Kontenseiten zuordnen:</b><br>
-            • <b>Soll:</b> Hier stehen alle Aufwendungen (z. B. Mietaufwand, Löhne). Sie mindern das Eigenkapital.<br>
-            • <b>Haben:</b> Hier stehen alle Erträge (z. B. Umsatzerlöse). Sie mehren das Eigenkapital.</p>
-            
-            <p><b>2. Saldo (Erfolg) ermitteln:</b><br>
-            • <b>Gewinn:</b> Ertrag > Aufwand. Der Saldo wird im Soll als "Eigenkapital (Gewinn)" eingetragen.<br>
-            • <b>Verlust:</b> Aufwand > Ertrag. Der Saldo wird im Haben als "Eigenkapital (Verlust)" eingetragen.</p>
-            
-            <p><b>3. Summen bilden:</b><br>
-            Beide Seiten müssen nach Eintragung des Saldos die gleiche Summe aufweisen (die wertmäßig größere Seite).</p>
-
-            <table class="help-table">
-                <tr style="background:#eee;"><th>Stufe</th><th>Details</th></tr>
-                <tr><td><b>Stufe 1</b></td><td>Werte vorgegeben. Du musst entscheiden, ob Gewinn/Verlust vorliegt und den Saldo im richtigen Feld eintragen.</td></tr>
-                <tr><td><b>Stufe 2</b></td><td>Alles leer. Ordne die Posten via Dropdown den richtigen Seiten zu (2-3 Fälle).</td></tr>
-                <tr><td><b>Stufe 3</b></td><td>Profi-Training. 5+ Posten mit krummen Werten. Volle Eigenleistung erforderlich.</td></tr>
-            </table>
-        </div>
-        <button class="btn-action btn-check" style="margin-top: 15px;" onclick="toggleHelp(false)">Verstanden!</button>
-    </div>
-</div>
-
 <script>
     let config = { level: 1, current: {} };
     const aufwandK = ["Mietaufwand", "Löhne", "Gehälter", "Büromaterial", "Werbeaufwand", "Zinsaufwand"];
     const ertragK = ["Umsatzerlöse", "Zinserträge", "Mieterträge", "Provisionserträge"];
     const alleK = ["-- wählen --", "Eigenkapital (Gewinn)", "Eigenkapital (Verlust)", ...aufwandK, ...ertragK];
 
-    function toggleHelp(s) { document.getElementById('helpModal').style.display = s ? 'block' : 'none'; }
+    const fmt = (n) => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    function toggleHelp(s) { /* Logic handled by UI */ }
     function toggleCalc() { const c = document.getElementById("calc-container"); c.style.display = (c.style.display === "block") ? "none" : "block"; }
     
     let calcVal = "0";
@@ -151,14 +117,6 @@
     function calcOp(op) { calcVal += " " + op + " "; updateCalc(); }
     function calcClear() { calcVal = "0"; updateCalc(); }
     function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); } catch { calcVal = "Error"; } updateCalc(); }
-
-    const calc = document.getElementById("calc-container");
-    let isDragging = false, offset = [0,0];
-    const startDrag = (e) => { if(e.target.tagName === 'BUTTON') return; isDragging = true; const cX = e.clientX || (e.touches ? e.touches[0].clientX : 0); const cY = e.clientY || (e.touches ? e.touches[0].clientY : 0); offset = [calc.offsetLeft - cX, calc.offsetTop - cY]; };
-    const doDrag = (e) => { if (!isDragging) return; e.preventDefault(); const cX = e.clientX || (e.touches ? e.touches[0].clientX : 0); const cY = e.clientY || (e.touches ? e.touches[0].clientY : 0); calc.style.left = (cX + offset[0]) + "px"; calc.style.top = (cY + offset[1]) + "px"; };
-    calc.addEventListener('mousedown', startDrag); calc.addEventListener('touchstart', startDrag);
-    document.addEventListener('mousemove', doDrag); document.addEventListener('touchmove', doDrag, {passive:false});
-    document.addEventListener('mouseup', () => isDragging = false); document.addEventListener('touchend', () => isDragging = false);
 
     function setLevel(lvl, btn) { config.level = lvl; document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); generateTask(); }
 
@@ -170,18 +128,18 @@
             html += `<div class="entry">`;
             if(config.level === 1) html += `<span class="gk-field" id="s-label-${i}"></span>`;
             else html += `<select class="gk-select" id="s-gk-${i}"><option value="">-- Konto --</option>${alleK.slice(1).map(k=>`<option value="${k}">${k}</option>`).join('')}</select>`;
-            html += `<input type="number" inputmode="decimal" class="val-in" id="s-val-${i}"></div>`;
+            html += `<input type="number" step="0.01" class="val-in" id="s-val-${i}"></div>`;
         }
-        html += `<div class="entry erfolg-row"><select class="gk-select" id="s-erfolg"><option value="">-- Erfolg? --</option><option>Eigenkapital (Gewinn)</option></select><input type="number" inputmode="decimal" class="val-in" id="s-erfolg-val"></div>`;
-        html += `<div class="sum-line"><span>Summe:</span><input type="number" inputmode="decimal" class="val-in" id="sum-s"></div></td><td id="haben-side">`;
+        html += `<div class="entry erfolg-row"><select class="gk-select" id="s-erfolg"><option value="">-- Erfolg? --</option><option>Eigenkapital (Gewinn)</option></select><input type="number" step="0.01" class="val-in" id="s-erfolg-val"></div>`;
+        html += `<div class="sum-line"><span>Summe:</span><input type="number" step="0.01" class="val-in" id="sum-s"></div></td><td id="haben-side">`;
         for(let i=0; i<rows; i++) {
             html += `<div class="entry">`;
             if(config.level === 1) html += `<span class="gk-field" id="h-label-${i}"></span>`;
             else html += `<select class="gk-select" id="h-gk-${i}"><option value="">-- Konto --</option>${alleK.slice(1).map(k=>`<option value="${k}">${k}</option>`).join('')}</select>`;
-            html += `<input type="number" inputmode="decimal" class="val-in" id="h-val-${i}"></div>`;
+            html += `<input type="number" step="0.01" class="val-in" id="h-val-${i}"></div>`;
         }
-        html += `<div class="entry erfolg-row"><select class="gk-select" id="h-erfolg"><option value="">-- Erfolg? --</option><option>Eigenkapital (Verlust)</option></select><input type="number" inputmode="decimal" class="val-in" id="h-erfolg-val"></div>`;
-        html += `<div class="sum-line"><span>Summe:</span><input type="number" inputmode="decimal" class="val-in" id="sum-h"></div></td></tr>`;
+        html += `<div class="entry erfolg-row"><select class="gk-select" id="h-erfolg"><option value="">-- Erfolg? --</option><option>Eigenkapital (Verlust)</option></select><input type="number" step="0.01" class="val-in" id="h-erfolg-val"></div>`;
+        html += `<div class="sum-line"><span>Summe:</span><input type="number" step="0.01" class="val-in" id="sum-h"></div></td></tr>`;
         body.innerHTML = html;
     }
 
@@ -192,24 +150,24 @@
         let aArr = [], eArr = [];
         for(let i=0; i<count; i++) {
             const factor = config.level === 3 ? (Math.random() + 0.5) : 1;
-            aArr.push({n: aufwandK[i%6], v: Math.round((Math.floor(Math.random()*12)+5)*100 * factor)});
-            eArr.push({n: ertragK[i%4], v: Math.round((Math.floor(Math.random()*18)+10)*100 * factor)});
+            aArr.push({n: aufwandK[i%6], v: Math.round((Math.floor(Math.random()*12)+5)*100 * factor * 100) / 100});
+            eArr.push({n: ertragK[i%4], v: Math.round((Math.floor(Math.random()*18)+10)*100 * factor * 100) / 100});
         }
         let totalA = aArr.reduce((a, b) => a + b.v, 0);
         let totalE = eArr.reduce((a, b) => a + b.v, 0);
-        if(isLoss && totalE >= totalA) totalA = totalE + 1240;
-        if(!isLoss && totalA >= totalE) totalE = totalA + 1550;
+        if(isLoss && totalE >= totalA) totalA = totalE + 1240.50;
+        if(!isLoss && totalA >= totalE) totalE = totalA + 1550.75;
         const saldo = Math.abs(totalE - totalA);
         const summe = Math.max(totalE, totalA);
         config.current = { aArr, eArr, totalA, totalE, saldo, summe, isLoss };
 
-        document.getElementById('task').innerHTML = `<b>Posten:</b> ` + [...aArr, ...eArr].map(x => `${x.n}: ${x.v} €`).join(" | ");
+        document.getElementById('task').innerHTML = `<b>Posten zur Erfolgsermittlung:</b><br>` + [...aArr, ...eArr].map(x => `${x.n}: ${fmt(x.v)} €`).join(" | ");
         document.getElementById('feedbackBox').style.display = 'none';
         document.getElementById('nextTaskBtn').disabled = true; document.getElementById('nextTaskBtn').classList.remove('enabled');
 
         if(config.level === 1) {
-            aArr.forEach((a, i) => { document.getElementById(`s-label-${i}`).innerText = a.n; document.getElementById(`s-val-${i}`).value = a.v; document.getElementById(`s-val-${i}`).disabled = true; });
-            eArr.forEach((e, i) => { document.getElementById(`h-label-${i}`).innerText = e.n; document.getElementById(`h-val-${i}`).value = e.v; document.getElementById(`h-val-${i}`).disabled = true; });
+            aArr.forEach((a, i) => { document.getElementById(`s-label-${i}`).innerText = a.n; document.getElementById(`s-val-${i}`).value = a.v.toFixed(2); document.getElementById(`s-val-${i}`).disabled = true; });
+            eArr.forEach((e, i) => { document.getElementById(`h-label-${i}`).innerText = e.n; document.getElementById(`h-val-${i}`).value = e.v.toFixed(2); document.getElementById(`h-val-${i}`).disabled = true; });
         }
     }
 
@@ -219,27 +177,24 @@
         const getG = (id) => document.getElementById(id).value;
         let err = [];
 
-        if(getV('sum-s') !== c.summe || getV('sum-h') !== c.summe) err.push("Summenfehler im Abschluss.");
+        if(Math.abs(getV('sum-s') - c.summe) > 0.01 || Math.abs(getV('sum-h') - c.summe) > 0.01) err.push("Summenfehler im Abschluss.");
         
-        let found = false;
+        let success = false;
         if(!c.isLoss) {
-            if(getG('s-erfolg') === "Eigenkapital (Gewinn)" && getV('s-erfolg-val') === c.saldo) {
-                if(getV('h-erfolg-val') === 0) found = true;
-            }
+            if(getG('s-erfolg') === "Eigenkapital (Gewinn)" && Math.abs(getV('s-erfolg-val') - c.saldo) < 0.01) success = true;
         } else {
-            if(getG('h-erfolg') === "Eigenkapital (Verlust)" && getV('h-erfolg-val') === c.saldo) {
-                if(getV('s-erfolg-val') === 0) found = true;
-            }
+            if(getG('h-erfolg') === "Eigenkapital (Verlust)" && Math.abs(getV('h-erfolg-val') - c.saldo) < 0.01) success = true;
         }
-        if(!found) err.push("Erfolg (Gewinn/Verlust) falsch zugeordnet oder berechnet.");
+        
+        if(!success) err.push("Erfolg (Gewinn/Verlust) falsch zugeordnet oder berechnet.");
 
         const fb = document.getElementById('feedbackBox'); fb.style.display = 'block';
         if(err.length === 0) {
             fb.innerHTML = "✅ Hervorragend! Du hast den Abschluss korrekt durchgeführt.";
-            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724"; fb.style.borderColor = "#c3e6cb";
             document.getElementById('nextTaskBtn').disabled = false; document.getElementById('nextTaskBtn').classList.add('enabled');
         } else {
-            fb.innerHTML = "❌ " + err[0]; fb.style.backgroundColor = "#f8d7da";
+            fb.innerHTML = "❌ " + err[0]; fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24"; fb.style.borderColor = "#f5c6cb";
         }
     }
     window.onload = generateTask;
