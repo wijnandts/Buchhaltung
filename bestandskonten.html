@@ -86,7 +86,49 @@
     <button id="nextTaskBtn" class="btn-action btn-next" onclick="generateTask()" disabled>Nächste Aufgabe</button>
 </div>
 
-<div id="helpModal" class="modal"><div class="modal-content"><span class="close" onclick="toggleHelp(false)">&times;</span><h2>Hilfe</h2><p>Aktivkonten: AB im Soll (+).<br>Passivkonten: AB im Haben (+).</p></div></div>
+<div id="helpModal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+        <span class="close" onclick="toggleHelp(false)">&times;</span>
+        <h2 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Anleitung: Bestandskonten führen</h2>
+        
+        <div style="text-align: left; margin-top: 15px;">
+            <h3>So gehst du vor:</h3>
+            <ol>
+                <li><b>Anfangsbestand (AB) eintragen:</b> Schau oben in die Aufgabe. Trage den Betrag beim Konto "EBK" ein. 
+                    <br><i>Achtung:</i> Bei Aktivkonten im Soll, bei Passivkonten im Haben!</li>
+                <li><b>Geschäftsfälle buchen (ab Stufe 2):</b> Trage die Beträge der Fälle auf die richtige Seite ein. Das System gibt dir in Stufe 2 die Gegenkonten vor.</li>
+                <li><b>Saldo ermitteln (SBK):</b> Berechne die Summe der stärkeren Seite und trage die Differenz (den Saldo) in die Zeile "SBK" auf der schwächeren Seite ein.</li>
+                <li><b>Abschluss:</b> Addiere beide Seiten. Die Summen müssen am Ende identisch sein!</li>
+            </ol>
+
+            <div style="background: #fdf2f2; padding: 10px; border-radius: 8px; border-left: 5px solid var(--error);">
+                <b>Sperre:</b> Der Button "Nächste Aufgabe" wird erst grün, wenn alle Einträge und die Summen absolut korrekt sind.
+            </div>
+
+            <h3 style="margin-top:20px;">Die Stufen im Detail:</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <tr style="background: #eee;">
+                    <th style="padding: 5px; border: 1px solid #ccc;">Stufe</th>
+                    <th style="padding: 5px; border: 1px solid #ccc;">Inhalt</th>
+                </tr>
+                <tr>
+                    <td style="padding: 5px; border: 1px solid #ccc;"><b>Stufe 1</b></td>
+                    <td style="padding: 5px; border: 1px solid #ccc;">Nur Eröffnung der Konten (AB).</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px; border: 1px solid #ccc;"><b>Stufe 2</b></td>
+                    <td style="padding: 5px; border: 1px solid #ccc;">Buchungen ohne Steuer. Gegenkonten sind fix.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px; border: 1px solid #ccc;"><b>Stufe 3</b></td>
+                    <td style="padding: 5px; border: 1px solid #ccc;">Buchungen mit Steuer. Gegenkonten über Dropdown wählen.</td>
+                </tr>
+            </table>
+        </div>
+        
+        <button class="btn-action btn-check" style="margin-top: 20px;" onclick="toggleHelp(false)">Verstanden, los geht's!</button>
+    </div>
+</div>
 
 <script>
     let config = { level: 1 };
