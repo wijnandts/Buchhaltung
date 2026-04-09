@@ -16,7 +16,7 @@
         .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; padding-right: 140px; }
         .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; }
 
-        /* Taschenrechner Design */
+        /* Taschenrechner */
         #calc-container { display: none; position: fixed; top: 120px; left: 20px; width: 220px; background: #333; border-radius: 12px; padding: 12px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: move; touch-action: none; }
         #calc-display { width: 100%; height: 45px; background: #eee; border-radius: 5px; margin-bottom: 10px; text-align: right; padding: 10px; font-family: monospace; font-size: 1.3rem; border: none; box-sizing: border-box; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
@@ -42,8 +42,8 @@
         .t-konto td:last-child { border-right: none; }
         
         .entry { display: flex; gap: 5px; align-items: center; margin-bottom: 8px; }
-        select { flex-grow: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.8rem; background: #fff; min-width: 0; }
-        input.val-in { width: 90px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.85rem; }
+        select { flex-grow: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.8rem; background: #fff; min-width: 0; font-weight: bold; }
+        input.val-in { width: 110px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.85rem; font-weight: bold; }
         
         .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 15px; padding: 8px 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         
@@ -54,7 +54,6 @@
         
         .feedback { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; text-align: left; font-weight: bold; border: 2px solid transparent; }
 
-        /* Help Modal */
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); }
         .modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 15px; width: 85%; max-width: 600px; position: relative; }
         .close { position: absolute; top: 10px; right: 20px; font-size: 28px; cursor: pointer; color: #aaa; }
@@ -87,9 +86,9 @@
 
 <div class="app-container">
     <div class="header-actions">
-        <a href="mailto:wijnandts@bk-erkelenz.de" class="btn-round" title="E-Mail Kontakt">✉</a>
-        <button class="btn-round" onclick="toggleCalc()" title="Taschenrechner">🖩</button>
-        <button class="btn-round" onclick="toggleHelp(true)" title="Hilfe">?</button>
+        <a href="mailto:wijnandts@bk-erkelenz.de" class="btn-round">✉</a>
+        <button class="btn-round" onclick="toggleCalc()">🖩</button>
+        <button class="btn-round" onclick="toggleHelp(true)">?</button>
     </div>
 
     <div class="nav-header">
@@ -122,12 +121,12 @@
     <div class="modal-content">
         <span class="close" onclick="toggleHelp(false)">&times;</span>
         <h2 style="color:var(--nrw-blue)">Anleitung: Transfer</h2>
-        <p>In dieser Übung lernst du das <b>Spiegelbild-Prinzip</b>:</p>
-        <ol>
-            <li>Werte von der <b>linken</b> Seite der Bilanz (Aktiva) werden im EBK auf die <b>rechte</b> Seite (Haben) übertragen.</li>
-            <li>Werte von der <b>rechten</b> Seite der Bilanz (Passiva) werden im EBK auf die <b>linke</b> Seite (Soll) übertragen.</li>
-            <li>Das EBK dient dazu, den Buchungssatz "Konto an EBK" (für Aktiva) oder "EBK an Konto" (für Passiva) vorzubereiten.</li>
-        </ol>
+        <div style="font-size: 0.9rem; line-height: 1.6;">
+            <p>1. <b>Aktiva</b> (links in EB) &rarr; werden im EBK <b>Haben</b> (rechts) gebucht.</p>
+            <p>2. <b>Passiva</b> (rechts in EB) &rarr; werden im EBK <b>Soll</b> (links) gebucht.</p>
+            <p>3. Das EBK ist das Gegenkonto für die Eröffnungsbuchungssätze.</p>
+            <p><i>Format: Nutze bei der Eingabe das Punkt-Symbol für Cent-Beträge.</i></p>
+        </div>
         <button class="btn-action btn-check" onclick="toggleHelp(false)">Verstanden!</button>
     </div>
 </div>
@@ -142,10 +141,11 @@
 
     let currentData = {};
 
+    const fmt = (n) => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
     function toggleHelp(s) { document.getElementById('helpModal').style.display = s ? 'block' : 'none'; }
     function toggleCalc() { const c = document.getElementById("calc-container"); c.style.display = (c.style.display === "block") ? "none" : "block"; }
 
-    // Rechner Logik
     let calcVal = "0";
     function updateCalc() { document.getElementById("calc-display").value = calcVal; }
     function calcNum(n) { calcVal === "0" && n !== "." ? calcVal = n : calcVal += n; updateCalc(); }
@@ -153,7 +153,6 @@
     function calcClear() { calcVal = "0"; updateCalc(); }
     function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); } catch { calcVal = "Error"; } updateCalc(); }
 
-    // Drag-Logik (Touch & Mouse)
     const calc = document.getElementById("calc-container");
     let isDragging = false, offset = [0,0];
     const startDrag = (e) => { if(e.target.tagName === 'BUTTON') return; isDragging = true; const cX = e.clientX || e.touches[0].clientX; const cY = e.clientY || e.touches[0].clientY; offset = [calc.offsetLeft - cX, calc.offsetTop - cY]; };
@@ -167,12 +166,12 @@
         body.innerHTML = `
             <tr>
                 <td id="soll-col">
-                    ${[1,2,3].map(i => `<div class="entry"><select id="s-sel-${i}"></select><input type="number" inputmode="decimal" class="val-in" id="s-val-${i}" placeholder="€"></div>`).join('')}
-                    <div class="sum-line"><span>Summe Soll:</span> <input type="number" inputmode="decimal" class="val-in" id="s-sum"></div>
+                    ${[1,2,3].map(i => `<div class="entry"><select id="s-sel-${i}"></select><input type="number" step="0.01" class="val-in" id="s-val-${i}" placeholder="0,00"></div>`).join('')}
+                    <div class="sum-line"><span>Summe Soll:</span> <input type="number" step="0.01" class="val-in" id="s-sum"></div>
                 </td>
                 <td id="haben-col">
-                    ${[1,2,3,4,5,6].map(i => `<div class="entry"><select id="h-sel-${i}"></select><input type="number" inputmode="decimal" class="val-in" id="h-val-${i}" placeholder="€"></div>`).join('')}
-                    <div class="sum-line"><span>Summe Haben:</span> <input type="number" inputmode="decimal" class="val-in" id="h-sum"></div>
+                    ${[1,2,3,4,5,6].map(i => `<div class="entry"><select id="h-sel-${i}"></select><input type="number" step="0.01" class="val-in" id="h-val-${i}" placeholder="0,00"></div>`).join('')}
+                    <div class="sum-line"><span>Summe Haben:</span> <input type="number" step="0.01" class="val-in" id="h-val-sum"></div>
                 </td>
             </tr>
         `;
@@ -185,12 +184,12 @@
         const nextBtn = document.getElementById('nextTaskBtn');
         nextBtn.disabled = true; nextBtn.classList.remove('enabled');
         renderFields();
-        const r = (min, max) => Math.floor(Math.random() * (max - min + 1) + min) * 100;
+        const r = (min, max) => (Math.floor(Math.random() * (max - min + 1) + min) * 100);
         
         const d = {
-            bga: r(450, 900), fuhrpark: r(350, 600), waren: r(120, 280),
-            ford: r(60, 180), bank: r(200, 450), kasse: r(30, 80),
-            darlehen: r(350, 550), verb: r(180, 380)
+            bga: r(500, 1000), fuhrpark: r(400, 700), waren: r(150, 300),
+            ford: r(80, 200), bank: r(250, 500), kasse: r(40, 90),
+            darlehen: r(400, 600), verb: r(200, 400)
         };
         const vermoegen = d.bga + d.fuhrpark + d.waren + d.ford + d.bank + d.kasse;
         const ek = vermoegen - (d.darlehen + d.verb);
@@ -199,40 +198,44 @@
         document.getElementById('eb-display').innerHTML = `
             <div class="eb-side">
                 <h4>Aktiva</h4>
-                <div class="eb-item"><span>BGA:</span> <b>${d.bga} €</b></div>
-                <div class="eb-item"><span>Fuhrpark:</span> <b>${d.fuhrpark} €</b></div>
-                <div class="eb-item"><span>Waren (Vorrat):</span> <b>${d.waren} €</b></div>
-                <div class="eb-item"><span>Forderungen a. L. L.:</span> <b>${d.ford} €</b></div>
-                <div class="eb-item"><span>Bank:</span> <b>${d.bank} €</b></div>
-                <div class="eb-item"><span>Kasse:</span> <b>${d.kasse} €</b></div>
-                <div class="eb-item" style="border-top:1px solid #333; margin-top:5px;"><span>Summe Aktiva:</span> <b>${vermoegen} €</b></div>
+                <div class="eb-item"><span>BGA:</span> <b>${fmt(d.bga)} €</b></div>
+                <div class="eb-item"><span>Fuhrpark:</span> <b>${fmt(d.fuhrpark)} €</b></div>
+                <div class="eb-item"><span>Waren (Vorrat):</span> <b>${fmt(d.waren)} €</b></div>
+                <div class="eb-item"><span>Forderungen a. L. L.:</span> <b>${fmt(d.ford)} €</b></div>
+                <div class="eb-item"><span>Bank:</span> <b>${fmt(d.bank)} €</b></div>
+                <div class="eb-item"><span>Kasse:</span> <b>${fmt(d.kasse)} €</b></div>
+                <div class="eb-item" style="border-top:2px solid #333; margin-top:5px; padding-top:2px;"><span>Summe Aktiva:</span> <b>${fmt(vermoegen)} €</b></div>
             </div>
             <div class="eb-side">
                 <h4>Passiva</h4>
-                <div class="eb-item"><span>Eigenkapital:</span> <b>${ek} €</b></div>
-                <div class="eb-item"><span>Darlehen:</span> <b>${d.darlehen} €</b></div>
-                <div class="eb-item"><span>Verbindlichkeiten a. L. L.:</span> <b>${d.verb} €</b></div>
-                <div class="eb-item" style="border-top:1px solid #333; margin-top:50px;"><span>Summe Passiva:</span> <b>${vermoegen} €</b></div>
+                <div class="eb-item"><span>Eigenkapital:</span> <b>${fmt(ek)} €</b></div>
+                <div class="eb-item"><span>Darlehen:</span> <b>${fmt(d.darlehen)} €</b></div>
+                <div class="eb-item"><span>Verbindlichkeiten a. L. L.:</span> <b>${fmt(d.verb)} €</b></div>
+                <div class="eb-item" style="border-top:2px solid #333; margin-top:52px; padding-top:2px;"><span>Summe Passiva:</span> <b>${fmt(vermoegen)} €</b></div>
             </div>
         `;
         document.getElementById('feedbackBox').style.display = 'none';
     }
 
     function validate() {
-        const val = (id) => parseInt(document.getElementById(id).value) || 0;
+        const val = (id) => parseFloat(document.getElementById(id).value) || 0;
         const selValue = (id) => document.getElementById(id).value;
         let err = [];
 
         const sollEntries = [1,2,3].map(i => ({k: selValue(`s-sel-${i}`), v: val(`s-val-${i}`)}));
         const habenEntries = [1,2,3,4,5,6].map(i => ({k: selValue(`h-sel-${i}`), v: val(`h-val-${i}`)}));
 
-        sollEntries.forEach(e => { if(kontenAktiv.includes(e.k)) err.push(`❌ ${e.k} (Aktiva) steht links in der EB, muss im EBK aber rechts stehen.`); });
-        habenEntries.forEach(e => { if(kontenPassiv.includes(e.k)) err.push(`❌ ${e.k} (Passiva) steht rechts in der EB, muss im EBK aber links stehen.`); });
+        sollEntries.forEach(e => { 
+            if(kontenAktiv.includes(e.k)) err.push(`❌ ${e.k} gehört im EBK auf die Haben-Seite.`); 
+        });
+        habenEntries.forEach(e => { 
+            if(kontenPassiv.includes(e.k)) err.push(`❌ ${e.k} gehört im EBK auf die Soll-Seite.`); 
+        });
 
         const check = (list, name, target) => {
             const item = list.find(x => x.k === name);
-            if(!item || item.k === "-- wählen --") err.push(`❌ Das Konto "${name}" fehlt.`);
-            else if(item.v !== target) err.push(`❌ Der Wert für "${name}" stimmt nicht.`);
+            if(!item || item.k === "-- wählen --") err.push(`❌ Konto "${name}" fehlt.`);
+            else if(Math.abs(item.v - target) > 0.01) err.push(`❌ Wert für "${name}" ist falsch.`);
         };
 
         check(sollEntries, K_EK, currentData.ek);
@@ -245,18 +248,23 @@
         check(habenEntries, "Bank", currentData.bank);
         check(habenEntries, "Kasse", currentData.kasse);
 
-        if(val('s-sum') !== currentData.sum || val('h-sum') !== currentData.sum) err.push("❌ Die Summen sind falsch.");
+        const uSumS = val('s-sum');
+        const uSumH = val('h-val-sum');
+
+        if(Math.abs(uSumS - currentData.sum) > 0.01 || Math.abs(uSumH - currentData.sum) > 0.01) {
+            err.push("❌ Die Bilanzsummen im EBK stimmen nicht.");
+        }
 
         const fb = document.getElementById('feedbackBox');
         fb.style.display = 'block';
         if(err.length === 0) {
-            fb.innerHTML = "🎯 EXZELLENT! Der Transfer ist fehlerfrei.";
-            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+            fb.innerHTML = "🎯 PERFEKT! Du hast das Spiegelbild-Prinzip verstanden.";
+            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724"; fb.style.borderColor = "#c3e6cb";
             document.getElementById('nextTaskBtn').disabled = false;
             document.getElementById('nextTaskBtn').classList.add('enabled');
         } else {
-            fb.innerHTML = "<b>Fehleranalyse:</b><br>" + [...new Set(err)].slice(0,3).join("<br>");
-            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+            fb.innerHTML = "<b>Analyse:</b><br>" + [...new Set(err)].slice(0,3).join("<br>");
+            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24"; fb.style.borderColor = "#f5c6cb";
         }
     }
     window.onload = generateTask;
