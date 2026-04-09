@@ -6,67 +6,130 @@
     <title>RW-Trainer BFS2: EB zu EBK XXL</title>
     <style>
         :root { --nrw-blue: #005aab; --bg-light: #f4f7f9; --success: #28a745; --error: #dc3545; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-light); display: flex; justify-content: center; padding: 10px; margin: 0; }
-        .app-container { background: white; max-width: 950px; width: 100%; padding: 25px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); margin-top: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-light); display: flex; justify-content: center; padding: 10px; margin: 0; touch-action: manipulation; }
+        .app-container { background: white; max-width: 950px; width: 100%; padding: 25px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); margin-top: 10px; position: relative; box-sizing: border-box; }
         
-        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; transition: 0.2s; }
-        .btn-home:hover { background: #d0d0d0; }
+        /* Header & Navigation */
+        .header-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 100; }
+        .btn-round { background: var(--nrw-blue); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 1.2rem; }
+        
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; padding-right: 140px; }
+        .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; }
 
-        h1 { color: var(--nrw-blue); text-align: center; font-size: 1.6rem; margin: 10px 0; }
+        /* Taschenrechner Design */
+        #calc-container { display: none; position: fixed; top: 120px; left: 20px; width: 220px; background: #333; border-radius: 12px; padding: 12px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: move; touch-action: none; }
+        #calc-display { width: 100%; height: 45px; background: #eee; border-radius: 5px; margin-bottom: 10px; text-align: right; padding: 10px; font-family: monospace; font-size: 1.3rem; border: none; box-sizing: border-box; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .calc-btn { padding: 12px; border: none; border-radius: 6px; background: #555; color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .calc-btn.op { background: var(--nrw-blue); }
+        .calc-btn.eq { background: var(--success); grid-column: span 2; }
+        .calc-btn.clr { background: var(--error); grid-column: span 2; }
+
+        h1 { color: var(--nrw-blue); text-align: center; font-size: 1.5rem; margin: 10px 0; }
         
+        /* Bilanz-Box */
         .eb-box { background: #fff; border: 2px solid #333; padding: 15px; margin: 15px 0; border-radius: 4px; box-shadow: 2px 2px 10px rgba(0,0,0,0.05); }
         .eb-title { text-align: center; font-weight: bold; border-bottom: 2px solid #333; margin-bottom: 10px; padding-bottom: 5px; }
         .eb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.85rem; }
         .eb-side h4 { border-bottom: 1px solid #333; margin: 5px 0; }
         .eb-item { display: flex; justify-content: space-between; margin: 2px 0; }
 
-        .t-konto { width: 100%; border-collapse: collapse; margin-top: 20px; border-top: 4px solid #333; }
+        /* T-Konto Styling */
+        .konto-grid { overflow-x: auto; }
+        .t-konto { width: 100%; min-width: 650px; border-collapse: collapse; margin-top: 20px; border-top: 4px solid #333; table-layout: fixed; }
         .t-konto th { border-bottom: 2px solid #333; padding: 10px; background: #fafafa; font-size: 0.9rem; }
-        .t-konto td { width: 50%; border-right: 2px solid #333; padding: 10px; vertical-align: top; }
+        .t-konto td { border-right: 2px solid #333; padding: 10px; vertical-align: top; width: 50%; }
         .t-konto td:last-child { border-right: none; }
         
-        .entry { display: flex; gap: 5px; align-items: center; margin-bottom: 8px; font-size: 0.8rem; }
-        select { flex-grow: 1; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.8rem; background: #fff; }
-        input.val-in { width: 90px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.85rem; }
+        .entry { display: flex; gap: 5px; align-items: center; margin-bottom: 8px; }
+        select { flex-grow: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.8rem; background: #fff; min-width: 0; }
+        input.val-in { width: 90px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.85rem; }
         
-        .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 15px; padding: 8px 0; font-weight: bold; display: flex; justify-content: space-between;}
+        .sum-line { border-top: 2px solid #333; border-bottom: 4px double #333; margin-top: 15px; padding: 8px 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         
-        .btn-action { width: 100%; padding: 16px; margin-top: 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.2s; }
+        .btn-action { width: 100%; padding: 16px; margin-top: 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         .btn-check { background-color: var(--nrw-blue); color: white; }
-        .btn-check:hover { background-color: #004488; }
-        .btn-next { background-color: #6c757d; color: white; margin-top: 10px; }
+        .btn-next { background-color: #6c757d; color: white; margin-top: 10px; opacity: 0.5; cursor: not-allowed; }
+        .btn-next.enabled { background-color: var(--success); opacity: 1; cursor: pointer; }
         
-        .feedback { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; text-align: left; font-weight: bold; line-height: 1.5; border: 2px solid transparent; }
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; text-align: left; font-weight: bold; border: 2px solid transparent; }
+
+        /* Help Modal */
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); }
+        .modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 15px; width: 85%; max-width: 600px; position: relative; }
+        .close { position: absolute; top: 10px; right: 20px; font-size: 28px; cursor: pointer; color: #aaa; }
     </style>
 </head>
 <body>
 
+<div id="calc-container">
+    <input type="text" id="calc-display" readonly value="0">
+    <div class="calc-grid">
+        <button class="calc-btn clr" onclick="calcClear()">C</button>
+        <button class="calc-btn op" onclick="calcOp('/')">÷</button>
+        <button class="calc-btn op" onclick="calcOp('*')">×</button>
+        <button class="calc-btn" onclick="calcNum('7')">7</button>
+        <button class="calc-btn" onclick="calcNum('8')">8</button>
+        <button class="calc-btn" onclick="calcNum('9')">9</button>
+        <button class="calc-btn op" onclick="calcOp('-')">-</button>
+        <button class="calc-btn" onclick="calcNum('4')">4</button>
+        <button class="calc-btn" onclick="calcNum('5')">5</button>
+        <button class="calc-btn" onclick="calcNum('6')">6</button>
+        <button class="calc-btn op" onclick="calcOp('+')">+</button>
+        <button class="calc-btn" onclick="calcNum('1')">1</button>
+        <button class="calc-btn" onclick="calcNum('2')">2</button>
+        <button class="calc-btn" onclick="calcNum('3')">3</button>
+        <button class="calc-btn op" onclick="calcNum('.')">.</button>
+        <button class="calc-btn" onclick="calcNum('0')">0</button>
+        <button class="calc-btn eq" onclick="calcSolve()">=</button>
+    </div>
+</div>
+
 <div class="app-container">
+    <div class="header-actions">
+        <a href="mailto:wijnandts@bk-erkelenz.de" class="btn-round" title="E-Mail Kontakt">✉</a>
+        <button class="btn-round" onclick="toggleCalc()" title="Taschenrechner">🖩</button>
+        <button class="btn-round" onclick="toggleHelp(true)" title="Hilfe">?</button>
+    </div>
+
     <div class="nav-header">
         <a href="index.html" class="btn-home">🏠 Übersicht</a>
     </div>
 
-    <h1>Transfer: Eröffnungsbilanz &rarr; EBK</h1>
+    <h1>Transfer: Bilanz &rarr; EBK</h1>
     
     <div class="eb-box">
         <div class="eb-title">Eröffnungsbilanz (EB) zum 01.01.</div>
-        <div class="eb-grid" id="eb-display">
-            </div>
+        <div class="eb-grid" id="eb-display"></div>
     </div>
 
-    <table class="t-konto">
-        <thead>
-            <tr><th colspan="2">Eröffnungsbilanzkonto (EBK)</th></tr>
-            <tr><th>Soll (Passiv-Übertrag)</th><th>Haben (Aktiv-Übertrag)</th></tr>
-        </thead>
-        <tbody id="konto-body">
-            </tbody>
-    </table>
+    <div class="konto-grid">
+        <table class="t-konto">
+            <thead>
+                <tr><th colspan="2">Eröffnungsbilanzkonto (EBK)</th></tr>
+                <tr><th>Soll (Passiv-Übertrag)</th><th>Haben (Aktiv-Übertrag)</th></tr>
+            </thead>
+            <tbody id="konto-body"></tbody>
+        </table>
+    </div>
 
     <div id="feedbackBox" class="feedback"></div>
     <button class="btn-action btn-check" onclick="validate()">EBK buchen & prüfen</button>
-    <button class="btn-action btn-next" onclick="generateTask()">Nächste Bilanz</button>
+    <button id="nextTaskBtn" class="btn-action btn-next" onclick="generateTask()">Nächste Bilanz</button>
+</div>
+
+<div id="helpModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="toggleHelp(false)">&times;</span>
+        <h2 style="color:var(--nrw-blue)">Anleitung: Transfer</h2>
+        <p>In dieser Übung lernst du das <b>Spiegelbild-Prinzip</b>:</p>
+        <ol>
+            <li>Werte von der <b>linken</b> Seite der Bilanz (Aktiva) werden im EBK auf die <b>rechte</b> Seite (Haben) übertragen.</li>
+            <li>Werte von der <b>rechten</b> Seite der Bilanz (Passiva) werden im EBK auf die <b>linke</b> Seite (Soll) übertragen.</li>
+            <li>Das EBK dient dazu, den Buchungssatz "Konto an EBK" (für Aktiva) oder "EBK an Konto" (für Passiva) vorzubereiten.</li>
+        </ol>
+        <button class="btn-action btn-check" onclick="toggleHelp(false)">Verstanden!</button>
+    </div>
 </div>
 
 <script>
@@ -79,17 +142,37 @@
 
     let currentData = {};
 
+    function toggleHelp(s) { document.getElementById('helpModal').style.display = s ? 'block' : 'none'; }
+    function toggleCalc() { const c = document.getElementById("calc-container"); c.style.display = (c.style.display === "block") ? "none" : "block"; }
+
+    // Rechner Logik
+    let calcVal = "0";
+    function updateCalc() { document.getElementById("calc-display").value = calcVal; }
+    function calcNum(n) { calcVal === "0" && n !== "." ? calcVal = n : calcVal += n; updateCalc(); }
+    function calcOp(op) { calcVal += " " + op + " "; updateCalc(); }
+    function calcClear() { calcVal = "0"; updateCalc(); }
+    function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); } catch { calcVal = "Error"; } updateCalc(); }
+
+    // Drag-Logik (Touch & Mouse)
+    const calc = document.getElementById("calc-container");
+    let isDragging = false, offset = [0,0];
+    const startDrag = (e) => { if(e.target.tagName === 'BUTTON') return; isDragging = true; const cX = e.clientX || e.touches[0].clientX; const cY = e.clientY || e.touches[0].clientY; offset = [calc.offsetLeft - cX, calc.offsetTop - cY]; };
+    const doDrag = (e) => { if (!isDragging) return; const cX = e.clientX || (e.touches ? e.touches[0].clientX : null); const cY = e.clientY || (e.touches ? e.touches[0].clientY : null); if(cX !== null) { calc.style.left = (cX + offset[0]) + "px"; calc.style.top = (cY + offset[1]) + "px"; }};
+    calc.addEventListener('mousedown', startDrag); calc.addEventListener('touchstart', startDrag);
+    document.addEventListener('mousemove', doDrag); document.addEventListener('touchmove', doDrag, {passive:false});
+    document.addEventListener('mouseup', () => isDragging = false); document.addEventListener('touchend', () => isDragging = false);
+
     function renderFields() {
         const body = document.getElementById('konto-body');
         body.innerHTML = `
             <tr>
                 <td id="soll-col">
-                    ${[1,2,3].map(i => `<div class="entry"><select id="s-sel-${i}"></select><input type="number" class="val-in" id="s-val-${i}" placeholder="€"></div>`).join('')}
-                    <div class="sum-line"><span>Summe Soll:</span> <input type="number" class="val-in" id="s-sum"></div>
+                    ${[1,2,3].map(i => `<div class="entry"><select id="s-sel-${i}"></select><input type="number" inputmode="decimal" class="val-in" id="s-val-${i}" placeholder="€"></div>`).join('')}
+                    <div class="sum-line"><span>Summe Soll:</span> <input type="number" inputmode="decimal" class="val-in" id="s-sum"></div>
                 </td>
                 <td id="haben-col">
-                    ${[1,2,3,4,5,6].map(i => `<div class="entry"><select id="h-sel-${i}"></select><input type="number" class="val-in" id="h-val-${i}" placeholder="€"></div>`).join('')}
-                    <div class="sum-line"><span>Summe Haben:</span> <input type="number" class="val-in" id="h-sum"></div>
+                    ${[1,2,3,4,5,6].map(i => `<div class="entry"><select id="h-sel-${i}"></select><input type="number" inputmode="decimal" class="val-in" id="h-val-${i}" placeholder="€"></div>`).join('')}
+                    <div class="sum-line"><span>Summe Haben:</span> <input type="number" inputmode="decimal" class="val-in" id="h-sum"></div>
                 </td>
             </tr>
         `;
@@ -99,6 +182,8 @@
     }
 
     function generateTask() {
+        const nextBtn = document.getElementById('nextTaskBtn');
+        nextBtn.disabled = true; nextBtn.classList.remove('enabled');
         renderFields();
         const r = (min, max) => Math.floor(Math.random() * (max - min + 1) + min) * 100;
         
@@ -135,21 +220,19 @@
 
     function validate() {
         const val = (id) => parseInt(document.getElementById(id).value) || 0;
-        const sel = (id) => document.getElementById(id).value;
+        const selValue = (id) => document.getElementById(id).value;
         let err = [];
 
-        const sollEntries = [1,2,3].map(i => ({k: sel(`s-sel-${i}`), v: val(`s-val-${i}`)}));
-        const habenEntries = [1,2,3,4,5,6].map(i => ({k: sel(`h-sel-${i}`), v: val(`h-val-${i}`)}));
+        const sollEntries = [1,2,3].map(i => ({k: selValue(`s-sel-${i}`), v: val(`s-val-${i}`)}));
+        const habenEntries = [1,2,3,4,5,6].map(i => ({k: selValue(`h-sel-${i}`), v: val(`h-val-${i}`)}));
 
-        // 1. Seitenprüfung
-        sollEntries.forEach(e => { if(kontenAktiv.includes(e.k)) err.push(`❌ ${e.k} (Aktiva) steht in der EB links, muss im EBK aber rechts (Haben) stehen.`); });
-        habenEntries.forEach(e => { if(kontenPassiv.includes(e.k)) err.push(`❌ ${e.k} (Passiva) steht in der EB rechts, muss im EBK aber links (Soll) stehen.`); });
+        sollEntries.forEach(e => { if(kontenAktiv.includes(e.k)) err.push(`❌ ${e.k} (Aktiva) steht links in der EB, muss im EBK aber rechts stehen.`); });
+        habenEntries.forEach(e => { if(kontenPassiv.includes(e.k)) err.push(`❌ ${e.k} (Passiva) steht rechts in der EB, muss im EBK aber links stehen.`); });
 
-        // 2. Konten- & Werte-Check
         const check = (list, name, target) => {
             const item = list.find(x => x.k === name);
-            if(!item || item.k === "-- wählen --") err.push(`❌ Das Konto "${name}" wurde nicht oder falsch zugeordnet.`);
-            else if(item.v !== target) err.push(`❌ Der Wert für "${name}" ist falsch.`);
+            if(!item || item.k === "-- wählen --") err.push(`❌ Das Konto "${name}" fehlt.`);
+            else if(item.v !== target) err.push(`❌ Der Wert für "${name}" stimmt nicht.`);
         };
 
         check(sollEntries, K_EK, currentData.ek);
@@ -162,25 +245,20 @@
         check(habenEntries, "Bank", currentData.bank);
         check(habenEntries, "Kasse", currentData.kasse);
 
-        // 3. Formale Ordnung
-        if(habenEntries[0].k !== "BGA") err.push("⚠️ Formfehler: Das Anlagevermögen (BGA) steht im EBK ganz oben.");
-        if(habenEntries[5].k !== "Kasse") err.push("⚠️ Formfehler: Die flüssigsten Mittel (Kasse) stehen im EBK ganz unten.");
-        if(sollEntries[0].k !== K_EK) err.push("⚠️ Formfehler: Das Eigenkapital steht auf der Passivseite immer zuerst.");
-
-        // 4. Summenprüfung
-        if(val('s-sum') !== currentData.sum || val('h-sum') !== currentData.sum) err.push("❌ Das EBK ist nicht ausgeglichen oder die Summen stimmen nicht mit der Bilanz überein.");
+        if(val('s-sum') !== currentData.sum || val('h-sum') !== currentData.sum) err.push("❌ Die Summen sind falsch.");
 
         const fb = document.getElementById('feedbackBox');
         fb.style.display = 'block';
         if(err.length === 0) {
-            fb.innerHTML = "🎯 EXZELLENT! Du hast den Transfer von der Bilanz in das Konto fehlerfrei gemeistert.";
-            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724"; fb.style.borderColor = "#c3e6cb";
+            fb.innerHTML = "🎯 EXZELLENT! Der Transfer ist fehlerfrei.";
+            fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+            document.getElementById('nextTaskBtn').disabled = false;
+            document.getElementById('nextTaskBtn').classList.add('enabled');
         } else {
-            fb.innerHTML = "<b>Fehleranalyse:</b><br>" + [...new Set(err)].slice(0,5).join("<br>");
-            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24"; fb.style.borderColor = "#f5c6cb";
+            fb.innerHTML = "<b>Fehleranalyse:</b><br>" + [...new Set(err)].slice(0,3).join("<br>");
+            fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
         }
     }
-
     window.onload = generateTask;
 </script>
 </body>
