@@ -26,26 +26,28 @@
         }
         .module-item:hover { transform: translateX(10px); }
         
+        /* Die Kacheln */
         .module-link {
             text-decoration: none;
             color: white;
             display: flex;
             align-items: center;
             width: 100%;
-            padding: 15px 20px;
-            border-radius: 10px;
+            padding: 18px 25px; /* Großzügige Kacheln */
+            border-radius: 12px;
             font-weight: bold;
             font-size: 1.1rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
+        /* Farbcodes für die Kacheln */
         .blue   { background-color: var(--accent-blue); }
         .green  { background-color: var(--accent-green); }
         .orange { background-color: var(--accent-orange); }
         .purple { background-color: var(--accent-purple); }
 
-        .icon { margin-right: 15px; font-size: 1.4rem; }
-        .badge { margin-left: auto; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 5px; font-size: 0.8rem; }
+        .icon { margin-right: 15px; font-size: 1.5rem; }
+        .badge { margin-left: auto; background: rgba(255,255,255,0.25); padding: 5px 12px; border-radius: 6px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -63,7 +65,7 @@
         </li>
 
         <li class="module-item">
-            <a href="buchungssatz.html" class="module-link blue">
+            <a href="buchungssaatze.html" class="module-link blue">
                 <span class="icon">📝</span>
                 2. Buchungssätze bilden
                 <span class="badge">Soll an Haben</span>
@@ -71,42 +73,58 @@
         </li>
 
         <li class="module-item">
+            <a href="eroeffnung.html" class="module-link blue">
+                <span class="icon">🔓</span>
+                3. Eröffnungsbuchungen
+                <span class="badge">EBK</span>
+            </a>
+        </li>
+
+        <li class="module-item">
             <a href="erfolgskonten.html" class="module-link orange">
                 <span class="icon">📈</span>
-                3. Erfolgskonten & GuV
+                4. Erfolgskonten buchen
                 <span class="badge">Aufwand / Ertrag</span>
             </a>
         </li>
 
         <li class="module-item">
-            <a href="warenverkehr.html" class="module-link orange">
-                <span class="icon">📦</span>
-                4. Warenverkehr buchen
-                <span class="badge">Wareneingang / -verkauf</span>
+            <a href="guv.html" class="module-link orange">
+                <span class="icon">⚖️</span>
+                5. GuV-Rechnung
+                <span class="badge">Abschluss</span>
             </a>
         </li>
 
         <li class="module-item">
             <a href="steuern.html" class="module-link green">
                 <span class="icon">💸</span>
-                5. Vorsteuer & Umsatzsteuer buchen
-                <span class="badge">Laufend</span>
+                6. Steuerkonten (lfd.)
+                <span class="badge">VSt / USt</span>
             </a>
         </li>
 
         <li class="module-item">
             <a href="steuerabschluss.html" class="module-link purple">
-                <span class="icon">⚖️</span>
-                6. Steuerkonten abschließen
+                <span class="icon">🏁</span>
+                7. Steuerabschluss
                 <span class="badge">Zahllast / Überhang</span>
             </a>
         </li>
 
         <li class="module-item">
-            <a href="privat.html" class="module-link orange">
-                <span class="icon">👤</span>
-                7. Privatentnahmen & -einlagen
-                <span class="badge">Eigenkapitalkorrektur</span>
+            <a href="sbk.html" class="module-link blue">
+                <span class="icon">🔒</span>
+                8. Schlussbilanzkonto (SBK)
+                <span class="badge">Bilanzabschluss</span>
+            </a>
+        </li>
+
+        <li class="module-item">
+            <a href="t-konten vorlagen.pdf" class="module-link green" target="_blank">
+                <span class="icon">📄</span>
+                T-Konten Vorlagen
+                <span class="badge">PDF</span>
             </a>
         </li>
     </ul>
