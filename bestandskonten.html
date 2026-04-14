@@ -2,293 +2,274 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RW-Trainer: Bestandskonten Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fibu-Trainer BFS 2 XXL</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --primary: #005aab; --primary-dark: #004a8d; --bg: #f4f7f9; --success: #28a745; --error: #dc3545; --border: #ced4da; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; touch-action: manipulation; }
-        .app-container { background: white; max-width: 1000px; width: 100%; padding: 25px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); position: relative; box-sizing: border-box; }
+        :root { --primary: #007aff; --secondary: #5856d6; --success: #34c759; --error: #ff3b30; --bg: #f0f2f5; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 10px; display: flex; justify-content: center; margin: 0; }
+        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%; max-width: 650px; margin-top: 5px; position: relative; }
         
-        /* Header & Navigation */
-        .header-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 100; }
-        .btn-round { background: var(--primary); color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 1.2rem; }
-        
-        .nav-header { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; padding-right: 140px; }
-        .btn-home { text-decoration: none; color: #555; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; }
-        
-        .level-selector { display: flex; gap: 5px; margin-top: 10px; }
-        .level-btn { padding: 6px 12px; border: 2px solid var(--primary); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--primary); font-size: 0.8rem; }
-        .level-btn.active { background: var(--primary); color: white; }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .btn-icon { background: #e9ecef; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; text-decoration: none; color: #333; transition: 0.2s; flex-shrink: 0; }
+        .btn-icon:hover { background: #dee2e6; }
 
-        h1 { color: var(--primary); text-align: center; font-size: 1.4rem; margin: 10px 0; text-transform: uppercase; }
-        .task-box { background: #eef2f7; border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 15px; border-radius: 4px; font-size: 0.95rem; line-height: 1.5; }
+        h1 { font-size: 1.3rem; text-align: center; color: var(--primary); margin: 0; flex-grow: 1; font-weight: 800; }
+        .progress-container { width: 100%; height: 6px; background: #eee; position: absolute; top: 0; left: 0; border-radius: 20px 20px 0 0; }
+        .progress-bar { height: 100%; background: var(--success); width: 0%; transition: width 0.3s; border-radius: 20px 20px 0 0; }
         
-        /* T-Konto Styling */
-        .ledger-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; margin-top: 20px; overflow-x: auto; }
-        .t-konto { border: 1px solid var(--border); border-top: 4px solid #333; background: white; border-radius: 8px; overflow: hidden; min-width: 450px; }
-        .t-header { background: #f8f9fa; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid #333; }
-        .t-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .t-table th { border-bottom: 1px solid #333; padding: 8px; background: #fafafa; }
-        .soll-side { border-right: 2px solid #333; width: 50%; }
+        #menu, #game, #results { display: none; }
+        #menu { display: block; text-align: center; }
         
-        .entry { display: flex; gap: 4px; align-items: center; padding: 6px; border-bottom: 1px solid #eee; }
-        .gk-select { flex-grow: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.75rem; background: #fff; }
-        .val-input { width: 105px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.85rem; font-weight: bold; }
+        .menu-btn { background: var(--primary); color: white; padding: 18px; margin: 8px 0; border-radius: 12px; cursor: pointer; width: 100%; font-size: 1.1rem; font-weight: bold; border: none; transition: 0.2s; text-align: left; position: relative; }
+        .menu-btn.med { background: var(--secondary); }
+        .menu-btn.pro { background: #af52de; }
+        .menu-btn:disabled { background: #ccc !important; cursor: not-allowed; opacity: 0.6; }
+        .menu-btn::after { content: '→'; position: absolute; right: 20px; }
+        .menu-btn:disabled::after { content: '🔒'; }
         
-        .sum-row { background: #f1f1f1; border-top: 2px solid #333; border-bottom: 4px double #333; font-weight: bold; display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; }
-
-        /* Buttons & Feedback */
-        .btn-action { width: 100%; padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1rem; margin-top: 15px; }
+        .lock-info { font-size: 0.75rem; display: block; margin-top: 4px; font-weight: normal; color: rgba(255,255,255,0.9); }
+        .desc { font-size: 0.8rem; color: #65676b; margin-bottom: 12px; display: block; text-align: left; padding-left: 5px; }
+        
+        .task { font-weight: bold; font-size: 1.05rem; margin-bottom: 20px; min-height: 110px; text-align: center; background: #f8f9fa; padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border-top: 4px solid var(--primary); line-height: 1.4; color: #1c1e21; box-sizing: border-box; }
+        
+        .entry-container { display: flex; gap: 10px; margin-bottom: 15px; }
+        .side { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .side-label { font-size: 0.75rem; font-weight: bold; color: var(--primary); text-transform: uppercase; text-align: center; background: #e7f3ff; padding: 4px; border-radius: 4px; }
+        
+        select { width: 100%; padding: 12px 5px; border-radius: 8px; border: 2px solid #e4e6eb; font-size: 0.85rem; height: 48px; background: #fff; appearance: none; }
+        .split-field { display: none; margin-top: 5px; }
+        
+        button.action { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1.1rem; }
         .btn-check { background: var(--primary); color: white; }
         .btn-next { background: var(--success); color: white; display: none; }
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; font-weight: bold; text-align: center; }
-
-        /* Taschenrechner */
-        #calc-container { display: none; position: fixed; top: 120px; left: 20px; width: 230px; background: #333; border-radius: 12px; padding: 12px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: move; touch-action: none; }
-        #calc-display { width: 100%; height: 45px; background: #eee; border-radius: 5px; margin-bottom: 10px; text-align: right; padding: 10px; font-family: monospace; font-size: 1.3rem; border: none; box-sizing: border-box; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .calc-btn { padding: 12px; border: none; border-radius: 8px; background: #555; color: white; font-weight: bold; cursor: pointer; }
-        .calc-btn.op { background: var(--primary); }
-        .calc-btn.eq { background: var(--success); grid-column: span 2; }
-        .calc-btn.clr { background: var(--error); grid-column: span 2; }
-
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); }
-        .modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 15px; width: 85%; max-width: 600px; position: relative; }
-        .close { position: absolute; top: 10px; right: 20px; font-size: 28px; cursor: pointer; color: #aaa; }
+        
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 10px; display: none; text-align: center; font-weight: bold; white-space: pre-line; }
+        .correct { background: #e7f3ff; color: #1877f2; border: 1px solid #1877f2; }
+        .wrong { background: #ffebe9; color: #f02849; border: 1px solid #f02849; }
+        .stat-box { background: #f8f9fa; padding: 15px; border-radius: 12px; margin: 10px 0; text-align: center; }
     </style>
 </head>
-<body>
+<body onload="checkLevelLocks()">
 
-<div id="calc-container">
-    <input type="text" id="calc-display" readonly value="0">
-    <div class="calc-grid">
-        <button class="calc-btn clr" onclick="calcClear()">C</button>
-        <button class="calc-btn op" onclick="calcOp('/')">÷</button>
-        <button class="calc-btn op" onclick="calcOp('*')">×</button>
-        <button class="calc-btn" onclick="calcNum('7')">7</button>
-        <button class="calc-btn" onclick="calcNum('8')">8</button>
-        <button class="calc-btn" onclick="calcNum('9')">9</button>
-        <button class="calc-btn op" onclick="calcOp('-')">-</button>
-        <button class="calc-btn" onclick="calcNum('4')">4</button>
-        <button class="calc-btn" onclick="calcNum('5')">5</button>
-        <button class="calc-btn" onclick="calcNum('6')">6</button>
-        <button class="calc-btn op" onclick="calcOp('+')">+</button>
-        <button class="calc-btn" onclick="calcNum('1')">1</button>
-        <button class="calc-btn" onclick="calcNum('2')">2</button>
-        <button class="calc-btn" onclick="calcNum('3')">3</button>
-        <button class="calc-btn" onclick="calcNum('.')">.</button>
-        <button class="calc-btn" onclick="calcNum('0')">0</button>
-        <button class="calc-btn eq" onclick="calcSolve()">=</button>
-    </div>
-</div>
-
-<div class="app-container">
+<div class="card">
+    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+   
     <div class="header-actions">
-        <a href="mailto:wijnandts@bk-erkelenz.de" class="btn-round">✉</a>
-        <button class="btn-round" onclick="toggleCalc()">🖩</button>
-        <button class="btn-round" onclick="toggleHelp(true)">?</button>
+        <button class="btn-icon" onclick="backToMenu()">🏠</button>
+        <h1 id="dynamicTitle">Fibu-Trainer XXL</h1>
+        <div style="width: 42px;"></div>
     </div>
-    
-    <div class="nav-header">
-        <a href="index.html" class="btn-home">🏠 Übersicht</a>
-        <div class="level-selector">
-            <button class="level-btn active" onclick="setLevel(1, this)">Stufe 1</button>
-            <button class="level-btn" onclick="setLevel(2, this)">Stufe 2</button>
-            <button class="level-btn" onclick="setLevel(3, this)">Stufe 3</button>
+
+    <div id="menu">
+        <button class="menu-btn" onclick="startGame('light')">
+            1. Einsteiger 🔓
+            <span class="lock-info" id="info-light">Gelöst: 0</span>
+        </button>
+        <span class="desc">Nur Bestandskonten (Aktiv/Passiv).</span>
+
+        <button class="menu-btn med" id="btn-medium" onclick="startGame('medium')" disabled>
+            2. Fortgeschritten 🔒
+            <span class="lock-info" id="info-medium">Sperre: 30 Einsteiger-Fragen</span>
+        </button>
+        <span class="desc">Erfolgskonten ohne Steuer.</span>
+
+        <button class="menu-btn pro" id="btn-pro" onclick="startGame('pro')" disabled>
+            3. Profi 🔒
+            <span class="lock-info" id="info-pro">Sperre: 20 Mittel-Fragen</span>
+        </button>
+        <span class="desc">Erfolgskonten mit MwSt.</span>
+        
+        <div style="margin-top:20px;">
+            <button style="background:none; border:none; color:#ccc; font-size:0.6rem; cursor:pointer;" onclick="resetAllProgress()">Fortschritt löschen</button>
         </div>
     </div>
 
-    <h1>Bestandskonten: Buchung & Abschluss</h1>
-    <div id="task" class="task-box">Generiere Aufgabe...</div>
-
-    <div class="ledger-grid" id="ledger-area">
-        <div class="t-konto">
-            <div class="t-header" id="konto-title">Konto</div>
-            <table class="t-table">
-                <thead>
-                    <tr><th class="soll-side">Soll</th><th>Haben</th></tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="soll-side" id="soll-rows"></td>
-                        <td id="haben-rows"></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="sum-row">
-                <span>Summe: <input type="number" step="0.01" class="val-input" id="sum-soll"></span>
-                <span>Summe: <input type="number" step="0.01" class="val-input" id="sum-haben"></span>
+    <div id="game">
+        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #65676b; margin-bottom: 5px;">
+            <span id="levelDisplay">Level</span>
+            <span id="counterDisplay">Aufgabe 1/10</span>
+        </div>
+        <div class="task" id="taskDisplay"></div>
+        <div class="entry-container">
+            <div class="side">
+                <div class="side-label">Soll</div>
+                <select id="soll1"></select>
+                <div class="split-field" id="soll2-box"><select id="soll2"></select></div>
+            </div>
+            <div class="side">
+                <div class="side-label">Haben</div>
+                <select id="haben1"></select>
+                <div class="split-field" id="haben2-box"><select id="haben2"></select></div>
             </div>
         </div>
+        <button class="action btn-check" id="checkBtn" onclick="checkAnswer()">Prüfen</button>
+        <button class="action btn-next" id="nextBtn" onclick="generateTask()">Weiter</button>
+        <div id="feedback" class="feedback"></div>
     </div>
 
-    <div id="feedback" class="feedback"></div>
-    <button id="checkBtn" class="btn-action btn-check" onclick="validate()">Eingabe prüfen & abschließen</button>
-    <button id="nextBtn" class="btn-action btn-next" onclick="generateTask()">Nächste Aufgabe</button>
-</div>
-
-<div id="helpModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="toggleHelp(false)">&times;</span>
-        <h2 style="color:var(--primary)">Anleitung</h2>
-        <div style="font-size: 0.95rem; line-height: 1.6;">
-            <p>1. <b>Eröffnung:</b> Trage den AB beim Gegenkonto <b>EBK</b> ein (Aktiv: Soll | Passiv: Haben).</p>
-            <p>2. <b>Buchungen:</b> Trage die Geschäftsfälle auf die richtige Seite ein.</p>
-            <p>3. <b>Abschluss:</b> Ermittle die Differenz (Saldo) und trage sie auf der wertmäßig kleineren Seite mit dem Gegenkonto <b>SBK</b> ein.</p>
-            <p>4. <b>Summen:</b> Addiere beide Seiten. Die Summen müssen identisch sein!</p>
+    <div id="results">
+        <div class="stat-box">
+            <p style="font-size: 1.2rem;">Richtig: <span id="currentScore" style="font-weight:bold;">0</span> / 10</p>
         </div>
-        <button class="btn-action btn-check" onclick="toggleHelp(false)">Verstanden!</button>
     </div>
 </div>
 
 <script>
-    let config = { level: 1 };
-    let task = {};
-    const kontoliste = ["BGA", "Fuhrpark", "Warenvorrat", "Forderungen", "Bank", "Kasse", "Eigenkapital", "Darlehen", "Verbindlichkeiten", "EBK", "SBK"];
+    // STRIKTE KONTENLISTE
+    const kontenListe = ["-- bitte wählen --", "Aufwendungen für Energie", "Aufwendungen für Waren (Wareneinkauf)", "Bank", "BGA", "Darlehen", "Eigenkapital", "Forderungen a. L. L.", "Fremdinstandsetzung", "Fuhrpark", "Kasse", "Mietaufwendungen", "Mieterträge", "Postgebühren", "Provisionsaufwendungen", "Provisionserträge", "Umsatzerlöse für Waren", "Umsatzsteuer", "Verbindlichkeiten a. L. L.", "Vorsteuer", "Waren (Vorrat)", "Werbung", "Zinsaufwendungen", "Zinserträge", "- kein zweites Konto -"];
+    
+    // MAXIMIERTE POOLS (GEPRÜFT)
+    const poolLight = [
+        { c: "geld", t: "Barabhebung vom Bankkonto für die Ladenkasse.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
+        { c: "geld", t: "Einzahlung von Bargeld aus der Kasse auf das Bankkonto.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
+        { c: "geld", t: "Ein Kunde begleicht eine offene Rechnung per Banküberweisung.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Forderungen a. L. L.", h2: "- kein zweites Konto -" },
+        { c: "geld", t: "Wir begleichen eine Lieferantenrechnung per Banküberweisung.", s1: "Verbindlichkeiten a. L. L.", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
+        { c: "bga", t: "Kauf von Ladentisch und Regalen auf Ziel.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
+        { c: "fuhrpark", t: "Anschaffung eines neuen Lieferwagens gegen Überweisung.", s1: "Fuhrpark", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
+        { c: "vorrat", t: "Kauf von Handelswaren auf Ziel (Bestandserhöhung).", s1: "Waren (Vorrat)", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
+        { c: "darlehen", t: "Aufnahme eines langfristigen Bankdarlehens, Gutschrift auf dem Konto.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Darlehen", h2: "- kein zweites Konto -" },
+        { c: "darlehen", t: "Tilgung einer Darlehensrate durch Banküberweisung.", s1: "Darlehen", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
+        { c: "bga", t: "Wir kaufen einen neuen Büroschrank gegen Barzahlung.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
+        { c: "geld", t: "Kunde begleicht Rechnung durch Scheck (Bankgutschrift).", s1: "Bank", s2: "- kein zweites Konto -", h1: "Forderungen a. L. L.", h2: "- kein zweites Konto -" },
+        { c: "geld", t: "Ein Kunde zahlt eine Rechnung bar in die Kasse ein.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Forderungen a. L. L.", h2: "- kein zweites Konto -" },
+        { c: "geld", t: "Wir begleichen eine Lieferantenrechnung bar aus der Kasse.", s1: "Verbindlichkeiten a. L. L.", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
+        { c: "geld", t: "Bareinzahlung von Tageseinnahmen auf das Bankkonto.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
+        { c: "geld", t: "Wir heben 500 € vom Konto ab für die Portokasse.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
+        { c: "bga", t: "Kauf von Büromöbeln auf Ziel.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
+        { c: "fuhrpark", t: "Wir kaufen einen Anhänger für den Fuhrpark bar.", s1: "Fuhrpark", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
+        { c: "darlehen", t: "Umwandlung einer Lieferantenrechnung in ein Darlehen.", s1: "Verbindlichkeiten a. L. L.", s2: "- kein zweites Konto -", h1: "Darlehen", h2: "- kein zweites Konto -" },
+        { c: "bga", t: "Gebrauchter Schreibtisch bar verkauft (Buchwert).", s1: "Kasse", s2: "- kein zweites Konto -", h1: "BGA", h2: "- kein zweites Konto -" }
+    ];
 
-    const pool = {
-        Bank: [
-            {t:"Kunde begleicht Rechnung per Überweisung", v:2500, gk:"Forderungen", z:true},
-            {t:"Zahlung einer Lieferantenrechnung", v:3200, gk:"Verbindlichkeiten", z:false},
-            {t:"Aufnahme eines Darlehens (Gutschrift)", v:10000, gk:"Darlehen", z:true},
-            {t:"Kauf neuer Büromöbel per Bank", v:1200, gk:"BGA", z:false},
-            {t:"Bareinzahlung auf das Geschäftskonto", v:800, gk:"Kasse", z:true},
-            {t:"Banküberweisung der monatlichen Darlehensrate", v:1500, gk:"Darlehen", z:false}
-        ],
-        Kasse: [
-            {t:"Barabhebung vom Bankkonto für die Kasse", v:500, gk:"Bank", z:true},
-            {t:"Kunde zahlt eine offene Forderung bar", v:150, gk:"Forderungen", z:true},
-            {t:"Barzahlung für Büromaterial", v:60, gk:"BGA", z:false},
-            {t:"Bareinzahlung auf das Bankkonto", v:1200, gk:"Bank", z:false}
-        ],
-        Verbindlichkeiten: [
-            {t:"Warenkauf beim Großhändler auf Ziel", v:4500, gk:"Warenvorrat", z:true},
-            {t:"Überweisung an Lieferer per Bank", v:2000, gk:"Bank", z:false},
-            {t:"Barzahlung an einen Lieferer", v:350, gk:"Kasse", z:false},
-            {t:"Kauf eines Firmenwagens auf Ziel", v:22000, gk:"Fuhrpark", z:true}
-        ]
-    };
+    const poolMedium = [
+        { c: "miete", t: "Wir bezahlen die monatliche Ladenmiete per Banküberweisung.", s1: "Mietaufwendungen", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
+        { c: "post", t: "Barkauf von Briefmarken für die Geschäftspost.", s1: "Postgebühren", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
+        { c: "energie", t: "Die Stromrechnung für das Lager wird per Bank bezahlt.", s1: "Aufwendungen für Energie", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
+        { c: "werbung", t: "Barzahlung einer Werbeanzeige.", s1: "Werbung", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
+        { c: "ertrag", t: "Ein Mieter überweist uns die Monatsmiete.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Mieterträge", h2: "- kein zweites Konto -" },
+        { c: "provis", t: "Provision für Warenvermittlung bar erhalten.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Provisionserträge", h2: "- kein zweites Konto -" },
+        { c: "zins", t: "Wir überweisen Zinsen für ein Darlehen.", s1: "Zinsaufwendungen", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" }
+    ];
 
-    function fmt(n) { return n.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
-    function setLevel(l, b) { config.level = l; document.querySelectorAll('.level-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); generateTask(); }
-    function toggleHelp(s) { document.getElementById('helpModal').style.display = s ? 'block' : 'none'; }
+    const poolPro = [
+        { c: "einkauf", t: "Einkauf von Waren auf Ziel (netto + 19% USt).", s1: "Aufwendungen für Waren (Wareneinkauf)", s2: "Vorsteuer", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
+        { c: "verkauf", t: "Verkauf von Waren auf Ziel (netto + 19% USt).", s1: "Forderungen a. L. L.", s2: "- kein zweites Konto -", h1: "Umsatzerlöse für Waren", h2: "Umsatzsteuer" },
+        { c: "werbung", t: "Wir bezahlen eine Werbeanzeige per Bank (netto + Vorsteuer).", s1: "Werbung", s2: "Vorsteuer", h1: "Bank", h2: "- kein zweites Konto -" },
+        { c: "instand", t: "Reparatur der Ladentür (Rechnung netto + USt) auf Ziel.", s1: "Fremdinstandsetzung", s2: "Vorsteuer", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
+        { c: "einkauf", t: "Wareneinkauf bar (netto + Vorsteuer).", s1: "Aufwendungen für Waren (Wareneinkauf)", s2: "Vorsteuer", h1: "Kasse", h2: "- kein zweites Konto -" }
+    ];
 
-    // Rechner Logik
-    let calcVal = "0";
-    function updateCalc() { document.getElementById("calc-display").value = calcVal; }
-    function calcNum(n) { calcVal === "0" && n !== "." ? calcVal = n : calcVal += n; updateCalc(); }
-    function calcOp(op) { calcVal += " " + op + " "; updateCalc(); }
-    function calcClear() { calcVal = "0"; updateCalc(); }
-    function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); } catch { calcVal = "Fehler"; } updateCalc(); }
+    let mode = ''; let currentPool = []; let taskCount = 0; let correctCount = 0; const maxTasks = 10;
 
-    // Rechner Drag
-    const calc = document.getElementById("calc-container");
-    let isDragging = false, offset = [0,0];
-    const startDrag = (e) => { if(e.target.tagName === 'BUTTON') return; isDragging = true; const cX = e.clientX || e.touches[0].clientX; const cY = e.clientY || e.touches[0].clientY; offset = [calc.offsetLeft - cX, calc.offsetTop - cY]; };
-    const doDrag = (e) => { if (!isDragging) return; const cX = e.clientX || (e.touches ? e.touches[0].clientX : null); const cY = e.clientY || (e.touches ? e.touches[0].clientY : null); if(cX !== null) { calc.style.left = (cX + offset[0]) + "px"; calc.style.top = (cY + offset[1]) + "px"; }};
-    calc.addEventListener('mousedown', startDrag); calc.addEventListener('touchstart', startDrag);
-    document.addEventListener('mousemove', doDrag); document.addEventListener('touchmove', doDrag, {passive:false});
-    document.addEventListener('mouseup', () => isDragging = false); document.addEventListener('touchend', () => isDragging = false);
-    function toggleCalc() { const c = document.getElementById("calc-container"); c.style.display = (c.style.display === "block") ? "none" : "block"; }
+    function checkLevelLocks() {
+        const solvedL = parseInt(localStorage.getItem('solved_light') || 0);
+        const solvedM = parseInt(localStorage.getItem('solved_medium') || 0);
+        document.getElementById('info-light').innerText = "Gelöst: " + solvedL;
+        document.getElementById('dynamicTitle').innerText = "Fibu-Trainer XXL";
+        
+        const btnM = document.getElementById('btn-medium');
+        if (solvedL >= 30) {
+            btnM.disabled = false;
+            btnM.style.opacity = "1";
+            btnM.innerHTML = `2. Fortgeschritten 🔓 <span class="lock-info">Gelöst: ${solvedM}</span>`;
+        } else {
+            document.getElementById('info-medium').innerText = `Sperre: Noch ${30-solvedL} Einsteiger-Fragen`;
+        }
+        
+        const btnP = document.getElementById('btn-pro');
+        if (solvedM >= 20) {
+            btnP.disabled = false;
+            btnP.innerHTML = `3. Profi 🔓 <span class="lock-info">Viel Erfolg!</span>`;
+        } else {
+            document.getElementById('info-pro').innerText = `Sperre: Noch ${20-solvedM} Mittel-Fragen`;
+        }
+    }
+
+    function backToMenu() {
+        document.getElementById('game').style.display = 'none';
+        document.getElementById('results').style.display = 'none';
+        document.getElementById('menu').style.display = 'block';
+        checkLevelLocks();
+    }
+
+    function resetAllProgress() {
+        if(confirm("Lernstand löschen?")) { localStorage.clear(); location.reload(); }
+    }
+
+    function startGame(m) {
+        mode = m; taskCount = 0; correctCount = 0;
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('game').style.display = 'block';
+        document.getElementById('dynamicTitle').innerText = "Runde läuft...";
+        setupDropdowns();
+        document.getElementById('soll2-box').style.display = (mode === 'pro') ? 'block' : 'none';
+        document.getElementById('haben2-box').style.display = (mode === 'pro') ? 'block' : 'none';
+        let basePool = mode === 'light' ? poolLight : (mode === 'medium' ? poolMedium : poolPro);
+        currentPool = [...basePool].sort(() => Math.random() - 0.5).slice(0, 10);
+        generateTask();
+    }
+
+    function setupDropdowns() {
+        ['soll1', 'soll2', 'haben1', 'haben2'].forEach(id => {
+            const s = document.getElementById(id); s.innerHTML = "";
+            kontenListe.sort().forEach(k => s.add(new Option(k, k)));
+        });
+    }
 
     function generateTask() {
-        document.getElementById('nextBtn').style.display = 'none';
-        document.getElementById('checkBtn').style.display = 'block';
+        if (taskCount >= maxTasks) { showFinalResults(); return; }
+        currentTask = currentPool[taskCount]; taskCount++;
+        document.getElementById('taskDisplay').innerText = currentTask.t;
         document.getElementById('feedback').style.display = 'none';
-
-        const keys = Object.keys(pool);
-        const name = keys[Math.floor(Math.random() * keys.length)];
-        const isAktiv = name !== "Verbindlichkeiten";
-        
-        let count = config.level === 1 ? 1 : (config.level === 2 ? 3 : 5);
-        let selFaelle = [...pool[name]].sort(() => 0.5 - Math.random()).slice(0, count);
-        
-        if(config.level === 3) selFaelle = selFaelle.map(f => ({...f, v: f.v + (Math.random() * 0.95)}));
-
-        task = { name, typ: isAktiv ? "aktiv" : "passiv", ab: Math.floor(Math.random() * 20 + 10) * 1000 + (config.level === 3 ? Math.random() * 50 : 0), faelle: selFaelle };
-
-        task.solS = []; task.solH = [];
-        if(isAktiv) {
-            task.solS.push({gk:"EBK", v:task.ab});
-            selFaelle.forEach(f => f.z ? task.solS.push({gk:f.gk, v:f.v}) : task.solH.push({gk:f.gk, v:f.v}));
-        } else {
-            task.solH.push({gk:"EBK", v:task.ab});
-            selFaelle.forEach(f => f.z ? task.solH.push({gk:f.gk, v:f.v}) : task.solS.push({gk:f.gk, v:f.v}));
+        document.getElementById('checkBtn').style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('soll1').selectedIndex = 0;
+        document.getElementById('haben1').selectedIndex = 0;
+        if(mode === 'pro') {
+            document.getElementById('soll2').value = "- kein zweites Konto -";
+            document.getElementById('haben2').value = "- kein zweites Konto -";
         }
+        document.getElementById('progressBar').style.width = (taskCount / maxTasks * 100) + "%";
+        document.getElementById('counterDisplay').innerText = `Aufgabe ${taskCount}/${maxTasks}`;
+    }
+
+    function checkAnswer() {
+        const s1 = document.getElementById('soll1').value;
+        const s2 = (mode === 'pro') ? document.getElementById('soll2').value : "- kein zweites Konto -";
+        const h1 = document.getElementById('haben1').value;
+        const h2 = (mode === 'pro') ? document.getElementById('haben2').value : "- kein zweites Konto -";
         
-        let sSum = task.solS.reduce((a,b) => a + b.v, 0);
-        let hSum = task.solH.reduce((a,b) => a + b.v, 0);
-        task.saldo = Math.abs(sSum - hSum);
-        task.total = Math.max(sSum, hSum);
-        if(sSum > hSum) task.solH.push({gk:"SBK", v:task.saldo}); else task.solS.push({gk:"SBK", v:task.saldo});
+        if (s1 === "-- bitte wählen --" || h1 === "-- bitte wählen --") { alert("Konten wählen!"); return; }
 
-        render();
-    }
+        // ROBUSTE PRÜFUNG (Ignoriert Reihenfolge im Soll/Haben-Block)
+        const sollKorrekt = (s1 === currentTask.s1 && s2 === currentTask.s2) || (s1 === currentTask.s2 && s2 === currentTask.s1);
+        const habenKorrekt = (h1 === currentTask.h1 && h2 === currentTask.h2) || (h1 === currentTask.h2 && h2 === currentTask.h1);
 
-    function render() {
-        document.getElementById('konto-title').innerText = task.name;
-        document.getElementById('task').innerHTML = `<b>1. Eröffnung:</b> AB ${fmt(task.ab)} €.<br><b>2. Buchungen:</b><br>` + 
-            task.faelle.map(f => `• ${f.t}: ${fmt(f.v)} €`).join("<br>") + `<br><b>3. Abschluss:</b> Errechne den Saldo (SBK) und die Summen.`;
-
-        const buildRows = (side) => {
-            let h = "";
-            let rowCount = config.level === 1 ? 3 : (config.level === 2 ? 6 : 9);
-            for(let i=0; i<rowCount; i++) {
-                h += `<div class="entry">
-                    <select class="gk-select" id="${side}-gk-${i}">
-                        <option value="">Gegenkonto</option>
-                        ${kontoliste.map(k => `<option value="${k}">${k}</option>`).join('')}
-                    </select>
-                    <input type="number" step="0.01" class="val-input" id="${side}-val-${i}">
-                </div>`;
-            }
-            return h;
-        };
-        document.getElementById('soll-rows').innerHTML = buildRows('s');
-        document.getElementById('haben-rows').innerHTML = buildRows('h');
-        document.getElementById('sum-soll').value = "";
-        document.getElementById('sum-haben').value = "";
-    }
-
-    function validate() {
         const fb = document.getElementById('feedback');
-        fb.style.display = 'block';
-        let rowCount = config.level === 1 ? 3 : (config.level === 2 ? 6 : 9);
-        
-        const getUserEntries = (side) => {
-            let entries = [];
-            for(let i=0; i<rowCount; i++) {
-                let v = parseFloat(document.getElementById(`${side}-val-${i}`).value) || 0;
-                let g = document.getElementById(`${side}-gk-${i}`).value;
-                if(v > 0) entries.push({gk: g, v: v});
-            }
-            return entries;
-        };
-
-        const uS = getUserEntries('s'); const uH = getUserEntries('h');
-        const sumS = parseFloat(document.getElementById('sum-soll').value) || 0;
-        const sumH = parseFloat(document.getElementById('sum-haben').value) || 0;
-
-        const checkArr = (u, s) => {
-            if(u.length !== s.length) return false;
-            let s1 = [...u].sort((a,b) => a.v - b.v);
-            let s2 = [...s].sort((a,b) => a.v - b.v);
-            return s1.every((e, idx) => e.gk === s2[idx].gk && Math.abs(e.v - s2[idx].v) < 0.01);
-        };
-
-        if(checkArr(uS, task.solS) && checkArr(uH, task.solH) && Math.abs(sumS - task.total) < 0.01 && Math.abs(sumH - task.total) < 0.01) {
-            fb.innerHTML = "✅ Hervorragend! Das Konto ist korrekt geführt und abgeschlossen.";
-            fb.style.background = "#d4edda"; fb.style.color = "#155724";
-            document.getElementById('checkBtn').style.display = 'none';
-            document.getElementById('nextBtn').style.display = 'block';
+        if (sollKorrekt && habenKorrekt) {
+            correctCount++;
+            let key = (mode === 'light') ? 'solved_light' : (mode === 'medium') ? 'solved_medium' : 'solved_pro';
+            localStorage.setItem(key, parseInt(localStorage.getItem(key) || 0) + 1);
+            fb.innerText = "✓ Richtig!"; fb.className = "feedback correct";
         } else {
-            fb.innerHTML = "❌ Fehler im Konto. Prüfe AB, Saldo (SBK) und die Summen!";
-            fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            let solSoll = currentTask.s1 + (currentTask.s2 !== "- kein zweites Konto -" ? " + " + currentTask.s2 : "");
+            let solHaben = currentTask.h1 + (currentTask.h2 !== "- kein zweites Konto -" ? " + " + currentTask.h2 : "");
+            fb.innerText = `✗ Falsch. Korrekte Lösung:\n${solSoll}\nan\n${solHaben}`;
+            fb.className = "feedback wrong";
         }
+        fb.style.display = 'block';
+        document.getElementById('checkBtn').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'block';
     }
 
-    window.onload = generateTask;
+    function showFinalResults() {
+        document.getElementById('game').style.display = 'none';
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('dynamicTitle').innerText = "Runde beendet!";
+        document.getElementById('currentScore').innerText = correctCount;
+        if (correctCount === 10) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    }
 </script>
 </body>
 </html>
