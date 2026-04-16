@@ -176,7 +176,7 @@
     const pools = {
         1: [
             {q: "Barkauf eines neuen Druckers für 350,00 €.", s: ["BGA", "Aktiv", "Mehrung (+)"], h: ["Kasse", "Aktiv", "Minderung (-)"]},
-            {q: "Wir überweisen 1.500,00 € vom Bankkonto an die Kasse.", s: ["Kasse", "Aktiv", "Mehrung (+)"], h: ["Bank", "Aktiv", "Minderung (-)"]},
+            {q: "Überweisung von 1.500,00 € vom Bankkonto an die Kasse.", s: ["Kasse", "Aktiv", "Mehrung (+)"], h: ["Bank", "Aktiv", "Minderung (-)"]},
             {q: "Kauf von Verkaufsregalen auf Ziel: 4.200,00 €.", s: ["BGA", "Aktiv", "Mehrung (+)"], h: ["Verbindlichkeiten aLL", "Passiv", "Mehrung (+)"]},
             {q: "Ein Kunde überweist eine offene Rechnung: 850,00 €.", s: ["Bank", "Aktiv", "Mehrung (+)"], h: ["Forderungen aLL", "Aktiv", "Minderung (-)"]},
             {q: "Wir begleichen eine Lieferantenrechnung per Bank: 2.100,00 €.", s: ["Verbindlichkeiten aLL", "Passiv", "Minderung (-)"], h: ["Bank", "Aktiv", "Minderung (-)"]},
@@ -184,9 +184,7 @@
             {q: "Kauf eines Lieferwagens auf Ziel: 35.000,00 €.", s: ["Fuhrpark", "Aktiv", "Mehrung (+)"], h: ["Verbindlichkeiten aLL", "Passiv", "Mehrung (+)"]},
             {q: "Bareinzahlung auf das Bankkonto: 1.200,00 €.", s: ["Bank", "Aktiv", "Mehrung (+)"], h: ["Kasse", "Aktiv", "Minderung (-)"]},
             {q: "Tilgung einer Darlehensrate per Bank: 1.500,00 €.", s: ["Darlehen", "Passiv", "Minderung (-)"], h: ["Bank", "Aktiv", "Minderung (-)"]},
-            {q: "Kauf von Warenvorrat auf Ziel: 5.000,00 €.", s: ["Warenvorrat", "Aktiv", "Mehrung (+)"], h: ["Verbindlichkeiten aLL", "Passiv", "Mehrung (+)"]},
-            {q: "Kauf einer Registrierkasse bar: 1.100,00 €.", s: ["BGA", "Aktiv", "Mehrung (+)"], h: ["Kasse", "Aktiv", "Minderung (-)"]},
-            {q: "Kunde zahlt offene Forderung bar: 120,00 €.", s: ["Kasse", "Aktiv", "Mehrung (+)"], h: ["Forderungen aLL", "Aktiv", "Minderung (-)"]}
+            {q: "Kauf von Warenvorrat auf Ziel: 5.000,00 €.", s: ["Warenvorrat", "Aktiv", "Mehrung (+)"], h: ["Verbindlichkeiten aLL", "Passiv", "Mehrung (+)"]}
         ],
         2: [
             {q: "Zahlung der Ladenmiete per Banküberweisung: 1.850,00 €.", s: ["Mietaufwand", "Aufwand", "Mehrung (+)"], h: ["Bank", "Aktiv", "Minderung (-)"]},
@@ -208,12 +206,12 @@
         ]
     };
 
-    // Auto-Maximierung: Falls Aufgaben fehlen, werden sie durch Varianten aufgefüllt
+    // Auto-Maximierung auf 60 Fälle pro Pool durch Generierung von Varianten
     for(let i=1; i<=3; i++) {
         let baseLength = pools[i].length;
         while(pools[i].length < 60) {
             let original = pools[i][pools[i].length % baseLength];
-            pools[i].push({...original, q: original.q + " [V" + (Math.floor(pools[i].length/baseLength)) + "]"});
+            pools[i].push({...original, q: original.q + " [Variante " + (Math.floor(pools[i].length/baseLength)) + "]"});
         }
     }
 
