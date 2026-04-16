@@ -11,7 +11,6 @@
         
         .app-container { background: white; max-width: 950px; width: 100%; padding: 25px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); position: relative; box-sizing: border-box; }
         
-        /* Header & Nav */
         .header-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; }
         .btn-round { background: var(--nrw-blue); color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
@@ -33,7 +32,7 @@
         }
 
         .label-cell { color: var(--nrw-blue); font-weight: bold; font-size: 0.75rem; text-transform: uppercase; align-self: center; }
-        .col-head { text-align: center; font-weight: bold; padding-bottom: 5px; border-bottom: 2px solid #ddd; font-size: 0.9rem; }
+        .col-head { text-align: center; font-weight: bold; padding-bottom: 15px; border-bottom: 2px solid #ddd; font-size: 1rem; color: #333; }
 
         select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.95rem; background: white; font-weight: bold; appearance: none; }
         select.correct { border-color: var(--success); background-color: #d4edda; }
@@ -68,7 +67,7 @@
     <div class="task-box" id="task-desc">Lade Analyse-Modul...</div>
 
     <div class="analysis-grid">
-        <div></div><div class="col-head">Konto A (Soll)</div><div class="col-head">Konto B (Haben)</div>
+        <div></div><div class="col-head">Konto A</div><div class="col-head">Konto B</div>
 
         <div class="label-cell">1. Welches Konto?</div>
         <select id="k1"></select><select id="k2"></select>
@@ -128,12 +127,12 @@
         ]
     };
 
-    // Auto-Maximierung auf 60 Fälle pro Pool
+    // Auto-Maximierung
     for(let i=1; i<=3; i++) {
         let baseLen = pools[i].length;
         while(pools[i].length < 60) {
             let original = pools[i][pools[i].length % baseLen];
-            pools[i].push({...original, q: original.q + " [V" + (Math.floor(pools[i].length/baseLen)) + "]"});
+            pools[i].push({...original, q: original.q + " [Variante]"});
         }
     }
 
