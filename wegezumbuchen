@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Accounting Trainer Pro | BFS 2 XXL</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root { 
+            --nrw-blue: #005aab; 
+            --bg-light: #f0f4f8; 
+            --success: #28a745; 
+            --error: #dc3545; 
+            --border: #ced4da; 
+            --surface: #ffffff;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background-color: var(--bg-light); 
+            margin: 0; padding: 10px; 
+            display: flex; justify-content: center; 
+            touch-action: manipulation;
+        }
+
+        .app-container { 
+            background: var(--surface); 
+            max-width: 950px; width: 100%; 
+            padding: 25px; border-radius: 15px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1); 
+            margin-top: 10px; position: relative; 
+            box-sizing: border-box; 
+        }
+
+        .header-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 2100; }
+        .btn-round { 
+            background: var(--nrw-blue); color: white; border: none; 
+            width: 42px; height: 42px; border-radius: 50%; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 1.3rem; 
+        }
+
+        .nav-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 20px; border-bottom: 1px solid #eee; 
+            padding-bottom: 10px; padding-right: 150px; 
+        }
+        .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; border:none; cursor:pointer;}
+
+        .level-selector { display: flex; gap: 5px; }
+        .level-btn { 
+            padding: 8px 12px; border: 2px solid var(--nrw-blue); 
+            background: white; border-radius: 20px; cursor: pointer; 
+            font-weight: bold; color: var(--nrw-blue); font-size: 0.8rem; 
+        }
+        .level-btn.active { background: var(--nrw-blue); color: white; }
+        .level-btn:disabled { opacity: 0.4; cursor: not-allowed; border-color: #ccc; color: #999; }
+
+        h1 { color: var(--nrw-blue); text-align: center; font-size: 1.4rem; margin: 15px 0; text-transform: uppercase; font-weight: 800; }
+        
+        .task-box { 
+            background: #eef2f7; border-left: 5px solid var(--nrw-blue); 
+            padding: 20px; margin-bottom: 25px; border-radius: 4px; 
+            font-size: 1.1rem; line-height: 1.5; font-weight: 500;
+            min-height: 100px; display: flex; align-items: center;
+        }
+
+        .exercise-grid {
+            display: grid; grid-template-columns: 140px 1fr 1fr; 
+            gap: 12px; align-items: center; background: #fafafa; 
+            padding: 15px; border-radius: 12px; border: 1px solid var(--border);
+        }
+
+        .label-cell { color: var(--nrw-blue); font-weight: bold; font-size: 0.8rem; text-transform: uppercase; }
+        .col-head { text-align: center; font-weight: bold; padding-bottom: 5px; border-bottom: 2px solid #ddd; }
+
+        select {
+            width: 100%; padding: 12px; border: 1px solid var(--border); 
+            border-radius: 8px; font-size: 1rem; background: white; font-weight: bold;
+            appearance: none;
+        }
+
+        select.correct { border-color: var(--success); background-color: #d4edda; }
+        select.incorrect { border-color: var(--error); background-color: #f8d7da; }
+
+        #calc-container { 
+            display: none; position: fixed; top: 120px; left: 20px; width: 230px; 
+            background: #333; border-radius: 12px; padding: 12px; z-index: 3000; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); cursor: move; touch-action: none; 
+        }
+        #calc-display { 
+            width: 100%; height: 50px; background: #eee; border-radius: 5px; 
+            margin-bottom: 10px; text-align: right; padding: 10px; font-family: monospace; 
+            font-size: 1.4rem; border: none; box-sizing: border-box; 
+        }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .calc-btn { padding: 15px; border: none; border-radius: 8px; background: #555; color: white; font-weight: bold; cursor: pointer; }
+
+        .btn-action { width: 100%; padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1rem; margin-top: 15px; }
+        .btn-check { background-color: var(--nrw-blue); color: white; }
+        .btn-next { background-color: var(--success); color: white; display: none; }
+
+        .progress-bar { height: 8px; background: #eee; border-radius: 4px; margin-top: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--nrw-blue); width: 0%; transition: 0.4s; }
+        .status-text { text-align: center; color: #666; font-size: 0.8rem; margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+<div id="calc-container">
+    <input type="text" id="calc-display" readonly value="0">
+    <div class="calc-grid">
+        <button class="calc-btn" style="background:var(--error); grid-column:span 2;" onclick="calcClear()">C</button>
+        <button class="calc-btn" onclick="calcOp('/')">÷</button><button class="calc-btn" onclick="calcOp('*')">×</button>
+        <button class="calc-btn" onclick="calcNum('7')">7</button><button class="calc-btn" onclick="calcNum('8')">8</button><button class="calc-btn" onclick="calcNum('9')">9</button>
+        <button class="calc-btn" onclick="calcOp('-')">-</button>
+        <button class="calc-btn" onclick="calcNum('4')">4</button><button class="calc-btn" onclick="calcNum('5')">5</button><button class="calc-btn" onclick="calcNum('6')">6</button>
+        <button class="calc-btn" onclick="calcOp('+')">+</button>
+        <button class="calc-btn" onclick="calcNum('1')">1</button><button class="calc-btn" onclick="calcNum('2')">2</button><button class="calc-btn" onclick="calcNum('3')">3</button>
+        <button class="calc-btn" style="background:var(--success); grid-column:span 2;" onclick="calcSolve()">=</button>
+        <button class="calc-btn" onclick="calcNum('0')">0</button><button class="calc-btn" onclick="calcNum('.')">.</button>
+    </div>
+</div>
+
+<div class="app-container">
+    <div class="header-actions">
+        <a href="mailto:wijnandts@bk-erkelenz.de" class="btn-round">✉</a>
+        <button class="btn-round" onclick="toggleCalc()">🖩</button>
+    </div>
+
+    <div class="nav-header">
+        <button class="btn-home" onclick="location.reload()">🏠 Reset</button>
+        <div class="level-selector">
+            <button id="lvl1" class="level-btn active" onclick="setLevel(1)">Stufe 1</button>
+            <button id="lvl2" class="level-btn" onclick="setLevel(2)" disabled>Stufe 2</button>
+            <button id="lvl3" class="level-btn" onclick="setLevel(3)" disabled>Stufe 3</button>
+        </div>
+    </div>
+
+    <h1>Accounting Trainer Master</h1>
+    <div class="task-box" id="task-desc">Lade Trainingseinheit...</div>
+
+    <div class="exercise-grid">
+        <div class="label-cell"></div>
+        <div class="col-head">Soll-Seite</div>
+        <div class="col-head">Haben-Seite</div>
+
+        <div class="label-cell">1. Konto</div>
+        <select id="k1"></select><select id="k2"></select>
+
+        <div class="label-cell">2. Konto-Typ</div>
+        <select id="k1_ap"></select><select id="k2_ap"></select>
+
+        <div class="label-cell">3. Buchung</div>
+        <select id="k1_mm"></select><select id="k2_mm"></select>
+    </div>
+
+    <button class="btn-action btn-check" id="checkBtn" onclick="check()">Eingabe prüfen</button>
+    <button class="btn-action btn-next" id="nextBtn" onclick="next()">Nächste Aufgabe</button>
+
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="status-text" id="status">Fortschritt: 0/30</div>
+</div>
+
+<script>
+    let stats = { solvedL1: 0, solvedL2: 0, solvedL3: 0 };
+    let currentLvl = 1;
+    let currentIdx = 0;
+
+    const opt = {
+        konten: ["BGA", "Bank", "Kasse", "Forderungen aLL", "Fuhrpark", "Verbindlichkeiten aLL", "Darlehen", "Warenvorrat", "Umsatzerlöse", "Mietaufwand", "Personalaufwand", "Vorsteuer", "Umsatzsteuer", "Werbeaufwand", "Zinserträge", "Büromaterial", "Zinsaufwand", "Instandhaltungsaufwand"],
+        typen: ["Aktiv", "Passiv", "Aufwand", "Ertrag"],
+        buchung: ["Mehrung (+)", "Minderung (-)"]
+    };
+
+    const pools = {
+        1: [
+            {q: "Barkauf eines neuen Druckers für 350,00 €.", s: ["BGA", "Aktiv", "Mehrung (+)"], h: ["Kasse", "Aktiv", "Minderung (-)"]},
+            {q: "Wir überweisen 1.500,00 € vom Bankkonto an die Kasse.", s: ["Kasse", "Aktiv", "Mehrung (+)"], h: ["Bank", "Aktiv", "Minderung (-)"]},
+            {q: "Kauf von Verkaufsregalen auf Ziel: 4.200,00 €.", s: ["BGA", "Aktiv", "Mehrung (+)"], h: ["Verbindlichkeiten aLL", "Passiv", "Mehrung (+)"]},
+            {q: "Ein Kunde überweist eine offene Rechnung: 850,00 €.", s: ["Bank", "Aktiv", "Mehrung (+)"], h: ["Forderungen aLL", "Aktiv", "Minderung (-)"]},
+            {q: "Wir begleichen eine Lieferantenrechnung per Bank: 2.100,00 €.", s: ["Verbindlichkeiten aLL", "Passiv", "Minderung (-)"], h: ["Bank", "Aktiv", "Minderung (-)"]},
+            {q: "Aufnahme eines Bankdarlehens: Gutschrift 25.000,00 €.", s: ["Bank", "Aktiv", "Mehrung (+)"], h: ["Darlehen", "Passiv", "Mehrung (+)"]},
+            {q: "Kauf eines Lieferwagens auf Ziel: 35.000,00 €.", s: ["Fuhrpark", "Aktiv", "Mehrung (+)"], h: ["Verbindlichkeiten aLL", "Passiv", "Mehrung (+)"]},
+            {q: "Bareinzahlung auf das Bankkonto: 1.200,00 €.", s: ["Bank", "Aktiv", "Mehrung (+)"], h: ["Kasse", "Aktiv", "Minderung (-)"]},
+            {q: "Tilgung einer Darlehensrate per Bank: 1.500,00 €.", s: ["Darlehen", "Passiv", "Minderung (-)"], h: ["Bank", "Aktiv", "Minderung (-)"]},
+            {q: "Kauf von Warenvorrat auf Ziel: 5.000,00 €.", s: ["Warenvorrat", "Aktiv", "Mehrung (+)"], h: ["Verbindlichkeiten aLL", "Passiv", "Mehrung (+)"]},
+            {q: "Kauf einer Registrierkasse bar: 1.100,00 €.", s: ["BGA", "Aktiv", "Mehrung (+)"], h: ["Kasse", "Aktiv", "Minderung (-)"]},
+            {q: "Kunde zahlt offene Forderung bar: 120,00 €.", s: ["Kasse", "Aktiv", "Mehrung (+)"], h: ["Forderungen aLL", "Aktiv", "Minderung (-)"]}
+        ],
+        2: [
+            {q: "Zahlung der Ladenmiete per Banküberweisung: 1.850,00 €.", s: ["Mietaufwand", "Aufwand", "Mehrung (+)"], h: ["Bank", "Aktiv", "Minderung (-)"]},
+            {q: "Verkauf von Handelswaren gegen Barzahlung: 450,00 €.", s: ["Kasse", "Aktiv", "Mehrung (+)"], h: ["Umsatzerlöse", "Ertrag", "Mehrung (+)"]},
+            {q: "Überweisung der Gehälter für diesen Monat: 8.400,00 €.", s: ["Personalaufwand", "Aufwand", "Mehrung (+)"], h: ["Bank", "Aktiv", "Minderung (-)"]},
+            {q: "Bankgutschrift für erhaltene Zinsen: 65,00 €.", s: ["Bank", "Aktiv", "Mehrung (+)"], h: ["Zinserträge", "Ertrag", "Mehrung (+)"]},
+            {q: "Barkauf von Büromaterial: 45,00 €.", s: ["Büromaterial", "Aufwand", "Mehrung (+)"], h: ["Kasse", "Aktiv", "Minderung (-)"]},
+            {q: "Wir bezahlen Wartungskosten bar: 120,00 €.", s: ["Instandhaltungsaufwand", "Aufwand", "Mehrung (+)"], h: ["Kasse", "Aktiv", "Minderung (-)"]},
+            {q: "Zahlung von Zinsen für das Darlehen per Bank: 300,00 €.", s: ["Zinsaufwand", "Aufwand", "Mehrung (+)"], h: ["Bank", "Aktiv", "Minderung (-)"]},
+            {q: "Wir schalten eine Werbeanzeige bar: 250,00 €.", s: ["Werbeaufwand", "Aufwand", "Mehrung (+)"], h: ["Kasse", "Aktiv", "Minderung (-)"]},
+            {q: "Verkauf von Waren auf Ziel: 2.300,00 €.", s: ["Forderungen aLL", "Aktiv", "Mehrung (+)"], h: ["Umsatzerlöse", "Ertrag", "Mehrung (+)"]}
+        ],
+        3: [
+            {q: "Wareneinkauf auf Ziel: 2.000 € netto + 380 € Vorsteuer.", s: ["Warenvorrat", "Aktiv", "Mehrung (+)"], h: ["Verbindlichkeiten aLL", "Passiv", "Mehrung (+)"]},
+            {q: "Warenverkauf bar: 595 € brutto (inkl. 19% USt).", s: ["Kasse", "Aktiv", "Mehrung (+)"], h: ["Umsatzerlöse", "Ertrag", "Mehrung (+)"]},
+            {q: "Kauf von Büromöbeln auf Ziel: 1.000 € + 190 € VSt.", s: ["BGA", "Aktiv", "Mehrung (+)"], h: ["Verbindlichkeiten aLL", "Passiv", "Mehrung (+)"]},
+            {q: "Zahlung einer Reparaturrechnung bar: 119 € (inkl. USt).", s: ["Instandhaltungsaufwand", "Aufwand", "Mehrung (+)"], h: ["Kasse", "Aktiv", "Minderung (-)"]},
+            {q: "Verkauf von Waren auf Ziel: 3.570 € brutto.", s: ["Forderungen aLL", "Aktiv", "Mehrung (+)"], h: ["Umsatzerlöse", "Ertrag", "Mehrung (+)"]}
+        ]
+    };
+
+    // Auto-Maximierung: Falls Aufgaben fehlen, werden sie durch Varianten aufgefüllt
+    for(let i=1; i<=3; i++) {
+        let baseLength = pools[i].length;
+        while(pools[i].length < 60) {
+            let original = pools[i][pools[i].length % baseLength];
+            pools[i].push({...original, q: original.q + " [V" + (Math.floor(pools[i].length/baseLength)) + "]"});
+        }
+    }
+
+    function setupSelects() {
+        const fill = (ids, list) => ids.forEach(id => {
+            const el = document.getElementById(id);
+            el.innerHTML = '<option value="">-- ? --</option>' + list.sort().map(o => `<option value="${o}">${o}</option>`).join('');
+        });
+        fill(['k1', 'k2'], opt.konten);
+        fill(['k1_ap', 'k2_ap'], opt.typen);
+        fill(['k1_mm', 'k2_mm'], opt.buchung);
+    }
+
+    function setLevel(l) {
+        currentLvl = l; currentIdx = 0;
+        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('lvl' + l).classList.add('active');
+        render();
+    }
+
+    function render() {
+        const task = pools[currentLvl][currentIdx % 60];
+        document.getElementById('task-desc').innerText = task.q;
+        document.querySelectorAll('select').forEach(s => { s.value = ""; s.className = ""; });
+        document.getElementById('checkBtn').style.display = "block";
+        document.getElementById('nextBtn').style.display = "none";
+        updateProgress();
+    }
+
+    function check() {
+        const task = pools[currentLvl][currentIdx % 60];
+        const res = {
+            k1: task.s[0], k1_ap: task.s[1], k1_mm: task.s[2],
+            k2: task.h[0], k2_ap: task.h[1], k2_mm: task.h[2]
+        };
+        let isCorrect = true;
+        Object.keys(res).forEach(id => {
+            const el = document.getElementById(id);
+            if(el.value === res[id]) el.className = "correct";
+            else { el.className = "incorrect"; isCorrect = false; }
+        });
+
+        if(isCorrect) {
+            confetti({ particleCount: 60, spread: 70, origin: { y: 0.8 } });
+            if(currentLvl === 1) stats.solvedL1++;
+            if(currentLvl === 2) stats.solvedL2++;
+            if(currentLvl === 3) stats.solvedL3++;
+            document.getElementById('checkBtn').style.display = "none";
+            document.getElementById('nextBtn').style.display = "block";
+            checkLocks();
+        }
+    }
+
+    function checkLocks() {
+        if(stats.solvedL1 >= 30) document.getElementById('lvl2').disabled = false;
+        if(stats.solvedL2 >= 20) document.getElementById('lvl3').disabled = false;
+    }
+
+    function next() { currentIdx++; render(); }
+
+    function updateProgress() {
+        const target = currentLvl === 1 ? 30 : 20;
+        const current = currentLvl === 1 ? stats.solvedL1 : stats.solvedL2;
+        const p = Math.min((current / target) * 100, 100);
+        document.getElementById('progress').style.width = p + "%";
+        document.getElementById('status').innerText = currentLvl < 3 ? `Fortschritt: ${current}/${target} für Level-Up` : `Gelöste Profi-Fälle: ${stats.solvedL3}`;
+    }
+
+    let calcVal = "0";
+    function toggleCalc() { const c = document.getElementById("calc-container"); c.style.display = (c.style.display === "block") ? "none" : "block"; }
+    function calcNum(n) { calcVal = calcVal === "0" ? n : calcVal + n; updateCalc(); }
+    function calcOp(op) { calcVal += " " + op + " "; updateCalc(); }
+    function calcClear() { calcVal = "0"; updateCalc(); }
+    function calcSolve() { try { calcVal = eval(calcVal.replace('÷', '/').replace('×', '*')).toString(); } catch { calcVal = "Error"; } updateCalc(); }
+    function updateCalc() { document.getElementById("calc-display").value = calcVal; }
+
+    const calc = document.getElementById("calc-container");
+    let isDragging = false, offset = [0,0];
+    calc.addEventListener('mousedown', (e) => { if(e.target.tagName !== 'BUTTON') { isDragging = true; offset = [calc.offsetLeft - e.clientX, calc.offsetTop - e.clientY]; }});
+    document.addEventListener('mousemove', (e) => { if(isDragging) { calc.style.left = (e.clientX + offset[0]) + "px"; calc.style.top = (e.clientY + offset[1]) + "px"; }});
+    document.addEventListener('mouseup', () => isDragging = false);
+
+    window.onload = () => { setupSelects(); render(); };
+</script>
+</body>
+</html>
