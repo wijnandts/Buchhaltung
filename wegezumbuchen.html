@@ -3,335 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Accounting Trainer Pro | BFS 2 XXL</title>
+    <title>Wege zum Buchen | BFS 2 XXL</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --primary: #005aab; --secondary: #5856d6; --success: #28a745; --error: #dc3545; --bg: #f4f7f9; }
-        body { font-family: -apple-system, 'Segoe UI', sans-serif; background: var(--bg); padding: 10px; display: flex; justify-content: center; margin: 0; }
-        .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); width: 100%; max-width: 650px; margin-top: 10px; position: relative; box-sizing: border-box; }
+        :root { --nrw-blue: #0056b3; --secondary: #5856d6; --success: #28a745; --error: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; }
         
-        .header-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 2100; }
-        .btn-round { background: var(--primary); color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 1.3rem; }
+        .app-container { background: white; max-width: 950px; width: 100%; padding: 25px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); position: relative; box-sizing: border-box; }
         
-        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; padding-right: 150px; }
-        .btn-home { text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; border:none; cursor:pointer;}
+        /* Header & Nav */
+        .header-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; }
+        .btn-round { background: var(--nrw-blue); color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        h1 { font-size: 1.4rem; text-align: center; color: var(--primary); margin: 15px 0; font-weight: 800; text-transform: uppercase; }
-        .progress-container { width: 100%; height: 6px; background: #eee; position: absolute; top: 0; left: 0; border-radius: 20px 20px 0 0; }
-        .progress-bar { height: 100%; background: var(--success); width: 0%; transition: width 0.3s; border-radius: 20px 20px 0 0; }
-        
-        #menu, #game, #results { display: none; }
-        #menu { display: block; text-align: center; }
-        
-        .menu-btn { background: var(--primary); color: white; padding: 18px; margin: 8px 0; border-radius: 12px; cursor: pointer; width: 100%; font-size: 1.1rem; font-weight: bold; border: none; transition: 0.2s; text-align: left; position: relative; }
-        .menu-btn.med { background: var(--secondary); }
-        .menu-btn.pro { background: #af52de; }
-        .menu-btn:disabled { background: #ccc !important; cursor: not-allowed; opacity: 0.6; }
-        .menu-btn::after { content: '→'; position: absolute; right: 20px; }
-        .menu-btn:disabled::after { content: '🔒'; }
-        
-        .lock-info { font-size: 0.75rem; display: block; margin-top: 4px; font-weight: normal; color: rgba(255,255,255,0.9); }
-        .desc { font-size: 0.8rem; color: #65676b; margin-bottom: 12px; display: block; text-align: left; padding-left: 5px; line-height: 1.3; }
-        
-        .task { font-weight: bold; font-size: 1.05rem; margin-bottom: 20px; min-height: 110px; text-align: center; background: #f8f9fa; padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border-top: 4px solid var(--primary); line-height: 1.4; color: #1c1e21; box-sizing: border-box; }
-        
-        .entry-container { display: flex; gap: 10px; margin-bottom: 15px; }
-        .side { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-        .side-label { font-size: 0.75rem; font-weight: bold; color: var(--primary); text-transform: uppercase; text-align: center; background: #e7f3ff; padding: 4px; border-radius: 4px; }
-        
-        select { width: 100%; padding: 12px 5px; border-radius: 8px; border: 2px solid #e4e6eb; font-size: 0.85rem; height: 48px; background: #fff; appearance: none; font-weight: bold; }
-        .split-field { display: none; margin-top: 5px; }
-        
-        button.action { width: 100%; padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1.1rem; }
-        .btn-check { background: var(--primary); color: white; }
-        .btn-next { background: var(--success); color: white; display: none; }
-        
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 10px; display: none; text-align: center; font-weight: bold; white-space: pre-line; }
-        .correct { background: #e7f3ff; color: #1877f2; border: 1px solid #1877f2; }
-        .wrong { background: #ffebe9; color: #f02849; border: 1px solid #f02849; }
-        .stat-box { background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 10px 0; text-align: center; border: 1px solid #eee; }
+        .nav-header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; padding-right: 120px; }
+        .btn-home { text-decoration: none; color: #555; font-weight: bold; background: #e0e0e0; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; }
 
-        #calc-container { display: none; position: fixed; top: 120px; left: 20px; width: 230px; background: #333; border-radius: 12px; padding: 12px; z-index: 3000; box-shadow: 0 10px 40px rgba(0,0,0,0.5); cursor: move; }
-        #calc-display { width: 100%; height: 50px; background: #eee; border-radius: 5px; margin-bottom: 10px; text-align: right; padding: 10px; font-family: monospace; font-size: 1.4rem; border: none; box-sizing: border-box; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .calc-btn { padding: 15px; border: none; border-radius: 8px; background: #555; color: white; font-weight: bold; cursor: pointer; }
+        .level-selector { display: flex; gap: 5px; }
+        .level-btn { padding: 8px 12px; border: 2px solid var(--nrw-blue); background: white; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--nrw-blue); font-size: 0.8rem; }
+        .level-btn.active { background: var(--nrw-blue); color: white; }
+        .level-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        h1 { color: var(--nrw-blue); text-align: center; font-size: 1.4rem; text-transform: uppercase; margin: 10px 0; }
+        
+        .task-box { background: #eef2f7; border-left: 5px solid var(--nrw-blue); padding: 20px; margin-bottom: 25px; border-radius: 4px; font-size: 1.1rem; min-height: 80px; display: flex; align-items: center; font-weight: 500; }
+
+        .analysis-grid {
+            display: grid; grid-template-columns: 160px 1fr 1fr; gap: 12px; 
+            background: #fafafa; padding: 15px; border-radius: 12px; border: 1px solid #ddd;
+        }
+
+        .label-cell { color: var(--nrw-blue); font-weight: bold; font-size: 0.75rem; text-transform: uppercase; align-self: center; }
+        .col-head { text-align: center; font-weight: bold; padding-bottom: 5px; border-bottom: 2px solid #ddd; font-size: 0.9rem; }
+
+        select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.95rem; background: white; font-weight: bold; appearance: none; }
+        select.correct { border-color: var(--success); background-color: #d4edda; }
+        select.incorrect { border-color: var(--error); background-color: #f8d7da; }
+
+        .btn-action { width: 100%; padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1rem; margin-top: 15px; }
+        .btn-check { background-color: var(--nrw-blue); color: white; }
+        .btn-next { background-color: var(--success); color: white; display: none; }
+
+        .progress-bar { height: 8px; background: #eee; border-radius: 4px; margin-top: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--nrw-blue); width: 0%; transition: 0.4s; }
+        .status-text { text-align: center; color: #666; font-size: 0.8rem; margin-top: 8px; }
     </style>
 </head>
-<body onload="checkLevelLocks()">
+<body>
 
-<div id="calc-container">
-    <input type="text" id="calc-display" readonly value="0">
-    <div class="calc-grid">
-        <button class="calc-btn" style="background:#ff3b30; grid-column:span 2;" onclick="calcClear()">C</button>
-        <button class="calc-btn" style="background:var(--primary);" onclick="calcOp('/')">÷</button>
-        <button class="calc-btn" style="background:var(--primary);" onclick="calcOp('*')">×</button>
-        <button class="calc-btn" onclick="calcNum('7')">7</button><button class="calc-btn" onclick="calcNum('8')">8</button><button class="calc-btn" onclick="calcNum('9')">9</button>
-        <button class="calc-btn" style="background:var(--primary);" onclick="calcOp('-')">-</button>
-        <button class="calc-btn" onclick="calcNum('4')">4</button><button class="calc-btn" onclick="calcNum('5')">5</button><button class="calc-btn" onclick="calcNum('6')">6</button>
-        <button class="calc-btn" style="background:var(--primary);" onclick="calcOp('+')">+</button>
-        <button class="calc-btn" onclick="calcNum('1')">1</button><button class="calc-btn" onclick="calcNum('2')">2</button><button class="calc-btn" onclick="calcNum('3')">3</button>
-        <button class="calc-btn" onclick="calcNum('.')">.</button><button class="calc-btn" onclick="calcNum('0')">0</button>
-        <button class="calc-btn" style="background:var(--success); grid-column:span 2;" onclick="calcSolve()">=</button>
-    </div>
-</div>
-
-<div class="card">
-    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
-   
+<div class="app-container">
     <div class="header-actions">
         <a href="mailto:wijnandts@bk-erkelenz.de" class="btn-round">✉</a>
-        <button class="btn-round" onclick="toggleCalc()">🖩</button>
     </div>
 
     <div class="nav-header">
         <a href="index.html" class="btn-home">🏠 Übersicht</a>
-    </div>
-
-    <h1 id="dynamicTitle">Accounting Trainer Pro</h1>
-
-    <div id="menu">
-        <button class="menu-btn" onclick="startGame('light')">
-            1. Einsteiger 🔓
-            <span class="lock-info" id="info-light">Gelöst: 0</span>
-        </button>
-        <span class="desc">Bestandskonten (Aktiv/Passiv).</span>
-
-        <button class="menu-btn med" id="btn-medium" onclick="startGame('medium')" disabled>
-            2. Fortgeschritten 🔒
-            <span class="lock-info" id="info-medium">Sperre: 30 Einsteiger-Fragen</span>
-        </button>
-        <span class="desc">Erfolgskonten ohne Steuer.</span>
-
-        <button class="menu-btn pro" id="btn-pro" onclick="startGame('pro')" disabled>
-            3. Profi 🔒
-            <span class="lock-info" id="info-pro">Sperre: 20 Mittel-Fragen</span>
-        </button>
-        <span class="desc">Erfolgskonten mit MwSt.</span>
-        
-        <div style="margin-top:20px;">
-            <button style="background:none; border:none; color:#ccc; font-size:0.6rem; cursor:pointer;" onclick="resetAllProgress()">Fortschritt löschen</button>
+        <div class="level-selector">
+            <button id="lvl1" class="level-btn active" onclick="setLevel(1)">Stufe 1</button>
+            <button id="lvl2" class="level-btn" onclick="setLevel(2)" disabled>Stufe 2</button>
+            <button id="lvl3" class="level-btn" onclick="setLevel(3)" disabled>Stufe 3</button>
         </div>
     </div>
 
-    <div id="game">
-        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #65676b; margin-bottom: 5px;">
-            <span id="levelDisplay">Level</span>
-            <span id="counterDisplay">Aufgabe 1/10</span>
-        </div>
-        <div class="task" id="taskDisplay"></div>
-        <div class="entry-container">
-            <div class="side">
-                <div class="side-label">Soll</div>
-                <select id="soll1"></select>
-                <div class="split-field" id="soll2-box"><select id="soll2"></select></div>
-            </div>
-            <div class="side">
-                <div class="side-label" style="background:#f0f0ff; color:#5856d6;">Haben</div>
-                <select id="haben1"></select>
-                <div class="split-field" id="haben2-box"><select id="haben2"></select></div>
-            </div>
-        </div>
-        <button class="action btn-check" id="checkBtn" onclick="checkAnswer()">Prüfen</button>
-        <button class="action btn-next" id="nextBtn" onclick="generateTask()">Weiter</button>
-        <div id="feedback" class="feedback"></div>
+    <h1>Analyse: Wege zum Buchen</h1>
+    <div class="task-box" id="task-desc">Lade Analyse-Modul...</div>
+
+    <div class="analysis-grid">
+        <div></div><div class="col-head">Konto A (Soll)</div><div class="col-head">Konto B (Haben)</div>
+
+        <div class="label-cell">1. Welches Konto?</div>
+        <select id="k1"></select><select id="k2"></select>
+
+        <div class="label-cell">2. Welcher Typ?</div>
+        <select id="k1_ap"></select><select id="k2_ap"></select>
+
+        <div class="label-cell">3. Veränderung?</div>
+        <select id="k1_mm"></select><select id="k2_mm"></select>
+
+        <div class="label-cell">4. Buchungsseite?</div>
+        <select id="k1_sh"></select><select id="k2_sh"></select>
     </div>
 
-    <div id="results">
-        <div class="stat-box">
-            <p style="font-size: 1.2rem;">Richtig: <span id="currentScore" style="font-weight:bold;">0</span> / 10</p>
-        </div>
-        <button class="action btn-check" onclick="backToMenu()">Zurück zum Menü</button>
-    </div>
+    <button class="btn-action btn-check" id="checkBtn" onclick="check()">Analyse prüfen</button>
+    <button class="btn-action btn-next" id="nextBtn" onclick="next()">Nächster Fall</button>
+    
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="status-text" id="status">Fortschritt: 0/30 Aufgaben</div>
 </div>
 
 <script>
-    const kontenListe = ["-- bitte wählen --", "Aufwendungen für Energie", "Aufwendungen für Waren (Wareneinkauf)", "Bank", "BGA", "Darlehen", "Eigenkapital", "Forderungen a. L. L.", "Fremdinstandsetzung", "Fuhrpark", "Kasse", "Mietaufwendungen", "Mieterträge", "Postgebühren", "Provisionsaufwendungen", "Provisionserträge", "Umsatzerlöse für Waren", "Umsatzsteuer", "Verbindlichkeiten a. L. L.", "Vorsteuer", "Waren (Vorrat)", "Werbung", "Zinsaufwendungen", "Zinserträge", "Büromaterial", "Instandhaltungsaufwand", "- kein zweites Konto -"];
-    
+    let stats = { solvedL1: 0, solvedL2: 0 };
+    let currentLvl = 1;
+    let currentIdx = 0;
+
+    const opt = {
+        konten: ["BGA", "Bank", "Kasse", "Forderungen aLL", "Fuhrpark", "Verbindlichkeiten aLL", "Darlehen", "Warenvorrat", "Umsatzerlöse", "Mietaufwand", "Personalaufwand", "Vorsteuer", "Umsatzsteuer", "Werbeaufwand", "Büromaterial", "Zinsaufwand", "Zinserträge", "Instandhaltungsaufwand", "Energieaufwand"],
+        typen: ["Aktiv", "Passiv", "Aufwand", "Ertrag"],
+        buchung: ["Mehrung (+)", "Minderung (-)"],
+        sh: ["Soll", "Haben"]
+    };
+
     const pools = {
-        light: [
-            { t: "Barabhebung vom Bankkonto für die Ladenkasse.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Einzahlung von Bargeld aus der Kasse auf das Bankkonto.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Ein Kunde begleicht eine offene Rechnung per Banküberweisung.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Forderungen a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Wir begleichen eine Lieferantenrechnung per Banküberweisung.", s1: "Verbindlichkeiten a. L. L.", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Kauf von Ladentisch und Regalen auf Ziel.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Anschaffung eines neuen Lieferwagens gegen Überweisung.", s1: "Fuhrpark", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Kauf von Handelswaren auf Ziel (Bestandserhöhung).", s1: "Waren (Vorrat)", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Aufnahme eines langfristigen Bankdarlehens, Gutschrift.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Darlehen", h2: "- kein zweites Konto -" },
-            { t: "Tilgung einer Darlehensrate durch Banküberweisung.", s1: "Darlehen", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Kauf eines gebrauchten PCs gegen Barzahlung.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Kunde begleicht Rechnung durch Scheck (Gutschrift Bank).", s1: "Bank", s2: "- kein zweites Konto -", h1: "Forderungen a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Einzahlung auf das Sparkonto der Bank vom Barbestand.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Kunde zahlt Rechnung bar in die Kasse ein.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Forderungen a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Wir kaufen einen Aktenvernichter gegen Rechnung.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Barkauf von Briefmarken für die Portokasse.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Anschaffung eines Fahrrads für den Botendienst bar.", s1: "Fuhrpark", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Umwandlung einer Lieferantenrechnung in ein Darlehen.", s1: "Verbindlichkeiten a. L. L.", s2: "- kein zweites Konto -", h1: "Darlehen", h2: "- kein zweites Konto -" },
-            { t: "Wir kaufen neue Lagerregale per Banküberweisung.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Bareinzahlung von Tageseinnahmen auf das Geschäftskonto.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Gutschrift einer Kundenforderung auf dem Bankkonto.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Forderungen a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Kauf von Büromöbeln auf Ziel.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Wir kaufen neue Ladenregale gegen Barzahlung.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Anschaffung von IT-Servern auf Ziel.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Kauf einer Ladenwaage gegen Barzahlung.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Ein Tresor wird auf Ziel gekauft.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Kauf von Schaufensterpuppen auf Ziel.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Anschaffung einer Kaffeemaschine bar.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Ein gebrauchter PC wird bar bezahlt.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Kauf eines neuen Beamers auf Ziel.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Wir kaufen Ladentheken auf Rechnung.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Kauf einer Registrierkasse per Überweisung.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Kauf von Lagerregalen per Banküberweisung.", s1: "BGA", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Kauf eines gebrauchten Gabelstaplers auf Ziel.", s1: "Fuhrpark", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Wir kaufen einen Anhänger gegen Barzahlung.", s1: "Fuhrpark", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Kauf eines LKWs auf Ziel.", s1: "Fuhrpark", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Wir kaufen einen Transportanhänger per Bank.", s1: "Fuhrpark", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Ein gebrauchter Transporter wird bar bezahlt.", s1: "Fuhrpark", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Warenkauf gegen Barzahlung.", s1: "Waren (Vorrat)", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Erhöhung des Warenbestands durch Einkauf auf Ziel.", s1: "Waren (Vorrat)", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Anschaffung von Vorrats-Waren per Bank.", s1: "Waren (Vorrat)", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Wir tilgen einen Teil des Darlehens bar.", s1: "Darlehen", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Scheckeinreichung zur Tilgung des Darlehens.", s1: "Darlehen", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Einzahlung auf Bank zur Gründung (EK).", s1: "Bank", s2: "- kein zweites Konto -", h1: "Eigenkapital", h2: "- kein zweites Konto -" },
-            { t: "Alter PKW gegen Ziel verkauft (Buchwert).", s1: "Forderungen a. L. L.", s2: "- kein zweites Konto -", h1: "Fuhrpark", h2: "- kein zweites Konto -" },
-            { t: "Büroschrank bar verkauft (Buchwert).", s1: "Kasse", s2: "- kein zweites Konto -", h1: "BGA", h2: "- kein zweites Konto -" }
+        1: [
+            {q: "Barkauf eines neuen Scanners für 450,00 €.", k1: "BGA", k1_ap: "Aktiv", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Kasse", k2_ap: "Aktiv", k2_mm: "Minderung (-)", k2_sh: "Haben"},
+            {q: "Ein Kunde überweist 1.200,00 € auf unser Bankkonto.", k1: "Bank", k1_ap: "Aktiv", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Forderungen aLL", k2_ap: "Aktiv", k2_mm: "Minderung (-)", k2_sh: "Haben"},
+            {q: "Kauf von Verkaufsregalen auf Ziel: 4.500,00 €.", k1: "BGA", k1_ap: "Aktiv", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Verbindlichkeiten aLL", k2_ap: "Passiv", k2_mm: "Mehrung (+)", k2_sh: "Haben"},
+            {q: "Wir überweisen 3.000,00 € vom Bankkonto an die Kasse.", k1: "Kasse", k1_ap: "Aktiv", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Bank", k2_ap: "Aktiv", k2_mm: "Minderung (-)", k2_sh: "Haben"},
+            {q: "Aufnahme eines Bankdarlehens: Gutschrift 10.000,00 €.", k1: "Bank", k1_ap: "Aktiv", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Darlehen", k2_ap: "Passiv", k2_mm: "Mehrung (+)", k2_sh: "Haben"},
+            {q: "Wir begleichen eine Lieferantenrechnung per Bank: 2.100,00 €.", k1: "Verbindlichkeiten aLL", k1_ap: "Passiv", k1_mm: "Minderung (-)", k1_sh: "Soll", k2: "Bank", k2_ap: "Aktiv", k2_mm: "Minderung (-)", k2_sh: "Haben"},
+            {q: "Kauf eines Lieferwagens auf Ziel: 25.000,00 €.", k1: "Fuhrpark", k1_ap: "Aktiv", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Verbindlichkeiten aLL", k2_ap: "Passiv", k2_mm: "Mehrung (+)", k2_sh: "Haben"},
+            {q: "Barabhebung vom Bankkonto für die Portokasse: 200,00 €.", k1: "Kasse", k1_ap: "Aktiv", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Bank", k2_ap: "Aktiv", k2_mm: "Minderung (-)", k2_sh: "Haben"}
         ],
-        medium: [
-            { t: "Zahlung der monatlichen Ladenmiete per Banküberweisung.", s1: "Mietaufwendungen", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Verkauf von Handelswaren gegen Barzahlung.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Umsatzerlöse für Waren", h2: "- kein zweites Konto -" },
-            { t: "Überweisung der Gehälter für diesen Monat per Bank.", s1: "Personalaufwand", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Bankgutschrift für erhaltene Zinserträge.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Zinserträge", h2: "- kein zweites Konto -" },
-            { t: "Barkauf von Büromaterial für die Verwaltung.", s1: "Büromaterial", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Zahlung von Stromkosten für den Laden per Bank.", s1: "Aufwendungen für Energie", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Wir schalten eine Werbeanzeige bar.", s1: "Werbung", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Einnahme einer Provision bar.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Provisionserträge", h2: "- kein zweites Konto -" },
-            { t: "Zahlung von Telefon- und Internetgebühren per Bank.", s1: "Postgebühren", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Reinigungskosten für das Treppenhaus bar bezahlt.", s1: "Mietaufwendungen", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Banküberweisung des Rundfunkbeitrags.", s1: "Postgebühren", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Reparatur am Lieferwagen per Bank bezahlt.", s1: "Fremdinstandsetzung", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Pacht für das Lager wird per Bank bezahlt.", s1: "Mietaufwendungen", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Gebäudeversicherung per Überweisung gezahlt.", s1: "Mietaufwendungen", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Zahlung der Gasrechnung per Bank.", s1: "Aufwendungen für Energie", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Barzahlung für die Entsorgung von Verpackungsmüll.", s1: "Aufwendungen für Energie", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Druck von Werbe-Flyern bar bezahlt.", s1: "Werbung", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Zahlung für Radiowerbung per Bank.", s1: "Werbung", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Reparatur der Registrierkasse bar gezahlt.", s1: "Fremdinstandsetzung", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Wartung der Klimaanlage bar bezahlt.", s1: "Fremdinstandsetzung", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Wir zahlen eine Vertreterprovision per Bank.", s1: "Provisionsaufwendungen", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Wir überweisen Zinsen für ein Darlehen.", s1: "Zinsaufwendungen", s2: "- kein zweites Konto -", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Barkauf von Briefmarken.", s1: "Postgebühren", s2: "- kein zweites Konto -", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Ein Mieter überweist Büromiete an uns.", s1: "Bank", s2: "- kein zweites Konto -", h1: "Mieterträge", h2: "- kein zweites Konto -" },
-            { t: "Verkauf von Waren auf Ziel (Nettodarstellung).", s1: "Forderungen a. L. L.", s2: "- kein zweites Konto -", h1: "Umsatzerlöse für Waren", h2: "- kein zweites Konto -" },
-            { t: "Wareneinkauf auf Ziel (aufwandsorientiert).", s1: "Aufwendungen für Waren (Wareneinkauf)", s2: "- kein zweites Konto -", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" }
+        2: [
+            {q: "Zahlung der Ladenmiete per Banküberweisung: 1.500,00 €.", k1: "Mietaufwand", k1_ap: "Aufwand", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Bank", k2_ap: "Aktiv", k2_mm: "Minderung (-)", k2_sh: "Haben"},
+            {q: "Barverkauf von Handelswaren: 350,00 €.", k1: "Kasse", k1_ap: "Aktiv", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Umsatzerlöse", k2_ap: "Ertrag", k2_mm: "Mehrung (+)", k2_sh: "Haben"},
+            {q: "Überweisung der Gehälter an das Personal: 6.000,00 €.", k1: "Personalaufwand", k1_ap: "Aufwand", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Bank", k2_ap: "Aktiv", k2_mm: "Minderung (-)", k2_sh: "Haben"},
+            {q: "Barkauf von Büromaterial: 45,00 €.", k1: "Büromaterial", k1_ap: "Aufwand", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Kasse", k2_ap: "Aktiv", k2_mm: "Minderung (-)", k2_sh: "Haben"},
+            {q: "Bankgutschrift für erhaltene Zinsen: 25,00 €.", k1: "Bank", k1_ap: "Aktiv", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Zinserträge", k2_ap: "Ertrag", k2_mm: "Mehrung (+)", k2_sh: "Haben"},
+            {q: "Wir bezahlen Stromkosten per Banküberweisung: 400,00 €.", k1: "Energieaufwand", k1_ap: "Aufwand", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Bank", k2_ap: "Aktiv", k2_mm: "Minderung (-)", k2_sh: "Haben"}
         ],
-        pro: [
-            { t: "Wareneinkauf auf Ziel: 2.000 € netto + 380 € Vorsteuer.", s1: "Aufwendungen für Waren (Wareneinkauf)", s2: "Vorsteuer", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Warenverkauf bar: 595 € brutto (inkl. 19% USt).", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Umsatzerlöse für Waren", h2: "Umsatzsteuer" },
-            { t: "Kauf von Büromöbeln auf Ziel: 1.000 € + 190 € Vorsteuer.", s1: "BGA", s2: "Vorsteuer", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Reparaturrechnung bar bezahlt: 119 € (inkl. 19 € Vorsteuer).", s1: "Instandhaltungsaufwand", s2: "Vorsteuer", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Verkauf von Waren auf Ziel: 1.000 € netto + 190 € USt.", s1: "Forderungen a. L. L.", s2: "- kein zweites Konto -", h1: "Umsatzerlöse für Waren", h2: "Umsatzsteuer" },
-            { t: "Kauf eines Laptops auf Ziel: 500 € netto + 95 € Vorsteuer.", s1: "BGA", s2: "Vorsteuer", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Wir bezahlen eine Werbeanzeige per Bank (netto + Vorsteuer).", s1: "Werbung", s2: "Vorsteuer", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Telefonrechnung per Lastschrift: 100 € netto + 19 € Vorsteuer.", s1: "Postgebühren", s2: "Vorsteuer", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Warenverkauf bar: netto 300 € + 57 € USt.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Umsatzerlöse für Waren", h2: "Umsatzsteuer" },
-            { t: "Einkauf von Waren per Scheck: brutto 1.190 €.", s1: "Aufwendungen für Waren (Wareneinkauf)", s2: "Vorsteuer", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Stromrechnung per Überweisung: netto + Vorsteuer.", s1: "Aufwendungen für Energie", s2: "Vorsteuer", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Mieteinnahmen bar erhalten: netto + USt.", s1: "Kasse", s2: "- kein zweites Konto -", h1: "Mieterträge", h2: "Umsatzsteuer" },
-            { t: "Kauf eines Regals auf Ziel: netto + Vorsteuer.", s1: "BGA", s2: "Vorsteuer", h1: "Verbindlichkeiten a. L. L.", h2: "- kein zweites Konto -" },
-            { t: "Kauf eines Lieferwagens per Bank: netto + Vorsteuer.", s1: "Fuhrpark", s2: "Vorsteuer", h1: "Bank", h2: "- kein zweites Konto -" },
-            { t: "Kauf von Kopierpapier bar: netto + Vorsteuer.", s1: "Büromaterial", s2: "Vorsteuer", h1: "Kasse", h2: "- kein zweites Konto -" },
-            { t: "Wartung der EDV per Bank: netto + Vorsteuer.", s1: "Fremdinstandsetzung", s2: "Vorsteuer", h1: "Bank", h2: "- kein zweites Konto -" }
+        3: [
+            {q: "Wareneinkauf auf Ziel: 1.000 € netto + 190 € Vorsteuer.", k1: "Warenvorrat", k1_ap: "Aktiv", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Verbindlichkeiten aLL", k2_ap: "Passiv", k2_mm: "Mehrung (+)", k2_sh: "Haben"},
+            {q: "Warenverkauf bar: 1.190 € brutto (inkl. 19% USt).", k1: "Kasse", k1_ap: "Aktiv", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Umsatzerlöse", k2_ap: "Ertrag", k2_mm: "Mehrung (+)", k2_sh: "Haben"},
+            {q: "Zahlung einer Reparaturrechnung bar: 119 € (inkl. USt).", k1: "Instandhaltungsaufwand", k1_ap: "Aufwand", k1_mm: "Mehrung (+)", k1_sh: "Soll", k2: "Kasse", k2_ap: "Aktiv", k2_mm: "Minderung (-)", k2_sh: "Haben"}
         ]
     };
 
-    // Automatisches Auffüllen der Pools auf mindestens 60 Einträge pro Stufe
-    for(let key in pools) {
-        let originalCount = pools[key].length;
-        while(pools[key].length < 60) {
-            let item = pools[key][pools[key].length % originalCount];
-            pools[key].push({...item, t: item.t + " (Variation)"});
+    // Auto-Maximierung auf 60 Fälle pro Pool
+    for(let i=1; i<=3; i++) {
+        let baseLen = pools[i].length;
+        while(pools[i].length < 60) {
+            let original = pools[i][pools[i].length % baseLen];
+            pools[i].push({...original, q: original.q + " [V" + (Math.floor(pools[i].length/baseLen)) + "]"});
         }
     }
 
-    let mode = ''; let currentPool = []; let taskCount = 0; let correctCount = 0; const maxTasks = 10;
-
-    function checkLevelLocks() {
-        const solvedL = parseInt(localStorage.getItem('solved_light') || 0);
-        const solvedM = parseInt(localStorage.getItem('solved_medium') || 0);
-        document.getElementById('info-light').innerText = "Gelöst: " + solvedL;
-        const btnM = document.getElementById('btn-medium');
-        if (solvedL >= 30) { btnM.disabled = false; btnM.innerHTML = `2. Fortgeschritten 🔓 <span class="lock-info">Gelöst: ${solvedM}</span>`; }
-        const btnP = document.getElementById('btn-pro');
-        if (solvedM >= 20) { btnP.disabled = false; btnP.innerHTML = `3. Profi 🔓 <span class="lock-info">Viel Erfolg!</span>`; }
-    }
-
-    function startGame(m) {
-        mode = m; taskCount = 0; correctCount = 0;
-        document.getElementById('menu').style.display = 'none';
-        document.getElementById('game').style.display = 'block';
-        setupDropdowns();
-        document.getElementById('soll2-box').style.display = (mode === 'pro') ? 'block' : 'none';
-        document.getElementById('haben2-box').style.display = (mode === 'pro') ? 'block' : 'none';
-        currentPool = [...pools[mode]].sort(() => Math.random() - 0.5).slice(0, 10);
-        generateTask();
-    }
-
-    function setupDropdowns() {
-        ['soll1', 'soll2', 'haben1', 'haben2'].forEach(id => {
-            const s = document.getElementById(id); s.innerHTML = "";
-            kontenListe.sort().forEach(k => s.add(new Option(k, k)));
+    function init() {
+        const fill = (ids, list) => ids.forEach(id => {
+            const el = document.getElementById(id);
+            el.innerHTML = '<option value="">-- ? --</option>' + list.sort().map(o => `<option value="${o}">${o}</option>`).join('');
         });
+        fill(['k1', 'k2'], opt.konten);
+        fill(['k1_ap', 'k2_ap'], opt.typen);
+        fill(['k1_mm', 'k2_mm'], opt.buchung);
+        fill(['k1_sh', 'k2_sh'], opt.sh);
+        render();
     }
 
-    function generateTask() {
-        if (taskCount >= maxTasks) { showFinalResults(); return; }
-        currentTask = currentPool[taskCount]; taskCount++;
-        document.getElementById('taskDisplay').innerText = currentTask.t;
-        document.getElementById('feedback').style.display = 'none';
-        document.getElementById('checkBtn').style.display = 'block';
-        document.getElementById('nextBtn').style.display = 'none';
-        document.getElementById('progressBar').style.width = (taskCount / maxTasks * 100) + "%";
-        document.getElementById('counterDisplay').innerText = `Aufgabe ${taskCount}/${maxTasks}`;
+    function setLevel(l) {
+        currentLvl = l; currentIdx = 0;
+        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('lvl' + l).classList.add('active');
+        render();
     }
 
-    function checkAnswer() {
-        const s1 = document.getElementById('soll1').value;
-        const s2 = (mode === 'pro') ? document.getElementById('soll2').value : "- kein zweites Konto -";
-        const h1 = document.getElementById('haben1').value;
-        const h2 = (mode === 'pro') ? document.getElementById('haben2').value : "- kein zweites Konto -";
-        const ok = ((s1 === currentTask.s1 && s2 === currentTask.s2) || (s1 === currentTask.s2 && s2 === currentTask.s1)) && 
-                   ((h1 === currentTask.h1 && h2 === currentTask.h2) || (h1 === currentTask.h2 && h2 === currentTask.h1));
-        const fb = document.getElementById('feedback');
-        if (ok) {
-            correctCount++;
-            localStorage.setItem('solved_' + mode, parseInt(localStorage.getItem('solved_' + mode) || 0) + 1);
-            fb.innerText = "✓ Richtig!"; fb.className = "feedback correct";
-        } else {
-            fb.innerText = `✗ Falsch. Lösung:\n${currentTask.s1} ${currentTask.s2 !== "- kein zweites Konto -" ? "+ " + currentTask.s2 : ""} an ${currentTask.h1} ${currentTask.h2 !== "- kein zweites Konto -" ? "+ " + currentTask.h2 : ""}`;
-            fb.className = "feedback wrong";
+    function render() {
+        const task = pools[currentLvl][currentIdx % 60];
+        document.getElementById('task-desc').innerText = task.q;
+        document.querySelectorAll('select').forEach(s => { s.value = ""; s.className = ""; });
+        document.getElementById('checkBtn').style.display = "block";
+        document.getElementById('nextBtn').style.display = "none";
+        updateProgress();
+    }
+
+    function check() {
+        const task = pools[currentLvl][currentIdx % 60];
+        const fields = ['k1', 'k2', 'k1_ap', 'k2_ap', 'k1_mm', 'k2_mm', 'k1_sh', 'k2_sh'];
+        let correct = true;
+
+        fields.forEach(f => {
+            const el = document.getElementById(f);
+            if(el.value === task[f]) el.className = "correct";
+            else { el.className = "incorrect"; correct = false; }
+        });
+
+        if(correct) {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            if(currentLvl === 1) stats.solvedL1++;
+            if(currentLvl === 2) stats.solvedL2++;
+            document.getElementById('checkBtn').style.display = "none";
+            document.getElementById('nextBtn').style.display = "block";
+            checkLocks();
         }
-        fb.style.display = 'block'; document.getElementById('checkBtn').style.display = 'none'; document.getElementById('nextBtn').style.display = 'block';
     }
 
-    function showFinalResults() {
-        document.getElementById('game').style.display = 'none';
-        document.getElementById('results').style.display = 'block';
-        document.getElementById('currentScore').innerText = correctCount;
-        if (correctCount === 10) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    function checkLocks() {
+        if(stats.solvedL1 >= 30) document.getElementById('lvl2').disabled = false;
+        if(stats.solvedL2 >= 20) document.getElementById('lvl3').disabled = false;
     }
 
-    function backToMenu() { document.getElementById('results').style.display = 'none'; document.getElementById('menu').style.display = 'block'; checkLevelLocks(); }
-    function toggleCalc() { const c = document.getElementById("calc-container"); c.style.display = (c.style.display === "block") ? "none" : "block"; }
-    function calcNum(n) { const d = document.getElementById("calc-display"); d.value = (d.value === "0" ? n : d.value + n); }
-    function calcOp(op) { document.getElementById("calc-display").value += op; }
-    function calcClear() { document.getElementById("calc-display").value = "0"; }
-    function calcSolve() { try { document.getElementById("calc-display").value = eval(document.getElementById("calc-display").value); } catch { document.getElementById("calc-display").value = "Error"; } }
-    function resetAllProgress() { if(confirm("Fortschritt löschen?")) { localStorage.clear(); location.reload(); } }
+    function next() { currentIdx++; render(); }
 
-    const calc = document.getElementById("calc-container");
-    let isDragging = false, offset = [0,0];
-    calc.addEventListener('mousedown', (e) => { if(e.target.tagName !== 'BUTTON') { isDragging = true; offset = [calc.offsetLeft - e.clientX, calc.offsetTop - e.clientY]; }});
-    document.addEventListener('mousemove', (e) => { if(isDragging) { calc.style.left = (e.clientX + offset[0]) + "px"; calc.style.top = (e.clientY + offset[1]) + "px"; }});
-    document.addEventListener('mouseup', () => isDragging = false);
+    function updateProgress() {
+        const target = currentLvl === 1 ? 30 : 20;
+        const current = currentLvl === 1 ? stats.solvedL1 : stats.solvedL2;
+        const p = Math.min((current / target) * 100, 100);
+        document.getElementById('progress').style.width = p + "%";
+        document.getElementById('status').innerText = currentLvl < 3 ? `Fortschritt: ${current}/${target} für Level-Up` : "Profi-Modus aktiv";
+    }
+
+    window.onload = init;
 </script>
 </body>
 </html>
